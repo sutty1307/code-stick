@@ -8,6 +8,12 @@
 - Published the source, tests, offline preview and deployment templates under
   `depositdesk/` on the separate `depositdesk-launch` branch in
   `sutty1307/code-stick`. The default branch is not changed.
+- Implemented the Google Cloud installer and Cloud Shell tutorial. It creates
+  a dedicated project, persistent VM, IP-based HTTPS, certificate renewal and
+  private owner bootstrap after the user's Google sign-in.
+- Added local tests for cloud decisions, HTTPS verification order, archive
+  isolation, installation recovery and preservation of rotated owner credentials.
+  The updated suite passes all 100 tests (77 existing and 23 new).
 
 ## Not yet completed
 
@@ -27,10 +33,11 @@ configuration. Independently replicated serverless instances cannot safely
 share this local database. The connected Vercel account alone does not provide
 the durable database this backend requires.
 
-Google Cloud remains an intended hosting option. No Google Cloud project was
-created and no Google sign-in was performed. An automated Google Cloud installer
-was discussed but has not been implemented or verified. The supplied deployment
-templates are not proof of a deployed site.
+No Google Cloud project was created and no Google sign-in was performed here.
+The automated installer is now implemented with local tests. Cloud responses
+are simulated in those tests; actual billing, VM provisioning, dependency
+installation, HTTPS issuance and public hosting are still unverified.
+Open `deploy/CLOUD-SHELL.md` for the shortest sign-in and installation path.
 
 Follow `LIVE-SETUP.md` for the remaining provider activation steps. The earlier
 entries in `AUDIT.md` and `VALIDATION.md` are dated historical records.

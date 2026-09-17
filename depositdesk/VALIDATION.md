@@ -1,5 +1,35 @@
 # Validation record
 
+## September 17, 2026 — Google Cloud installer
+
+- Source was published to `sutty1307/code-stick`, branch `depositdesk-launch`,
+  folder `depositdesk/`. Earlier statements about an unperformed GitHub upload
+  are retained below as historical records.
+- All 100 Python tests pass: the existing 77 and 23 new deployment tests.
+  `verification/google-cloud-unittest.txt` records this run.
+- Cloud tests use a fake `gcloud` and fake HTTPS responses. They cover missing
+  sign-in/billing, project/account selection, restricted SSH, disk retention,
+  resumption, configuration drift, upload orchestration and public readiness
+  verification before success or password display. No Google login or cloud
+  resource creation was performed.
+- Owner bootstrap runs as a real Python subprocess against temporary SQLite
+  databases. Tests verify preservation after password rotation, interrupted
+  initialization and a missing database. Bundle checks exclude credentials
+  and records, verify reproducibility and reject changed hashes, traversal,
+  unexpected files and links before extraction.
+- Both JavaScript syntax checks pass. The renewal systemd units pass local
+  `systemd-analyze verify` syntax validation with their VM-only executable
+  substituted by `/usr/bin/true`; this does not verify Certbot execution.
+- Running the installer without `--deploy` prints its plan without `gcloud`
+  or cloud calls. Google Cloud Shell tutorial and installer are included.
+- Actual VM creation, IAP/OS Login access, billing, Debian package installation,
+  Gunicorn 26.2.2 installation, nginx startup, certificate issuance/renewal and
+  public HTTPS are **not runtime-verified here**. The installer checks these
+  at execution time and stops if a required command or readiness check fails.
+- No new browser verification, provider API acceptance, bank connection or
+  actual transfer was performed. This update completes deployment automation,
+  not a deployed site or activated banking service.
+
 ## September 13, 2026 — production adapter update
 
 - Recovered baseline: all 46 existing tests reproduced before changes.

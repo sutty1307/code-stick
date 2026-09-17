@@ -4,6 +4,16 @@ A single-owner payment register for outgoing deposits. Python 3.11+; the local a
 
 **A production adapter is now implemented, but has not been tested with an actual provider account or deployed.** The default simulator contacts no bank. The sandbox adapter remains sandbox-only. Production requires separate credentials, an HTTPS origin, a production webhook secret, a verified business source, and an explicit server-side live-release switch. See **[LIVE-SETUP.md](LIVE-SETUP.md)** for activation. This is payment workflow software, not a payroll calculation or tax filing service.
 
+## Install on Google Cloud
+
+[Open the Google Cloud installer](https://shell.cloud.google.com/?cloudshell_git_repo=https://github.com/sutty1307/code-stick&cloudshell_git_branch=depositdesk-launch&cloudshell_workspace=.&cloudshell_tutorial=depositdesk/deploy/CLOUD-SHELL.md).
+Complete your Google sign-in, then run the command in the tutorial. The installer
+creates the project ID, persistent VM, HTTPS endpoint and initial owner login.
+Google hosting charges apply. New installations use the simulator.
+
+The installer is implemented and locally tested. It has not yet been executed
+against a real Google Cloud account. See [deployment details](deploy/README.md).
+
 ## Run locally
 
 Extract the source archive and open its `DepositDesk` directory:
