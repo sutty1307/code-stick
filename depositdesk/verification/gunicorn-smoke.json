@@ -1,0 +1,20 @@
+{
+  "result": "passed",
+  "gunicorn_version": "26.2.0",
+  "workers": 2,
+  "threads_per_worker": 4,
+  "checks": [
+    "readiness",
+    "owner login",
+    "draft",
+    "release",
+    "processed",
+    "password rotation while serving",
+    "old session rejected",
+    "old password rejected",
+    "new password accepted",
+    "record retained"
+  ],
+  "deployment_requirement": "26.2.2",
+  "deployment_requirement_tested": false
+}

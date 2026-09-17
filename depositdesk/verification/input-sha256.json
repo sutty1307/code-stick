@@ -1,0 +1,42 @@
+[
+  {
+    "filename": "Dockerfile",
+    "sha256": "c277fca502a279343925bb02016e4ae62dd984f657b7239760a56064c3e96619"
+  },
+  {
+    "filename": "app.js",
+    "sha256": "535fe3e547603ffcf17ca55974a38d8f519de2ec91e68f629da451d904773636"
+  },
+  {
+    "filename": "app.py.diff",
+    "sha256": "24e94adb7fabc1a1285c412bcee2efbd450d32cec317e77fb5883db3012f77f3"
+  },
+  {
+    "filename": "backup.sh",
+    "sha256": "f75081698099bbf08cfa1ee9f65c66e0d36a2c84eff66ec9772ce8f696d22a84"
+  },
+  {
+    "filename": "depositdesk.service",
+    "sha256": "e3aaa71c9f5fff03f07fc6779bcf81cd1f8cf6a5e63e88c8e507306b318e9459"
+  },
+  {
+    "filename": "index.html",
+    "sha256": "9fc7a9e52493b62f308cc061f69a2175f6218c6e5ddd82f58891b8e374bf969a"
+  },
+  {
+    "filename": "nginx.conf",
+    "sha256": "bf2915b66c8784709874e229abdaef8d135e9fe9c38a62d6a0d98b4340d40317"
+  },
+  {
+    "filename": "providers.py",
+    "sha256": "e74c85591cfe4122dc67b7b0841e6ee852bc63f97c0f30b01422e38242dba8d5"
+  },
+  {
+    "filename": "requirements.txt",
+    "sha256": "684d57cfbcccc6ca3a482f2dc2f1e92c01032adcdf821f6f9290e7aa374b7fc3"
+  },
+  {
+    "filename": "wsgi.py",
+    "sha256": "be17a820d4b68b6708dc5c8674d69d73f9d61bd299d46cc5c4474eb19f360c9f"
+  }
+]

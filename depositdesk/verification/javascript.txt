@@ -1,0 +1,3 @@
+node --check static/app.js: passed
+node --check preview-adapter.js: passed
+No browser execution or visual verification is claimed.

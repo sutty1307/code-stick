@@ -1,0 +1,12 @@
+{
+  "result": "passed",
+  "html_ids": 39,
+  "javascript_static_id_references": 37,
+  "missing_id_references": [],
+  "duplicate_ids": false,
+  "inline_event_handlers": false,
+  "linked_app_assets_present": true,
+  "preview_external_scripts": 0,
+  "preview_external_stylesheets": 0,
+  "browser_runtime_test": "not_performed_policy_blocked"
+}

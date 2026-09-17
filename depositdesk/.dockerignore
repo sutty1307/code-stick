@@ -1,0 +1,13 @@
+.git
+.venv
+.env
+.env.*
+data
+**/owner.json
+**/*.sqlite3*
+**/__pycache__
+**/*.pyc
+tests
+*.zip
+/DepositDesk-Upgraded-Preview.html
+verification

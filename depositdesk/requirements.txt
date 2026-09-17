@@ -1,0 +1,3 @@
+# Only required for deployment; the application and tests use Python's standard library.
+# Official upstream patch release; see VALIDATION.md for the local package-index limitation.
+gunicorn==26.2.2

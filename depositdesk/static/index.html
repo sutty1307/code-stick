@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>DepositDesk · Payment register</title>
+<link rel="stylesheet" href="/styles.css">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+<a class="skip-link" href="#register-heading">Skip to payment register</a>
+<noscript><p class="banner">Enable JavaScript to use the payment register.</p></noscript>
+<div class="gate" id="gate" hidden>
+  <div class="gate-card">
+    <p class="eyebrow">Payment operations / Owner access</p>
+    <h1 class="gate-title">DepositDesk<span>.</span></h1>
+    <p class="gate-sub">Every payment, accounted for.</p>
+    <form id="gate-form">
+      <label class="field"><span class="field-label">Owner password</span>
+        <input type="password" id="gate-password" autocomplete="current-password" required maxlength="256">
+      </label>
+      <p class="alert" id="gate-error" role="alert" hidden></p>
+      <button type="submit" class="btn btn-primary btn-wide" id="gate-submit">Open the register <span aria-hidden="true">↗</span></button>
+    </form>
+    <p class="gate-foot">Owner access only. Review the payment environment after signing in.</p>
+  </div>
+</div>
+<div class="shell" id="shell" hidden>
+  <header class="masthead">
+    <span class="mark">DepositDesk<span>.</span></span>
+    <span class="masthead-business" id="business-name"></span>
+    <span class="masthead-spacer"></span>
+    <span class="env" id="env-badge"></span>
+    <button class="btn btn-quiet" id="sign-out">Sign out</button>
+  </header>
+  <div class="context-strip"><span class="context-dot" aria-hidden="true"></span><p id="mode-banner"></p></div>
+  <main class="workspace">
+    <section class="register" aria-labelledby="register-heading">
+      <div class="register-head">
+        <div><p class="eyebrow">Outgoing payments / USD</p><h1 id="register-heading" tabindex="-1">Payment register</h1><p class="register-source" id="source-label"></p></div>
+        <div class="register-actions"><button class="btn" id="check-connection">Check connection</button><button class="btn" id="open-recipient">Add recipient</button><button class="btn btn-primary" id="open-payment"><span aria-hidden="true">＋</span> New payment</button></div>
+      </div>
+      <div class="summary" aria-label="Totals for all recorded payments">
+        <div><span class="summary-label">Drafts to review</span><strong id="draft-total">$0.00</strong><span id="draft-count">0 payments</span></div>
+        <div><span class="summary-label">Pending</span><strong id="pending-total">$0.00</strong><span id="pending-count">0 payments</span></div>
+        <div class="summary-attention"><span class="summary-label">Needs attention</span><strong id="attention-count">0</strong><span>Unconfirmed, failed or returned</span></div>
+      </div>
+      <div class="register-tools">
+        <label class="search-field"><span class="sr-only">Search payments</span><span aria-hidden="true">⌕</span><input id="search-payments" type="search" placeholder="Search name, reference or memo" autocomplete="off"></label>
+        <label class="filter-field"><span class="sr-only">Payment status</span><select id="status-filter"><option value="all">All statuses</option><option value="attention">Needs attention</option><option value="draft">Draft</option><option value="pending">Pending</option><option value="processed">Processed</option><option value="returned">Returned</option><option value="failed">Failed</option><option value="cancelled">Cancelled</option></select></label>
+        <button class="btn btn-quiet" id="reload-state" aria-label="Refresh register">↻ Refresh</button>
+        <a class="btn btn-quiet" id="export-link" href="/api/export.csv">Export all ↗</a>
+      </div>
+      <div class="ledger-wrap">
+        <table class="ledger">
+          <caption class="sr-only">Recorded payments, newest first. Open a reference for details.</caption>
+          <thead><tr><th scope="col">Reference</th><th scope="col">Recipient</th><th scope="col" class="col-amount">Amount</th><th scope="col">Status</th><th scope="col" class="col-date">Recorded</th></tr></thead>
+          <tbody id="ledger-body"></tbody>
+        </table>
+        <div class="empty" id="ledger-empty" hidden><p id="empty-title">Your register starts here.</p><p class="empty-hint" id="empty-hint">Add a recipient, then save your first payment for review.</p></div>
+      </div>
+      <div class="register-foot"><span id="record-count" role="status">0 records</span><span id="last-updated"></span></div>
+      <p class="ledger-note">A recorded or processed payment is not independent proof of bank receipt.</p>
+    </section>
+    <aside class="detail" id="detail" aria-label="Payment details">
+      <div class="detail-top"><span class="eyebrow">Payment details</span><button class="btn btn-quiet" id="detail-close" aria-label="Close payment details" hidden>× Close</button></div>
+      <div class="detail-idle" id="detail-idle"><span class="detail-symbol" aria-hidden="true">↖</span><h2>The complete record.</h2><p>Open a payment to review its destination, authorization and history.</p><div class="idle-rule"></div><p class="small">Draft → Review → Release → Track</p></div>
+      <div id="detail-body" hidden></div>
+    </aside>
+  </main>
+  <footer class="page-foot"><span>DepositDesk / One business. One register.</span><span id="funds-mode">Amounts in USD</span></footer>
+</div>
+<dialog class="overlay" id="overlay" aria-labelledby="sheet-title" hidden>
+  <div class="sheet" id="sheet"><div class="sheet-head"><h2 id="sheet-title"></h2><button class="btn btn-quiet sheet-close" id="sheet-close" aria-label="Close dialog">× Close</button></div><div class="sheet-body" id="sheet-body"></div></div>
+</dialog>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+<script src="/app.js"></script>
+</body>
+</html>

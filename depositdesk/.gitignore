@@ -1,0 +1,13 @@
+data/
+.env
+.env.*
+!.env.example
+!.env.production.example
+__pycache__/
+*.py[cod]
+.venv/
+*.sqlite3*
+owner.json
+*.zip
+*.rej
+*.orig

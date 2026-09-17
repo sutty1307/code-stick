@@ -1,0 +1,42 @@
+[Unit]
+Description=DepositDesk payment register
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=exec
+User=depositdesk
+Group=depositdesk
+WorkingDirectory=/opt/depositdesk
+EnvironmentFile=/etc/depositdesk/depositdesk.env
+Environment=DEPOSITDESK_DATA_DIR=/var/lib/depositdesk
+ExecStart=/opt/depositdesk/.venv/bin/gunicorn --config gunicorn.conf.py wsgi:application
+Restart=on-failure
+RestartSec=5
+
+# The process needs to read its code and write one directory. Nothing else.
+StateDirectory=depositdesk
+StateDirectoryMode=0700
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+ProtectHostname=true
+ProtectClock=true
+RestrictNamespaces=true
+RestrictRealtime=true
+RestrictSUIDSGID=true
+LockPersonality=true
+MemoryDenyWriteExecute=true
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+# Loopback only in simulator mode; AF_INET is needed to reach Dwolla's sandbox.
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target
