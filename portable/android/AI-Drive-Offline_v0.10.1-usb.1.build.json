@@ -1,0 +1,38 @@
+{
+  "build_method": "Source Metro/Hermes bundle with verified matching publisher native shell",
+  "application_id": "com.codestick.aidrive",
+  "version": "0.10.1-usb.1",
+  "apk_sha256": "937b9d098130525d72dbbbf428868c4a66794927a801fe55d6a8899278cb28e2",
+  "publisher_native_apk_sha256": "ec051d90bc9f82587a726b525976494bacef50bc8a7dd0e3789b859373121753",
+  "source_package_lock_sha256": "c288c0e0ee6ed50c945c80d9346bd8fcd00a29a8bff98c8e67d6392c8273807d",
+  "source_bundle_sha256": "49e63ee043dc3ebc25accad0a208261b91e77bb3e3218285a019c17522089aa5",
+  "react_native": "0.86.3",
+  "expo_sdk": "57.0.0",
+  "hermes_bytecode": 98,
+  "preserved_dex_and_native_files": 55,
+  "native_files_byte_identical": true,
+  "zip_crc_verified": true,
+  "zip_alignment_verified": true,
+  "architecture": [
+    "arm64-v8a"
+  ],
+  "minimum_android_sdk": 24,
+  "internet_permission": false,
+  "network_state_permission": false,
+  "allow_backup": false,
+  "cleartext_traffic": false,
+  "debuggable": false,
+  "ota_updates": false,
+  "private_signing_key_included": false,
+  "actual_android_phone_tested": false,
+  "signature_schemes_verified": [
+    "v2",
+    "v3"
+  ],
+  "signer_certificate_sha256": "9a286ca73cc5ef45bc6a474773209317433639aa9fdc068e65a63dea10d3b551",
+  "delivery_status": "final source build; actual Android phone test outstanding",
+  "final_fix_source_sha256": {
+    "lib/driveDatabase.ts": "134657f7ff309d7dd5143ec7274f7ce9c2b2a8d06e44b9fe515867b9c8cbf810",
+    "lib/driveMemory/android.ts": "6810aa048c973f2a4d9a65fd7c910ff8d4845604043a3da475e75586c92dd478"
+  }
+}

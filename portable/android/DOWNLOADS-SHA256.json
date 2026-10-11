@@ -1,0 +1,61 @@
+{
+  "format_version": 1,
+  "files": [
+    {
+      "name": "AI-Drive-Offline-AGPL-3.0.txt",
+      "size_bytes": 34523,
+      "sha256": "8486a10c4393cee1c25392769ddd3b2d6c242d6ec7928e1414efff7dfb2f07ef"
+    },
+    {
+      "name": "AI-Drive-Offline-v0.10.1-usb.1-source.zip",
+      "size_bytes": 3804450,
+      "sha256": "deb79e4e100f115c92ec0cf739ab871c92a66d0ffbf15569eada4f6ee194ec72"
+    },
+    {
+      "name": "AI-Drive-Offline-v0.10.1-usb.1-source.zip.sha256",
+      "size_bytes": 108,
+      "sha256": "7c09671180d226f09337567f2751c64b6d4be3bd6dcf5be75e656e8421b7bb6e"
+    },
+    {
+      "name": "AI-Drive-Offline_v0.10.1-usb.1.apk",
+      "size_bytes": 67661929,
+      "sha256": "937b9d098130525d72dbbbf428868c4a66794927a801fe55d6a8899278cb28e2"
+    },
+    {
+      "name": "AI-Drive-Offline_v0.10.1-usb.1.build.json",
+      "size_bytes": 1562,
+      "sha256": "ae5a32d9944afae129b6f37bb5e242f85f5d0a0f6018594274520a7da4460455"
+    },
+    {
+      "name": "Android-AI-Drive-Picture-Guide.pdf",
+      "size_bytes": 1980810,
+      "sha256": "ce41bf3da2e4143491b52d0e8bec4e57afbcb55134601a77153f80dcc7d06ba0"
+    },
+    {
+      "name": "Llama-3.2-Community-License.txt",
+      "size_bytes": 7669,
+      "sha256": "8cc15535a8a34b41888f644b339a1a9eb428af793a4f5e24df58a3e5b1487d74"
+    },
+    {
+      "name": "Llama-3.2-NOTICE.txt",
+      "size_bytes": 116,
+      "sha256": "3bc2d1a6b360a03d172058198631b931c9aadf01650892fb0d25b93c6b8f0025"
+    },
+    {
+      "name": "README.md",
+      "size_bytes": 3769,
+      "sha256": "7dad9fe226ac0d63a074a83eab61d1b67ef4826350394d5b9ab96c103db0694e"
+    },
+    {
+      "name": "USB-MEMORY-AND-TOOLS.md",
+      "size_bytes": 4531,
+      "sha256": "efcfdeeba9b12a450bc7bdf89a229f9711d554abd208b3402cf7f3b48f8e004e"
+    }
+  ],
+  "model": {
+    "filename": "Llama-3.2-3B-Instruct-abliterated.Q4_K_M.gguf",
+    "size_bytes": 2019377472,
+    "sha256": "e1f2b428e316d8bd1cb5ca13e9649329e299d951fbcee6b3cd0e9f1d646c9fa7",
+    "url": "https://huggingface.co/QuantFactory/Llama-3.2-3B-Instruct-abliterated-GGUF/resolve/120d74373f679f9d9e0463b435dfd3fb802d9eb0/Llama-3.2-3B-Instruct-abliterated.Q4_K_M.gguf?download=true"
+  }
+}
