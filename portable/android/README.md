@@ -10,19 +10,40 @@ the app; plugging in a USB drive does not automatically launch it.
 - [Android installer — 67.7 MB](https://github.com/sutty1307/code-stick/raw/refs/heads/portable/android-usb-download/portable/android/AI-Drive-Offline_v0.10.1-usb.1.apk)
 - [Llama 3.2 3B Instruct Abliterated model — 2.02 GB](https://huggingface.co/QuantFactory/Llama-3.2-3B-Instruct-abliterated-GGUF/resolve/120d74373f679f9d9e0463b435dfd3fb802d9eb0/Llama-3.2-3B-Instruct-abliterated.Q4_K_M.gguf?download=true)
 - [Four-page picture guide](Android-AI-Drive-Picture-Guide.pdf)
-- [Corresponding modified application source](AI-Drive-Offline-v0.10.1-usb.1-source.zip)
-- [Application license](AI-Drive-Offline-AGPL-3.0.txt)
-- [Llama license](Llama-3.2-Community-License.txt) and [required attribution](Llama-3.2-NOTICE.txt)
-- [File checksums](DOWNLOADS-SHA256.json)
-- [Detailed USB memory and tools documentation](USB-MEMORY-AND-TOOLS.md)
-- [Installer build provenance](AI-Drive-Offline_v0.10.1-usb.1.build.json)
 
-The installer does not contain the 2 GB model. Download both files and place the
-GGUF model on your USB/SD drive. The illustrated guide begins after you connect
-the drive: install/open AI Drive Offline, choose a removable memory folder,
-select the GGUF model, and start a local conversation. Start with a 2,048-token
-context. If the drive is unavailable or a save fails, follow the visible error
-and reconnect it before disconnecting the session.
+
+## Set up from these downloads
+
+Use the Android phone for these steps. If you are reading on an iPhone, open
+these instructions on the Android phone you will use with the drive.
+
+1. On Android, tap **Android installer** above and wait for the download.
+   Open **Files > Downloads** and tap `AI-Drive-Offline_v0.10.1-usb.1.apk`.
+2. If Android blocks installation, tap **Settings**, enable **Allow from this
+   source** for the app opening the file, then go Back. Tap **Install > Open**.
+   The permission may be for Files or Chrome, depending on how you opened it.
+3. Connect the USB drive or SD-card reader to Android. In Files, open that
+   removable drive and create one folder named **AI-Drive**.
+4. Tap the **Llama model** download above. When it finishes, find the `.gguf`
+   file in **Files > Downloads** and copy it into **USB drive > AI-Drive**.
+   Wait for the copy to finish. The model is about 2 GB; it is a separate download
+   from the installer.
+5. Open **AI Drive Offline > menu > Drive Memory > Choose USB memory folder**.
+   Select **USB drive > AI-Drive**, then tap **Use this folder > Allow**.
+   Wait for **Drive connected** and **Verified save #**.
+6. Open **menu > Models**. Tap the document-plus icon, then **Use External
+   Model**. Select the `.gguf` inside **USB drive > AI-Drive**.
+7. In Models, tap the bottom **Settings** tab, set **Max Context** to **2048**,
+   then return to the **Models** tab. Tap the circular play button beside the
+   model and wait for **Model Loaded**. Go Back to the home list, open **AI Bot**,
+   and send a message. Keep the drive connected.
+
+The picture guide starts after drive insertion and shows an `Android-Drive-Kit`
+folder with separate `apps` and `models` folders on prepared sticks. The separate
+downloads do not create those folders. For this setup, use the single
+**AI-Drive** folder above; the pictured folder hierarchy is optional.
+If the drive is unavailable or a save fails, resolve the visible error before
+disconnecting the session.
 
 ## What is remembered
 
@@ -38,6 +59,13 @@ automatic phone or cloud fallback. The complete stored history is distinct
 from the limited context that can fit into a model prompt.
 
 ## Validation and source
+
+- [Corresponding modified application source](AI-Drive-Offline-v0.10.1-usb.1-source.zip)
+- [Application license](AI-Drive-Offline-AGPL-3.0.txt)
+- [Llama license](Llama-3.2-Community-License.txt) and [required attribution](Llama-3.2-NOTICE.txt)
+- [File checksums](DOWNLOADS-SHA256.json)
+- [Detailed USB memory and tools documentation](USB-MEMORY-AND-TOOLS.md)
+- [Installer build provenance](AI-Drive-Offline_v0.10.1-usb.1.build.json)
 
 149 software tests and the TypeScript check passed. The installer signature,
 alignment, and absence of Internet permission were checked. The full model was
