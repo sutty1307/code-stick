@@ -43,13 +43,38 @@
     },
     {
       "name": "README.md",
-      "size_bytes": 5332,
-      "sha256": "a564a1907e807bc4f4ca59df56fad17f177c20954ef50108b9c6d64ad4e5a77b"
+      "size_bytes": 6383,
+      "sha256": "845d09de33b99adce37d8d95b5bdca1ee8c897aee53b47a8bbc420d9f92685b4"
     },
     {
       "name": "USB-MEMORY-AND-TOOLS.md",
       "size_bytes": 4531,
       "sha256": "efcfdeeba9b12a450bc7bdf89a229f9711d554abd208b3402cf7f3b48f8e004e"
+    },
+    {
+      "name": "pictures/Install-from-Downloads.png",
+      "size_bytes": 1377951,
+      "sha256": "7cba30d7e2ffaf11beb9502fff91263db404d4fd4b3b29c2081def92f3682d1e"
+    },
+    {
+      "name": "pictures/Page-1.png",
+      "size_bytes": 284634,
+      "sha256": "36dd8e4ece3daa5f0c08915defb690fabb84c40bf6ee674846e100d9d2099049"
+    },
+    {
+      "name": "pictures/Page-2.png",
+      "size_bytes": 240929,
+      "sha256": "6ea82e55aa71c8154d487a97fbc2cad9958358470a1825e467bf85fa49d2644b"
+    },
+    {
+      "name": "pictures/Page-3.png",
+      "size_bytes": 245570,
+      "sha256": "a09721942c77240a160bbf817eb18d92adb2a70ffedee2d714ae9e732b39bc7a"
+    },
+    {
+      "name": "pictures/Page-4.png",
+      "size_bytes": 265233,
+      "sha256": "381a56642003f852ca1059e14b1b09b367b789b1a28128358aabd2eaaac026a1"
     }
   ],
   "model": {
@@ -57,5 +82,14 @@
     "size_bytes": 2019377472,
     "sha256": "e1f2b428e316d8bd1cb5ca13e9649329e299d951fbcee6b3cd0e9f1d646c9fa7",
     "url": "https://huggingface.co/QuantFactory/Llama-3.2-3B-Instruct-abliterated-GGUF/resolve/120d74373f679f9d9e0463b435dfd3fb802d9eb0/Llama-3.2-3B-Instruct-abliterated.Q4_K_M.gguf?download=true"
+  },
+  "pictures": {
+    "install_from_downloads": "pictures/Install-from-Downloads.png",
+    "prepared_usb_guide": [
+      "pictures/Page-1.png",
+      "pictures/Page-2.png",
+      "pictures/Page-3.png",
+      "pictures/Page-4.png"
+    ]
   }
 }

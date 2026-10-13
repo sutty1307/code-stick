@@ -17,6 +17,10 @@ the app; plugging in a USB drive does not automatically launch it.
 Use the Android phone for these steps. If you are reading on an iPhone, open
 these instructions on the Android phone you will use with the drive.
 
+### Installation picture for separately downloaded app
+
+![Install the downloaded Android app](pictures/Install-from-Downloads.png)
+
 1. On Android, tap **Android installer** above and wait for the download.
    Open **Files > Downloads** and tap `AI-Drive-Offline_v0.10.1-usb.1.apk`.
 2. If Android blocks installation, tap **Settings**, enable **Allow from this
@@ -44,6 +48,29 @@ downloads do not create those folders. For this setup, use the single
 **AI-Drive** folder above; the pictured folder hierarchy is optional.
 If the drive is unavailable or a save fails, resolve the visible error before
 disconnecting the session.
+
+## Picture guide for a prepared Android-Drive-Kit stick
+
+These pictures assume an `Android-Drive-Kit` folder on the USB drive, with the
+installer in `apps` and the model in the separate `models` folder. For separately
+downloaded files, follow the **Downloads** and **AI-Drive** instructions above.
+The screens are illustrations; wording may vary on your phone.
+
+### 1. Install the app and connect USB memory
+
+![Picture guide page 1: install the app and choose the USB memory folder](pictures/Page-1.png)
+
+### 2. Select the model and start chatting
+
+![Picture guide page 2: select the model, load it and send a message](pictures/Page-2.png)
+
+### 3. Use memory and offline tools
+
+![Picture guide page 3: review memories, continue chats and use offline tools](pictures/Page-3.png)
+
+### 4. Save, disconnect and return
+
+![Picture guide page 4: safely disconnect, return to the same drive and get help](pictures/Page-4.png)
 
 ## What is remembered
 
