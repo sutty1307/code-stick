@@ -22,6 +22,32 @@ AVD = 'ai_drive_runtime_api30'
 SERIAL = 'emulator-5554'
 
 
+def report_annotation(kind, message):
+    """Emit a bounded native CI diagnostic directly from this execution."""
+    # A single bounded annotation is a failure summary, not an artifact/file relay.
+    # Escape workflow-command data so exception text cannot create new commands.
+    message = message[:2000]
+    message = message.replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
+    print(f'::{kind}::{message}', flush=True)
+
+
+def report_error(label, error):
+    """Report a newly raised test error through the runner's ordinary diagnostics."""
+    report_annotation('error', f'{label}: {type(error).__name__}: {error}')
+
+
+def report_pass(label, details=None):
+    # Publish only the explicit outcome fields from this operation, never files
+    # or the full evidence/results object.
+    allowed = {'version_code', 'install_kind', 'uid', 'process_stable_seconds',
+               'foreground_activity_verified', 'actual_ui_controls_verified',
+               'real_ui_result_verified', 'expected_visible_result',
+               'baseline_uid', 'candidate_uid'}
+    summary = {key: value for key, value in (details or {}).items() if key in allowed}
+    suffix = ' ' + json.dumps(summary, sort_keys=True) if summary else ''
+    report_annotation('notice', f'{label}: PASS{suffix}')
+
+
 def digest(path):
     value = hashlib.sha256()
     with Path(path).open('rb') as stream:
@@ -143,9 +169,11 @@ class Smoke:
             self.shell('logcat', '-c', check=False)
             details = operation() or {}
             self.results['phases'][label] = {'passed': True, 'elapsed_seconds': round(time.monotonic() - started, 2), **details}
+            report_pass(label, details)
             return True
         except Exception as error:
             self.results['phases'][label] = {'passed': False, 'elapsed_seconds': round(time.monotonic() - started, 2), 'error': str(error)}
+            report_error(label, error)
             return False
         finally:
             self.capture(label)
@@ -237,25 +265,33 @@ def run(args):
         Path(env['ANDROID_AVD_HOME']).mkdir()
         Path(env['ANDROID_USER_HOME']).mkdir()
         smoke, emulator, logcat, handles = Smoke(args.sdk, evidence, env), None, None, []
+        setup_stage = 'KVM prerequisites'
         try:
             if platform.machine() != 'x86_64' or not os.access('/dev/kvm', os.R_OK | os.W_OK):
                 raise RuntimeError('This test requires an x86_64 hosted VM with usable /dev/kvm; no TCG fallback')
+            setup_stage = 'APK SHA-256 verification'
             for name, file, expected in [('baseline', args.baseline, BASELINE_SHA256), ('candidate', args.candidate, CANDIDATE_SHA256)]:
                 if file.is_symlink() or digest(file) != expected:
                     raise RuntimeError(f'{name} APK SHA-256 does not match the exact reviewed binary')
             smoke.results['apk_sha256'] = {'baseline': BASELINE_SHA256, 'candidate': CANDIDATE_SHA256}
+            setup_stage = 'SDK installation'
             sdkmanager = args.sdk / 'cmdline-tools/latest/bin/sdkmanager'
             installed = smoke.command([sdkmanager, 'platform-tools', 'emulator', IMAGE], timeout=900, check=False, input_text='y\n' * 100)
             smoke.write('sdk-install.txt', installed.stdout + installed.stderr)
             if installed.returncode:
-                raise RuntimeError('SDK installation failed; see sdk-install.txt')
+                raise RuntimeError(f'sdkmanager exited {installed.returncode}; stderr: {installed.stderr[-1200:]}; stdout: {installed.stdout[-400:]}')
+            setup_stage = 'installed SDK image properties'
             smoke.write('system-image-source.properties', (args.sdk / 'system-images/android-30/google_apis/x86_64/source.properties').read_text())
+            setup_stage = 'emulator version'
             smoke.write('emulator-version.txt', smoke.command([args.sdk / 'emulator/emulator', '-version']).stdout)
+            setup_stage = 'emulator KVM acceleration check'
             acceleration = smoke.command([args.sdk / 'emulator/emulator', '-accel-check'])
             smoke.write('acceleration.txt', acceleration.stdout + acceleration.stderr)
+            setup_stage = 'AVD creation'
             created = smoke.command([args.sdk / 'cmdline-tools/latest/bin/avdmanager', 'create', 'avd', '--name', AVD,
                                      '--package', IMAGE, '--device', 'pixel_2', '--force'], timeout=90, input_text='no\n')
             smoke.write('avd-create.txt', created.stdout + created.stderr)
+            setup_stage = 'emulator process startup'
             emu_log = (evidence / 'emulator.log').open('w')
             handles.append(emu_log)
             emulator = subprocess.Popen([str(args.sdk / 'emulator/emulator'), '-avd', AVD, '-no-window', '-no-metrics', '-no-audio',
@@ -263,19 +299,24 @@ def run(args):
                                          '-camera-back', 'none', '-camera-front', 'none', '-feature', '-Vulkan',
                                          '-feature', '-HostComposition', '-feature', '-PlayStoreImage', '-port', '5554'],
                                         env=env, stdout=emu_log, stderr=subprocess.STDOUT)
+            setup_stage = 'ADB server startup'
             smoke.command([smoke.adb_path, 'start-server'])
+            setup_stage = 'stable unlocked Android boot'
             smoke.wait_boot()
             smoke.adb('wait-for-device', timeout=30)
+            setup_stage = 'guest logcat capture'
             adb_log = (evidence / 'logcat.txt').open('w')
             handles.append(adb_log)
             logcat = subprocess.Popen([str(smoke.adb_path), '-s', SERIAL, 'logcat', '-T', '1', '-v', 'threadtime', '-b', 'main', '-b', 'system', '-b', 'crash'],
                                       env=env, stdout=adb_log, stderr=subprocess.STDOUT)
+            setup_stage = 'guest ARM64 translation verification'
             smoke.shell('input', 'keyevent', '82')
             props = {key: smoke.shell('getprop', key) for key in ['ro.product.cpu.abilist', 'ro.dalvik.vm.native.bridge', 'ro.dalvik.vm.isa.arm64', 'ro.build.version.sdk']}
             smoke.write('guest-runtime-properties.json', json.dumps(props, indent=2))
             if ('arm64-v8a' not in props['ro.product.cpu.abilist'] or props['ro.dalvik.vm.native.bridge'] != 'libndk_translation.so'
                     or props['ro.dalvik.vm.isa.arm64'] != 'x86_64' or props['ro.build.version.sdk'] != '30'):
                 raise RuntimeError('The Google API image does not advertise the required ARM64 native translation')
+            setup_stage = 'app runtime phases'
             baseline = smoke.phase('baseline-install', lambda: smoke.install(args.baseline, 1))
             if baseline:
                 smoke.phase('baseline-startup', lambda: smoke.launch('baseline'))
@@ -289,6 +330,10 @@ def run(args):
                     smoke.results['phases']['upgrade-identity'] = {'passed': smoke.results['upgrade_same_uid'],
                         'baseline_uid': smoke.results['phases']['baseline-install']['uid'],
                         'candidate_uid': smoke.results['phases']['candidate-upgrade']['uid']}
+                    if smoke.results['upgrade_same_uid']:
+                        report_pass('upgrade-identity', smoke.results['phases']['upgrade-identity'])
+                    else:
+                        report_error('upgrade-identity', RuntimeError('Android UID changed during the in-place upgrade'))
                 launched = smoke.phase('candidate-startup', lambda: smoke.launch('candidate'))
                 if launched:
                     smoke.phase('candidate-calculator', smoke.calculator)
@@ -297,7 +342,9 @@ def run(args):
             smoke.save()
             return 0 if smoke.results['passed'] else 1
         except Exception as error:
-            smoke.results.update({'passed': False, 'infrastructure_or_setup_error': str(error)})
+            smoke.results.update({'passed': False, 'setup_failure_stage': setup_stage,
+                                  'infrastructure_or_setup_error': str(error)})
+            report_error(f'Android runtime setup [{setup_stage}]', error)
             smoke.capture('failure')
             smoke.save()
             return 1
