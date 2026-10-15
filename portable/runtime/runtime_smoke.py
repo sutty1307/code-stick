@@ -191,9 +191,12 @@ class Smoke:
         info = self.shell('dumpsys', 'package', PACKAGE)
         if not re.search(rf'\bversionCode={version_code}\b', info):
             raise RuntimeError('Installed package versionCode does not match the tested APK')
-        uid = re.search(r'\buserId=(\d+)', info)
+        uid_report = self.shell('cmd', 'package', 'list', 'packages', '-U', '--user', '0', PACKAGE)
+        self.write(f'package-uid-v{version_code}.txt', uid_report)
+        uid = re.search(rf'^package:{re.escape(PACKAGE)}\s+uid:\s*(\d+)\s*$',
+                        uid_report, re.MULTILINE)
         if not uid or int(uid[1]) <= 0:
-            raise RuntimeError('Installed application UID was missing or invalid')
+            raise RuntimeError(f'Installed application UID was missing or invalid: {uid_report}')
         return {'version_code': version_code, 'install_kind': 'upgrade' if replace else 'fresh',
                 'uid': uid[1]}
 
