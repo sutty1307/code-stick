@@ -1,0 +1,120 @@
+AI DRIVE OFFLINE — AFTER YOU PLUG IN
+
+Open PICTURE-GUIDE.pdf for the current one-page illustrated guide.
+START-HERE.html shows that same guide offline.
+The standalone picture is customer-guide/After-You-Plug-It-In-usb2.png.
+The older four-page guide is customer-guide/Earlier-Illustrations-usb1.pdf.
+
+FIRST USE — DRIVE ALREADY CONNECTED TO YOUR ANDROID PHONE
+1. Unlock the phone. Open Files > USB drive > Android-Drive-Kit > apps.
+   Tap AI-Drive-Offline_v0.10.1-usb.2.apk.
+   Already installed? Open AI Drive Offline and continue at step 3.
+2. If prompted, tap Settings and enable Allow from this source for the file
+   manager opening the APK. Go Back, then Install > Open.
+3. Open AI Drive Offline. If Drive Memory is already open, continue below.
+   Otherwise, open the top-left menu > Drive Memory.
+4. Tap Choose USB memory folder. In the picker, open your USB drive and
+   select Android-Drive-Kit itself. Tap Use this folder > Allow.
+   Wait for Drive connected and Verified save #.
+   Phone internal storage and cloud providers are rejected.
+5. Tap Choose a model in Drive Memory. In the model manager, tap the
+   document-plus icon > Use External Model.
+   Choose USB > Android-Drive-Kit > models >
+   Llama-3.2-3B-Instruct-abliterated.Q4_K_M.gguf
+6. Tap the bottom Settings tab. Edit Max Context to 2048, dismiss the
+   keyboard, then tap the Models tab. No Save button is needed.
+7. Tap the circular play button beside the model. Wait until Model Loaded
+   shows the model's name. Leave the drive connected.
+8. Go Back to Drive Memory, tap Chats, then AI Bot. Type in Message...
+   and tap the paper-plane send button. Example: Give me 3 lunch ideas.
+
+FINDING THE MODEL SCREEN
+- Tap Choose a model in Drive Memory after connecting the drive, or
+  tap Choose a model above the message box in a chat.
+- Drive Memory has no menu button. For the menu route, tap Chats, then
+  the top-left menu > Models. Both routes open the model manager.
+- The current one-page picture guide shows the Choose a model shortcut.
+  Earlier-Illustrations-usb1.pdf preserves the previous four-page guide;
+  use this text and the current one-page guide for this version.
+
+KEEP THE DRIVE CONNECTED WHILE USING THE APP.
+No account or subscription is needed for this local model.
+This app has no internet permission: it cannot make network requests
+even when your phone is online.
+
+YOUR PERSISTENT USB MEMORY
+- Full chat history, preferences, facts and notes save automatically to
+  the selected USB folder. Drive Memory shows Verified save # when a
+  save has been checked. Wait while Saving / checking drive... appears.
+- Clear user statements such as "I prefer brief answers", "My name is
+  Steve", or "Remember that my appointment is Monday" become saved
+  memories. Assistant replies are not mined for facts about you.
+- Open Drive Memory > Memories to review, add or edit entries.
+  Choose Preference, Fact or Note, fill Memory text, then Save to drive.
+  For an existing entry: Edit > change text > Save changes to drive.
+- Delete forgets that memory entry. Its original message remains in
+  saved conversation history. Rescanning the old chat does not recreate
+  the forgotten entry; a new statement can be remembered again.
+- Open Drive Memory > Saved conversations > choose a conversation >
+  Continue this conversation to resume it.
+- USB memory files are readable plaintext, not encrypted. Protect your
+  drive from people you do not want to read it.
+
+OFFLINE TOOLKIT
+In Drive Memory, tap Offline Toolkit. Tap the calculator example, then
+Run tool. The result should read (12 + 8) * 3 = 60. This tool does not
+need the Llama model to be loaded. Go Back to Drive Memory afterward.
+For menu navigation, tap Chats > menu > Offline Toolkit.
+You can also type these commands in a chat:
+
+  /calc (12 + 8) * 3                 Calculates 60
+  /remember I prefer brief answers  Saves a memory
+  /memories                         Lists saved facts/preferences and IDs
+  /forget ID                        Deletes the memory with that ID
+  /note Shopping | Milk, bread       Saves a named note
+  /notes                            Lists note titles and IDs
+  /read-note ID                     Reads the note with that ID
+  /edit-note ID | New text          Replaces that note's text
+  /delete-note ID                   Deletes that note
+  /help                             Shows tool commands
+
+Replace ID with the actual ID returned by /memories or /notes.
+Only commands you submit run tools; model replies cannot run them.
+
+WHEN FINISHED
+1. Open menu > Drive Memory > Save and disconnect.
+2. Confirm Save and disconnect. Let saving finish.
+3. If a model remains loaded, tap Chats > menu > Models and tap its red X.
+4. Use Eject if the phone offers it, then remove the drive.
+
+Personal data clears from the app session; saved files remain on the USB.
+If saving fails, keep the drive connected and resolve the error before
+disconnecting. The app does not quietly save personal data to the phone.
+
+NEXT TIME / ANOTHER ANDROID PHONE
+Open AI Drive Offline > Drive Memory, or Chats > menu > Drive Memory.
+Tap Choose USB memory folder or Reconnect / choose folder. Select the same USB > Android-Drive-Kit
+folder and Allow. Tap Choose a model, load it, then continue your saved chat.
+Folder permission must be granted again on a different phone.
+
+QUICK HELP
+- Drive unavailable: reconnect it, then Drive Memory > Reconnect / choose
+  folder. Select the same USB folder and Allow.
+- No reply: connect memory and confirm Models shows Model Loaded with
+  the model's name. Load the model before opening your chat.
+- Load fails or the app closes: close other apps. Use Max Context 2048;
+  try 1024 if needed. Reselect the .gguf with Use External Model.
+- An interrupted snapshot may restore an earlier verified save. Check
+  recent messages and memories; keep the USB files for recovery.
+- Each snapshot allows about 32 million characters. A full save fails
+  visibly; it never silently cuts history. Resolve a save error before
+  disconnecting. Memory entries allow up to 2,000 characters each.
+
+Built with Llama. Guide for AI Drive Offline 0.10.1-usb.2.
+Screens are illustrations; Android wording may vary.
+Fresh install, update, startup, calculator, saved fact/note recovery and
+the model-screen shortcut passed in an API 35 Android emulator. Saved facts
+and notes used a simulated removable drive, not a physical USB device.
+Actual Android phone and physical USB-drive compatibility remain untested.
+The included model has not yet generated a response inside this Android app.
+Licenses and technical validation notes are included elsewhere in this kit.

@@ -1,0 +1,113 @@
+CURRENT INSTALLER: AI Drive Offline 0.10.1-usb.2.
+The following original ChatterUI acquisition notes are retained for provenance.
+Follow START-HERE and USB-MEMORY-AND-TOOLS.md for the modified app.
+
+ANDROID / PIXEL USB AI KIT
+
+WHAT IS READY
+This kit contains the official ChatterUI Android app installer, the complete
+Llama 3.2 3B Instruct Abliterated Q4_K_M model, licenses and source references,
+your code-stick source snapshot, and these instructions.
+The APK SHA-256 matches the digest published by the developer on GitHub.
+
+MODEL INCLUDED: BUILT WITH LLAMA
+The complete GGUF is already in models/. No separate model download is needed.
+File: Llama-3.2-3B-Instruct-abliterated.Q4_K_M.gguf
+Size: 2,019,377,472 bytes (~2.02 GB / 1.88 GiB)
+Its full-file SHA-256 matches the publisher's digest. The Android app APK also
+matches the digest published by its developer on GitHub.
+Source links and checksums: models/MODEL-DOWNLOAD.txt
+
+QUICK START
+1. Extract the complete ZIP and copy the Android-Drive-Kit folder to the drive.
+2. On the phone, install apps/ChatterUI_v0.10.1.apk once.
+3. In ChatterUI, enable Local Mode > Models > Use External Model.
+4. Select the included GGUF file from the drive's models folder.
+5. Load the model and try a chat with the drive connected.
+
+This kit does not auto-launch when a drive is inserted. Open the installed
+app and select/load its model. No custom operating system is needed for this
+Android workflow. Use airplane mode to verify local inference after setup.
+
+YOUR DRIVE AND PHONE
+Use a USB-C USB drive or a USB-C OTG adapter with a USB drive/card reader.
+Pixel phones do not have a microSD slot; connect an SD card through a reader.
+Leave existing files in place. This kit does not format, erase, flash, root,
+or unlock anything. Copy this entire Android-Drive-Kit folder onto the drive.
+Make sure Android's Files app can open files on it before proceeding.
+Allow about 2.2 GB free for the extracted kit, or 4.2 GB if keeping the ZIP
+and extracted folder together. An 8 GB or larger drive gives useful space.
+
+GrapheneOS is an Android operating system. It can be a privacy-focused Pixel
+choice, but does not turn desktop code-stick binaries into Android apps.
+Code-stick supports Windows/macOS/desktop Linux, not native Android.
+This kit uses ChatterUI for Android instead; it is not code-stick ported to
+Android. OpenClaw is not installed or integrated by this kit.
+No custom OS is required just to run an Android local AI app. If considering
+GrapheneOS, first check the exact Pixel model against its official supported
+devices and installation instructions: https://grapheneos.org/install/web
+
+INSTALL THE APP
+1. Open apps/ChatterUI_v0.10.1.apk on the Android phone and use the phone's
+   normal APK installation flow. Install it on the phone, not on the drive.
+2. Official release/source, for checking the download or getting updates:
+   https://github.com/Vali-98/ChatterUI/releases/tag/v0.10.0
+   The publisher places the 0.10.1 APK under the v0.10.0 release tag.
+3. This app does not require your Llama subscription for local GGUF inference.
+   Keep subscription passwords and account tokens out of this kit.
+
+LOAD THE INCLUDED MODEL
+1. The verified .gguf file is already in this kit's models folder on the drive.
+2. Keep the drive connected. Open ChatterUI and enable Local Mode.
+3. Go to Models > Use External Model, then select the GGUF using Android's
+   system file picker. This path uses external storage without deliberately
+   copying the complete model into the app.
+4. Load/select the model and start a new chat. Follow any model/template
+   instructions provided by the verified model card.
+5. Try a short prompt such as "Write a Python function that adds two numbers."
+   After a successful setup, use airplane mode and repeat the prompt
+   to check that inference is local and works without the subscription.
+
+The phone still needs sufficient RAM, and the external file provider must
+offer a readable, seekable file. Actual USB/SD inference on your particular
+phone or GrapheneOS installation has not been tested. Slow storage, a lost
+connection, or unsupported file access can prevent loading. Keep the drive
+connected throughout a chat. Do not unplug it while a model is loaded.
+
+FALLBACK IF EXTERNAL LOADING DOES NOT WORK
+Use ChatterUI's Import Model option to copy the GGUF into phone storage.
+That requires enough internal free space for the complete model, and then
+the drive becomes a transfer/backup device rather than the live model store.
+PocketPal AI is another Android GGUF app that imports a copy internally:
+  https://play.google.com/store/apps/details?id=com.pocketpalai
+
+MODEL DETAILS
+The selected community-modified model is huihui-ai's Llama 3.2 3B Instruct
+Abliterated, quantized by QuantFactory using llama.cpp. The file is public
+and ungated. Its embedded chat template uses the Llama 3 header/EOT format.
+Start with a conservative context of 2048 tokens and increase only if your
+phone has enough available RAM. The full model-card context capacity does
+not imply that your phone can run at that setting.
+Model card and Llama 3.2 license are in models/MODEL-CARD.md and
+models/LLAMA-3.2-LICENSE.txt.
+Llama 3.2 is licensed under the Llama 3.2 Community License,
+Copyright © Meta Platforms, Inc. All Rights Reserved.
+
+GITHUB FILES
+Your existing repository: https://github.com/sutty1307/code-stick
+Extract repositories/code-stick-source.zip to access its editable files.
+This snapshot contains source, not Git history, credentials or AI models.
+To edit and synchronize with GitHub, clone the existing repository using
+Git or GitHub Desktop on a computer, then commit and push your changes.
+You do not need to create the same GitHub repository again.
+
+INTEGRITY AND LICENSE
+FILES-SHA256.json contains checksums for the files in this kit. On a computer
+with Node installed, run: node verify-kit.mjs
+Android's installer independently handles the APK signature and updates.
+ChatterUI's AGPL license and the source published with its release are in
+apps/ChatterUI-LICENSE.txt and sources/ChatterUI-v0.10.0-source.zip.
+The complete model also loaded and generated text in an offline cloud CPU
+test. Details are in MODEL-VALIDATION.md; that test does not establish
+performance or external-drive compatibility on your Android phone.
+Source references and verified checks are listed in CONTENTS.json.

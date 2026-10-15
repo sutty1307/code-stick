@@ -1,0 +1,210 @@
+{
+  "document_status": "final",
+  "prepared_utc": "2026-10-15T06:28:12.344824+00:00",
+  "release_gate": {
+    "status": "reviewed emulator preview evidence",
+    "scope": "Exact unchanged APK verified for fresh startup, calculator and simulated-removable fact/note persistence and restored UI. This is not physical-device, physical-USB, model-inference or retail approval."
+  },
+  "apk_build": {
+    "build_method": "Source Metro/Hermes bundle with verified matching publisher native shell",
+    "application_id": "com.codestick.aidrive",
+    "application_name": "AI Drive Offline",
+    "version": "0.10.1-usb.2",
+    "version_code": 2,
+    "apk_sha256": "aab31bcdf39f623cd21c30e02db0b1c16674e4ec27c77fb28f9cef7f5d422c1b",
+    "publisher_native_apk_sha256": "ec051d90bc9f82587a726b525976494bacef50bc8a7dd0e3789b859373121753",
+    "source_package_lock_sha256": "c288c0e0ee6ed50c945c80d9346bd8fcd00a29a8bff98c8e67d6392c8273807d",
+    "source_public_config_sha256": "3edb0e71aecb8c11863da8a8d02e994208a0cf4dd75c1f24a939e0c5223b35ce",
+    "source_bundle_sha256": "2d66fcb20410a22eac480e4d2ddc521823ddaf61c430507e6c108d0aeef01b6d",
+    "react_native": "0.86.3",
+    "expo_sdk": "57.0.0",
+    "hermes_bytecode": 98,
+    "preserved_dex_and_native_files": 55,
+    "native_files_byte_identical": true,
+    "zip_crc_verified": true,
+    "zip_alignment_verified": true,
+    "architecture": [
+      "arm64-v8a"
+    ],
+    "minimum_android_sdk": 24,
+    "internet_permission": false,
+    "network_state_permission": false,
+    "allow_backup": false,
+    "cleartext_traffic": false,
+    "debuggable": false,
+    "ota_updates": false,
+    "private_signing_key_included": false,
+    "actual_android_phone_tested": false
+  },
+  "corresponding_source": {
+    "path": "sources/AI-Drive-Offline-v0.10.1-usb.2-source.zip",
+    "sha256": "3d1885585295e0be811789ff1bf46d6bd19bcf4b2c2fe8210bb35355c3228654",
+    "file_count": 346,
+    "matches_current_source_byte_for_byte": true,
+    "crc_verified": true
+  },
+  "native_metadata_verification": {
+    "same_signing_certificate_as_usb1": true,
+    "signer_certificate_sha256": "9a286ca73cc5ef45bc6a474773209317433639aa9fdc068e65a63dea10d3b551",
+    "higher_version_code": true,
+    "embedded_config_and_provenance_match": true,
+    "publisher_native_files_preserved": 55,
+    "native_files_byte_identical": true,
+    "actual_runtime_upgrade_evidence": "emulator_upgrade_run below; the adjacent upgrade-verification.json records earlier metadata-only verification"
+  },
+  "emulator_upgrade_run": {
+    "platform": "Hosted KVM Android API 35 x86_64 emulator with ARM64 native translation",
+    "run_url": "https://github.com/sutty1307/code-stick/actions/runs/38689963109",
+    "run_id": 38689963109,
+    "test_commit": "4bd49db80e2d8dc6a80be7e0f4b0fb5874f0eb9b",
+    "overall_job_conclusion": "failure",
+    "overall_failure_reason": "The original usb.1 cold-launch ActivityManager command timed out; the candidate phases below passed. This is not a passing overall job.",
+    "actual_passed_phases": {
+      "candidate-calculator": {
+        "passed": true,
+        "expected_visible_result": "(12 + 8) * 3 = 60",
+        "real_ui_result_verified": true
+      },
+      "candidate-startup": {
+        "passed": true,
+        "actual_ui_controls_verified": [
+          "Choose USB memory folder",
+          "Offline Toolkit"
+        ],
+        "foreground_activity_verified": true,
+        "process_stable_seconds": 20
+      },
+      "upgrade-identity": {
+        "passed": true,
+        "baseline_uid": "10209",
+        "candidate_uid": "10209"
+      },
+      "candidate-upgrade": {
+        "passed": true,
+        "install_kind": "upgrade",
+        "uid": "10209",
+        "version_code": 2
+      },
+      "baseline-install": {
+        "passed": true,
+        "install_kind": "fresh",
+        "uid": "10209",
+        "version_code": 1
+      }
+    },
+    "evidence_source": "Standard GitHub Actions and native Checks APIs; exact phase annotations recorded in this document",
+    "local_observation_sha256": "e595ebc47e5745b31abb936772fda6f15df9af62fa799664afac018400e16aaf"
+  },
+  "fresh_candidate_and_simulated_usb": {
+    "status": "passed",
+    "platform": "Official Google APIs Android15/API35 x86_64 KVM emulator with ARM64 native translation",
+    "run_url": "https://github.com/sutty1307/code-stick/actions/runs/38691785099",
+    "run_id": 38691785099,
+    "test_commit": "ed122ffbf56badefc599525105a2f3584e6baec6",
+    "overall_job_conclusion": "success",
+    "completed_utc": "2026-10-15T06:27:16Z",
+    "evidence_source": "GitHub standard Actions and native Checks APIs; no artifact downloads",
+    "local_observation_sha256": "80e33d171befd9450b7b80db146da3c262fc8a89711122c57043b3d735d1b130",
+    "actual_passed_phases": {
+      "virtual-removable-model-route": {
+        "passed": true,
+        "actual_ui_controls_verified": [
+          "Choose a model",
+          "Models",
+          "Settings",
+          "Model Settings",
+          "CPU Settings"
+        ],
+        "model_route_verified": true
+      },
+      "virtual-removable-force-stop-restore": {
+        "passed": true,
+        "app_data_cleared": false,
+        "force_stop_restart_restored_fact_and_note": true,
+        "restored_revision": 5
+      },
+      "virtual-removable-note-form": {
+        "passed": true,
+        "manual_form_saved": "note",
+        "revision": 4,
+        "saved_card_visible": true,
+        "snapshot_sha256_verified": true
+      },
+      "virtual-removable-fact-form": {
+        "passed": true,
+        "manual_form_saved": "fact",
+        "revision": 3,
+        "saved_card_visible": true,
+        "snapshot_sha256_verified": true
+      },
+      "virtual-removable-saf-grant": {
+        "passed": true,
+        "genuine_saf_ui_grant": true,
+        "initial_revision": 2,
+        "simulated_removable_storage": true
+      },
+      "virtual-removable-fixture": {
+        "passed": true,
+        "newly_created_disk_only": true,
+        "simulated_removable_storage": true
+      },
+      "candidate-calculator": {
+        "passed": true,
+        "expected_visible_result": "(12 + 8) * 3 = 60",
+        "real_ui_result_verified": true
+      },
+      "candidate-startup": {
+        "passed": true,
+        "actual_ui_controls_verified": [
+          "Choose USB memory folder",
+          "Offline Toolkit"
+        ],
+        "am_launch_elapsed_seconds": 11.03,
+        "am_launch_status": "timeout",
+        "foreground_activity_verified": true,
+        "process_stable_seconds": 20,
+        "ready_elapsed_seconds": 38.84
+      },
+      "candidate-fresh-install": {
+        "passed": true,
+        "install_kind": "fresh",
+        "uid": "10209",
+        "version_code": 2
+      }
+    },
+    "physical_phone_tested": false,
+    "physical_usb_tested": false,
+    "model_inference_tested": false,
+    "snapshot_provenance": "The actual unchanged app saved manual fact and note forms through Android DocumentsUI consent to a newly created virtual removable volume. SHA-256 snapshot payloads and matching visible saved cards were checked. After force-stop/relaunch without clearing app data, both records reappeared in the UI at revision5.",
+    "test_definitions": {
+      "runtime_smoke.py": "bdd97d828af32413fc4bdde9485feff1ef8e0a4ddcd5ca66e0993c59fc53d47f",
+      "usb_memory_smoke.py": "56ddb6c9e21cabb73d8ebc19b6dd995ad471c69bd1dfd3fdcd1208342f8a0352"
+    }
+  },
+  "software_validation": {
+    "baseline_usb1_tests_passed": 149,
+    "baseline_test_count_is_not_new_android_runtime_testing": true,
+    "candidate_whole_typescript": "passed in source repair",
+    "candidate_focused_eslint": "passed with no errors; pre-existing warnings retained",
+    "new_ui_automation_result": "Nine actual Android runtime phases passed in run38691785099; original v1 cold-launch failure retained separately."
+  },
+  "model": {
+    "filename": "Llama-3.2-3B-Instruct-abliterated.Q4_K_M.gguf",
+    "size_bytes": 2019377472,
+    "sha256": "e1f2b428e316d8bd1cb5ca13e9649329e299d951fbcee6b3cd0e9f1d646c9fa7",
+    "payload_verified_against_publisher": true,
+    "cloud_cpu_inference": "Previously passed with llama.cpp b11429, context 2048; separate from Android execution",
+    "android_inference": "not tested"
+  },
+  "physical_android_device": "not tested",
+  "physical_usb_detach_reconnect": "not tested",
+  "grapheneos": "not tested",
+  "phone_performance_and_retail_readiness": "not validated",
+  "limits": [
+    "The emulator uses a translated ARM64 native runtime; it is not a physical phone.",
+    "A simulated removable volume is not a physical USB drive.",
+    "The complete model has not generated a response inside the Android app.",
+    "USB memory snapshots are plaintext and verified by SHA-256 and exact read-back, without an OS flush guarantee.",
+    "The model-selection route passed, but importing/loading the complete model and generating an Android response are separate from this test."
+  ]
+}
