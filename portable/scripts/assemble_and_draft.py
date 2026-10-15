@@ -14,6 +14,7 @@ from pathlib import Path, PurePosixPath
 import re
 import shutil
 import subprocess
+import sys
 import tempfile
 import urllib.parse
 import urllib.request
@@ -277,8 +278,45 @@ def assemble(seed, output, model_file=None):
         raise
 
 
+def diagnostic_text(value, limit=2400):
+    value = str(value)[:16000]
+    # Diagnostic output must never turn transport/authentication material into
+    # a public Check annotation. Preserve the HTTP error and command stage.
+    value = re.sub(r"(?im)^[^\n]*\b(?:authorization|proxy-authorization|cookie|set-cookie|x-api-key|x-auth-token)\s*:.*$",
+                   "[redacted authentication header]", value)
+
+    def clean_url(match):
+        try:
+            parsed = urllib.parse.urlsplit(match[0])
+            # Keep the endpoint, remove URL userinfo, every query value and fragment.
+            host = parsed.netloc.rsplit("@", 1)[-1]
+            return urllib.parse.urlunsplit((parsed.scheme, host, parsed.path,
+                                            "[redacted-query]" if parsed.query else "", ""))
+        except ValueError:
+            return "[redacted URL]"
+
+    value = re.sub(r'''https?://[^\s<>"']+''', clean_url, value)
+    # URLs must be cleaned before substitutions introduce spaces into a token
+    # value; otherwise a later URL match could miss remaining query parameters.
+    value = re.sub(r"(?i)\b(?:gh[pousr]_[A-Za-z0-9_]+|github_pat_[A-Za-z0-9_]+)",
+                   "[redacted token]", value)
+    value = re.sub(r"(?i)\b(?:bearer|basic)\s+[A-Za-z0-9._~+/=-]+", "[redacted authentication]", value)
+    value = re.sub(
+        r'''(?i)["']?(?:GH_TOKEN|GITHUB_TOKEN|access_token|refresh_token|client_secret|password|api_key)["']?\s*[:=]\s*(?:"[^"\n]*"|'[^'\n]*'|[^\s,;]+)''',
+        "[redacted credential assignment]", value)
+    return value[:limit] + (" [diagnostic truncated]" if len(value) > limit else "")
+
+
 def gh(*args):
-    result = subprocess.run(["gh", *args], check=True, text=True, capture_output=True)
+    result = subprocess.run(["gh", *args], check=False, text=True, capture_output=True)
+    if result.returncode:
+        stage = f"gh release {args[1]}" if len(args) > 1 and args[0] == "release" and args[1] in {"create", "upload", "download"} else "gh api metadata"
+        details = [f"{stage} failed (exit {result.returncode})"]
+        if result.stderr.strip():
+            details.append("stderr: " + diagnostic_text(result.stderr, 1600))
+        if result.stdout.strip():
+            details.append("stdout: " + diagnostic_text(result.stdout, 600))
+        raise RuntimeError(diagnostic_text("\n".join(details)))
     return result.stdout
 
 
@@ -419,6 +457,15 @@ def workflow_notice(title, report):
         print(f"::notice title={title}::{message}")
 
 
+def report_failure(error):
+    message = diagnostic_text(f"{type(error).__name__}: {error}")
+    if os.getenv("GITHUB_ACTIONS") == "true":
+        escaped = message.replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A")
+        print(f"::error title=Android delivery failed::{escaped}")
+    # JSON quoting keeps any captured newline/command text on one inert line.
+    print("Android delivery failed: " + json.dumps(message), file=sys.stderr)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("command", choices=["inspect", "assemble", "draft"])
@@ -451,4 +498,8 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as error:
+        report_failure(error)
+        raise SystemExit(1)
