@@ -110,7 +110,12 @@ pip install -r requirements.txt
 gunicorn --config gunicorn.conf.py wsgi:application
 ```
 
-The requirements pin the upstream Gunicorn 26.2.2 patch. The accessible package index in the build environment did not provide that release; the WSGI smoke test was run with 26.2.0. **The pinned deployment dependency, Docker image and nginx/systemd deployment have not been verified here.** Do not describe these templates as a completed production deployment. The standard-library local run is independent of that dependency.
+The requirements pin the official Gunicorn 26.2.2 release source to its upstream
+commit and archive SHA-256. That patch is absent from PyPI, so a version-only pin
+prevented installation. The corrected requirement installed in a fresh virtual
+environment and passed the actual two-worker WSGI smoke test on October 15, 2026.
+**The Docker image and nginx/systemd deployment have not been runtime-verified.**
+The standard-library local run is independent of that deployment dependency.
 
 For HTTPS, configure the exact public `DEPOSITDESK_ORIGIN`. The nginx file is a complete `http{}`-context snippet with its rate-limit definitions and headers included; replace its example domain and certificate paths. Bind the app privately. Enable `DEPOSITDESK_BEHIND_PROXY` only with `DEPOSITDESK_TRUSTED_PROXIES` listing the actual connecting proxy addresses. For host nginx and host Gunicorn, the loopback defaults apply. Containers require configuring their actual proxy connection address; do not assume that it is loopback.
 

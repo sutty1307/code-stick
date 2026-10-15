@@ -1,4 +1,17 @@
-# DepositDesk status — September 17, 2026
+# DepositDesk status — October 15, 2026
+
+## Dependency repair verified locally
+
+The version-only `gunicorn==26.2.2` requirement could not be installed from the
+package index. It now pins the same official release's source commit and archive
+checksum. A fresh virtual environment installs it successfully, and the actual
+Gunicorn 26.2.2 two-worker application test passes. All 100 Python tests and both
+JavaScript syntax checks pass. See `VALIDATION.md` for the exact scope.
+
+This repairs a deployment dependency. No public endpoint or Google Cloud
+deployment was created, and no financial account was connected.
+
+## September 17, 2026 — retained hosting status
 
 ## Completed
 
