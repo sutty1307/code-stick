@@ -90,6 +90,17 @@ def preference(data, key):
     return value.get('state') if isinstance(value, dict) else None
 
 
+def default_character_state(data):
+    """Inspect the fresh app-created rows; never create or inject a test character."""
+    all_rows = rows(data, 'characters')
+    characters = [row for row in all_rows if row.get('type') == 'character']
+    summary = {'all_character_table_rows': len(all_rows), 'character_count': len(characters),
+               'rows': [{key: row.get(key) for key in ('id', 'name', 'type')} for row in all_rows[:8]],
+               'rows_omitted': max(0, len(all_rows) - 8), 'snapshot_revision': data['revision']}
+    matches = [row for row in characters if row.get('name') == 'AI Bot']
+    return (matches[0] if len(characters) == 1 and len(matches) == 1 else None), summary
+
+
 def examine_slot(name, raw):
     """Decode the same core envelope/body contract, returning metadata without payload text."""
     meta = {'name': name, 'present': True, 'raw_characters': len(raw),
@@ -251,6 +262,68 @@ class InferenceTest(_USBTest):
         self.model_name, self.baseline_ids = None, set()
         self.last_slot_diagnostics, self._last_diagnostic_text = {}, None
         self._reported_invalid_slot = False
+        self.onboarding_character, self.onboarding_revision = None, None
+
+    def onboarding(self):
+        """Cheap real Home/default-card gate before model download or inference."""
+        self._top()
+        self._tap_xml(self._find('Chats'), 'Chats')
+        diagnostic = {'character_count': None, 'rows': [], 'home_visible_labels': []}
+
+        def ready():
+            data = self._snapshots()
+            character, summary = default_character_state(data)
+            diagnostic.update(summary)
+            xml = self._screen()
+            diagnostic['home_visible_labels'] = list(dict.fromkeys(
+                node.get('text', '')[:160] for node in ET.fromstring(xml).iter('node')
+                if node.get('text') and _bounds(node)))[:25]
+            positions = {_bounds(node) for node in _nodes(xml, 'AI Bot')}
+            if character is None or len(positions) != 1:
+                return None
+            self.onboarding_character = {key: character[key] for key in ('id', 'name', 'type')}
+            self.onboarding_revision = data['revision']
+            return data
+
+        try:
+            with budget(30):
+                data = self._wait('Actual unique AI Bot Home card and verified snapshot identity', ready, 30)
+        except Exception as error:
+            diagnostic['slot_metadata'] = self.last_slot_diagnostics
+            # This reads only the current disposable app's fresh native diagnostics.
+            # Production removes Logger.console.log, so its real Logs UI may be
+            # needed to see caught default-card/asset failures; no export occurs.
+            try:
+                pid = self.s.shell('pidof', PACKAGE, check=False)
+                log = self.s.shell('logcat', '-d', '--pid', pid, '-v', 'brief', timeout=15, check=False) if re.fullmatch(r'\d+', pid) else ''
+                diagnostic['fresh_native_error_lines'] = [line[:350] for line in log.splitlines()
+                    if re.search(r'error|exception|failed|aibot|asset|default.character', line, re.I)][-12:]
+            except Exception as log_error:
+                diagnostic['fresh_native_log_read_error'] = type(log_error).__name__
+            try:
+                self.s.capture('onboarding-home-failure')
+                self._swipe('right')
+                self._tap('Logs', maximum=10)
+                self._wait('Actual app Logs screen', lambda: _nodes(self._screen(), 'Logs'), 10)
+                xml = self._screen()
+                diagnostic['actual_app_log_ui_lines'] = [node.get('text', '')[:400]
+                    for node in ET.fromstring(xml).iter('node')
+                    if re.search(r'\[ERROR\]|\[WARN\]|aibot|asset|default.character', node.get('text', ''), re.I)][-12:]
+            except Exception as log_error:
+                diagnostic['actual_app_log_ui_read_error'] = type(log_error).__name__
+            self.s.write('onboarding-diagnostic.json', json.dumps(diagnostic, indent=2) + '\n')
+            raise InvariantError('Default AI Bot onboarding did not become ready in30s; current operation '
+                                 'diagnostic=' + json.dumps(diagnostic, sort_keys=True) +
+                                 '; wait_error=' + type(error).__name__) from error
+        result = {'actual_ai_bot_card_visible': True, 'verified_snapshot_ai_bot_identity': self.onboarding_character,
+                  'verified_revision': data['revision'], 'no_character_created_by_harness': True}
+        report_annotation('notice', 'actual-default-ai-bot-onboarding: PASS ' + json.dumps(result, sort_keys=True))
+        # Real Home drawer route returns to the connected Memory screen.
+        self.open_memory()
+        self._wait('Connected Drive Memory after verified Home onboarding',
+                   lambda: _nodes(self._screen(), 'Drive connected'), 30)
+        self.current_revision = data['revision']
+        return result
 
     def _snapshots(self):
         samples, read_errors = [], {}
@@ -465,11 +538,16 @@ class InferenceTest(_USBTest):
         self.s.shell('input', 'keyevent', 'KEYCODE_BACK')
         self._top()
         self._tap_xml(self._find('Chats'), 'Chats')
-        data = self._wait('Initial Home application snapshot', self._snapshots, 30)
-        characters = [row for row in rows(data, 'characters') if row.get('type') == 'character']
-        if len(characters) != 1 or not characters[0].get('name'):
-            raise InvariantError('The new disposable session does not have exactly one default character')
-        self._find(characters[0]['name'])
+        if self.onboarding_character is None:
+            raise InvariantError('No earlier verified real AI Bot onboarding identity')
+        def proven_home():
+            data = self._snapshots()
+            matches = [row for row in rows(data, 'characters')
+                       if row.get('id') == self.onboarding_character['id']
+                       and row.get('type') == 'character' and row.get('name') == 'AI Bot']
+            return data if (data['revision'] >= self.onboarding_revision and len(matches) == 1
+                            and _nodes(self._screen(), 'AI Bot')) else None
+        data = self._wait('Previously proven AI Bot Home identity in a current verified snapshot', proven_home, 30)
         self._swipe('right')
         self._tap('Sampler')
         self._numeric('Generated Tokens', 16)
@@ -486,7 +564,7 @@ class InferenceTest(_USBTest):
 
         data = self._wait('Real Generated Tokens setting saved on removable volume', sample_config, 45)
         self.s.shell('input', 'keyevent', 'KEYCODE_BACK')
-        self._tap(characters[0]['name'])
+        self._tap(self.onboarding_character['name'])
         self._wait('Loaded-model chat input', lambda: _nodes(self._screen(), 'Message...'), 30)
         data = self._wait('Initial chat snapshot', self._snapshots, 30)
         self.baseline_ids = {str(row['id']) for row in rows(data, 'chat_entries')}
@@ -633,6 +711,7 @@ def run(args):
                           ('candidate-startup', lambda: smoke.launch('candidate')),
                           ('virtual-removable-fixture', test.fixture),
                           ('virtual-removable-saf-grant', test.grant),
+                          ('actual-default-ai-bot-onboarding', test.onboarding),
                           ('low-memory-model-settings', test.configure),
                           ('verified-full-model-fixture', lambda: stage_model(smoke, directory)),
                           ('genuine-external-model-selection', test.select_model),
