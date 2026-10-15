@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Runtime-only Android CI smoke test. No GitHub writes, USB simulation or model load."""
+"""Android CI smoke checks, with optional debug removable storage; no model load."""
 import argparse
 import hashlib
 import json
@@ -43,7 +43,13 @@ def report_pass(label, details=None):
     allowed = {'version_code', 'install_kind', 'uid', 'process_stable_seconds',
                'foreground_activity_verified', 'actual_ui_controls_verified',
                'real_ui_result_verified', 'expected_visible_result',
-               'baseline_uid', 'candidate_uid'}
+               'baseline_uid', 'candidate_uid', 'am_launch_status',
+               'am_launch_elapsed_seconds', 'ready_elapsed_seconds',
+               'newly_created_disk_only', 'simulated_removable_storage',
+               'genuine_saf_ui_grant', 'initial_revision', 'manual_form_saved',
+               'snapshot_sha256_verified', 'revision', 'saved_card_visible',
+               'force_stop_restart_restored_fact_and_note', 'app_data_cleared',
+               'restored_revision', 'model_route_verified'}
     summary = {key: value for key, value in (details or {}).items() if key in allowed}
     suffix = ' ' + json.dumps(summary, sort_keys=True) if summary else ''
     report_annotation('notice', f'{label}: PASS{suffix}')
@@ -132,10 +138,18 @@ class Smoke:
                 time.sleep(5)
         raise RuntimeError('Android never reached stable boot/unlocked storage+package services; no installer was invoked')
 
-    def xml(self):
-        self.shell('rm', '-f', '/sdcard/ai-drive-runtime-ui.xml')
-        self.shell('uiautomator', 'dump', '/sdcard/ai-drive-runtime-ui.xml', timeout=20)
-        content = self.shell('cat', '/sdcard/ai-drive-runtime-ui.xml')
+    def xml(self, maximum=50):
+        deadline = time.monotonic() + maximum
+
+        def remaining(limit):
+            value = min(limit, deadline - time.monotonic())
+            if value <= 0:
+                raise RuntimeError('UI hierarchy capture exceeded its time budget')
+            return value
+
+        self.shell('rm', '-f', '/sdcard/ai-drive-runtime-ui.xml', timeout=remaining(15))
+        self.shell('uiautomator', 'dump', '/sdcard/ai-drive-runtime-ui.xml', timeout=remaining(20))
+        content = self.shell('cat', '/sdcard/ai-drive-runtime-ui.xml', timeout=remaining(15))
         ET.fromstring(content)
         return content
 
@@ -202,13 +216,30 @@ class Smoke:
 
     def launch(self, label):
         self.shell('am', 'force-stop', PACKAGE)
+        began = time.monotonic()
+        deadline = began + 90
         started = self.shell('am', 'start', '-W', '-n', COMPONENT, timeout=45)
-        if 'Status: ok' not in started or 'Error' in started:
-            raise RuntimeError(f'Activity launch was not successful: {started}')
+        launch_elapsed = time.monotonic() - began
         self.write(f'{label}-activity-launch.txt', started)
-        initial, until = None, time.monotonic() + 20
-        while time.monotonic() < until:
-            pid = self.shell('pidof', PACKAGE, check=False)
+        statuses = re.findall(r'^Status:\s*(\S+)\s*$', started, re.MULTILINE)
+        launch_record = {'am_launch_status': statuses[0] if len(statuses) == 1 else 'unexpected',
+                         'am_launch_elapsed_seconds': round(launch_elapsed, 2)}
+        self.results.setdefault('activity_launches', {})[label] = launch_record
+        if len(statuses) != 1 or statuses[0] not in {'ok', 'timeout'} or 'Error' in started:
+            raise RuntimeError(f'Activity launch returned an unexpected status: {started}')
+        launch_status = statuses[0]
+        initial, ready_since, last_pending = None, None, 'Real app UI has not appeared'
+
+        def remaining(limit):
+            value = min(limit, deadline - time.monotonic())
+            if value <= 0:
+                raise RuntimeError('Application startup exceeded its 90-second deadline')
+            return value
+
+        # am start -W can time out while a cold translated app is still starting.
+        # Neither that timeout nor Status: ok proves real application readiness.
+        while time.monotonic() < deadline:
+            pid = self.shell('pidof', PACKAGE, timeout=remaining(15), check=False)
             if not pid or (initial is not None and initial != pid):
                 crash = self.shell('logcat', '-d', '-b', 'crash', '-v', 'brief', check=False)
                 lines = crash.splitlines()
@@ -223,19 +254,36 @@ class Smoke:
                 raise RuntimeError('Application process exited or restarted during startup. '
                                    f'Android crash diagnostic: {crash_detail or "No crash message returned"}')
             initial = pid
-            if self.shell('pidof', 'system_server') != self.results['stable_system_server_pid']:
+            if self.shell('pidof', 'system_server', timeout=remaining(15)) != self.results['stable_system_server_pid']:
                 raise RuntimeError('Android framework restarted during application startup')
-            time.sleep(2)
-        activity = self.shell('dumpsys', 'activity', 'activities')
-        resumed = [line for line in activity.splitlines() if 'mResumedActivity' in line or 'topResumedActivity' in line]
-        if not any(PACKAGE in line for line in resumed):
-            raise RuntimeError('Application is not the foreground resumed activity')
-        content = self.xml()
-        self.write(f'{label}-startup-visible.xml', content)
-        text_bounds(content, 'Choose USB memory folder')
-        text_bounds(content, 'Offline Toolkit')
-        return {'process_stable_seconds': 20, 'pid': initial, 'foreground_activity_verified': True,
-                'actual_ui_controls_verified': ['Choose USB memory folder', 'Offline Toolkit']}
+            try:
+                activity = self.shell('dumpsys', 'activity', 'activities', timeout=remaining(15))
+                resumed = [line for line in activity.splitlines() if 'mResumedActivity' in line or 'topResumedActivity' in line]
+                if not any(PACKAGE in line for line in resumed):
+                    raise RuntimeError('Application is not yet the foreground resumed activity')
+                content = self.xml(maximum=remaining(20))
+                text_bounds(content, 'Choose USB memory folder')
+                text_bounds(content, 'Offline Toolkit')
+            except (RuntimeError, subprocess.TimeoutExpired, ET.ParseError) as error:
+                ready_since = None
+                last_pending = str(error)
+            else:
+                now = time.monotonic()
+                if ready_since is None:
+                    ready_since = now
+                last_pending = 'Real UI appeared; waiting for 20 seconds of stable readiness'
+                if now <= deadline and now - ready_since >= 20:
+                    self.write(f'{label}-startup-visible.xml', content)
+                    return {'process_stable_seconds': 20, 'pid': initial,
+                            'foreground_activity_verified': True,
+                            'actual_ui_controls_verified': ['Choose USB memory folder', 'Offline Toolkit'],
+                            'am_launch_status': launch_status,
+                            'am_launch_elapsed_seconds': round(launch_elapsed, 2),
+                            'ready_elapsed_seconds': round(now - began, 2)}
+            time.sleep(max(0, min(2, deadline - time.monotonic())))
+        raise RuntimeError(f'Application did not show the real USB controls in the foreground '
+                           f'with an unchanged PID for 20 seconds within 90 seconds '
+                           f'(am status: {launch_status}): {last_pending}')
 
     def tap(self, label, maximum=45):
         deadline = time.monotonic() + maximum
@@ -280,15 +328,21 @@ def run(args):
         Path(env['ANDROID_AVD_HOME']).mkdir()
         Path(env['ANDROID_USER_HOME']).mkdir()
         smoke, emulator, logcat, handles = Smoke(args.sdk, evidence, env), None, None, []
+        smoke.results['test_mode'] = 'fresh-candidate' if args.fresh_candidate else 'baseline-upgrade'
+        if args.fresh_candidate:
+            smoke.results['test'] = f'API{API} KVM fresh candidate startup smoke; no baseline or upgrade test'
         setup_stage = 'KVM prerequisites'
         try:
             if platform.machine() != 'x86_64' or not os.access('/dev/kvm', os.R_OK | os.W_OK):
                 raise RuntimeError('This test requires an x86_64 hosted VM with usable /dev/kvm; no TCG fallback')
             setup_stage = 'APK SHA-256 verification'
-            for name, file, expected in [('baseline', args.baseline, BASELINE_SHA256), ('candidate', args.candidate, CANDIDATE_SHA256)]:
+            apks = [('candidate', args.candidate, CANDIDATE_SHA256)]
+            if not args.fresh_candidate:
+                apks.insert(0, ('baseline', args.baseline, BASELINE_SHA256))
+            for name, file, expected in apks:
                 if file.is_symlink() or digest(file) != expected:
                     raise RuntimeError(f'{name} APK SHA-256 does not match the exact reviewed binary')
-            smoke.results['apk_sha256'] = {'baseline': BASELINE_SHA256, 'candidate': CANDIDATE_SHA256}
+            smoke.results['apk_sha256'] = {name: expected for name, _, expected in apks}
             setup_stage = 'SDK installation'
             sdkmanager = args.sdk / 'cmdline-tools/latest/bin/sdkmanager'
             installed = smoke.command([sdkmanager, 'platform-tools', 'emulator', IMAGE], timeout=900, check=False, input_text='y\n' * 100)
@@ -332,11 +386,21 @@ def run(args):
                     or props['ro.dalvik.vm.isa.arm64'] != 'x86_64' or props['ro.build.version.sdk'] != str(API)):
                 raise RuntimeError(f'The Google API {API} image does not advertise the required ARM64 native translation: {props}')
             setup_stage = 'app runtime phases'
-            baseline = smoke.phase('baseline-install', lambda: smoke.install(args.baseline, 1))
-            if baseline:
-                smoke.phase('baseline-startup', lambda: smoke.launch('baseline'))
+            baseline = False
+            if args.fresh_candidate:
+                setup_stage = 'fresh candidate package absence on new isolated AVD'
+                installed = smoke.shell('cmd', 'package', 'list', 'packages', '--user', '0', PACKAGE)
+                smoke.write('fresh-candidate-before-install.txt', installed + '\n')
+                if re.search(rf'^package:{re.escape(PACKAGE)}\s*$', installed, re.MULTILINE):
+                    raise RuntimeError('Candidate package already exists; this is not a fresh installation test')
+                smoke.results['fresh_candidate_clean_avd_verified'] = True
+                setup_stage = 'fresh candidate runtime phases'
             else:
-                smoke.results['phases']['baseline-startup'] = {'passed': False, 'skipped': True, 'reason': 'Baseline install failed'}
+                baseline = smoke.phase('baseline-install', lambda: smoke.install(args.baseline, 1))
+                if baseline:
+                    smoke.phase('baseline-startup', lambda: smoke.launch('baseline'))
+                else:
+                    smoke.results['phases']['baseline-startup'] = {'passed': False, 'skipped': True, 'reason': 'Baseline install failed'}
             # Keep the installed v1 and its UID; never uninstall/clear before attempting -r.
             candidate = smoke.phase('candidate-upgrade' if baseline else 'candidate-fresh-install', lambda: smoke.install(args.candidate, 2, replace=baseline))
             if candidate:
@@ -352,8 +416,13 @@ def run(args):
                 launched = smoke.phase('candidate-startup', lambda: smoke.launch('candidate'))
                 if launched:
                     smoke.phase('candidate-calculator', smoke.calculator)
+                    if args.usb_memory:
+                        from usb_memory_smoke import run_usb_memory
+                        run_usb_memory(smoke)
             smoke.results['passed'] = all(phase['passed'] for phase in smoke.results['phases'].values())
-            smoke.results['candidate_install_kind'] = 'upgrade' if baseline else 'fresh; NOT an upgrade test'
+            smoke.results['candidate_install_kind'] = ('fresh on a new isolated AVD; baseline never installed'
+                                                       if args.fresh_candidate else
+                                                       'upgrade' if baseline else 'fresh; NOT an upgrade test')
             smoke.save()
             return 0 if smoke.results['passed'] else 1
         except Exception as error:
@@ -386,7 +455,14 @@ def run(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--sdk', type=Path, required=True)
-    parser.add_argument('--baseline', type=Path, required=True)
+    parser.add_argument('--baseline', type=Path)
     parser.add_argument('--candidate', type=Path, required=True)
     parser.add_argument('--evidence', type=Path, required=True)
-    raise SystemExit(run(parser.parse_args()))
+    parser.add_argument('--fresh-candidate', action='store_true',
+                        help='Test only the exact candidate on the new isolated AVD; not an upgrade test')
+    parser.add_argument('--usb-memory', action='store_true',
+                        help='Exercise real SAF consent and memory on a new debug virtual removable disk')
+    args = parser.parse_args()
+    if not args.fresh_candidate and args.baseline is None:
+        parser.error('--baseline is required unless --fresh-candidate is selected')
+    raise SystemExit(run(args))

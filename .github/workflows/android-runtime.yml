@@ -1,4 +1,4 @@
-name: Android v1 to v2 runtime smoke
+name: Android offline app runtime checks
 
 # Local proposal. Root owns integration into the isolated repair branch.
 on:
@@ -7,6 +7,7 @@ on:
     paths:
       - .github/workflows/android-runtime.yml
       - portable/runtime/runtime_smoke.py
+      - portable/runtime/usb_memory_smoke.py
       - portable/android/AI-Drive-Offline_v0.10.1-usb.2.apk
 
 permissions:
@@ -20,7 +21,7 @@ jobs:
   runtime:
     if: github.repository == 'sutty1307/code-stick' && github.ref == 'refs/heads/repair/android-runtime-usb2'
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
@@ -40,14 +41,16 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends libpulse0
-      - name: Test exact baseline, upgrade, startup and visible local calculator
-        timeout-minutes: 25
+      - name: Test fresh installation, startup, calculator and simulated drive memory
+        timeout-minutes: 30
         run: >-
           python3 portable/runtime/runtime_smoke.py
           --sdk "$ANDROID_HOME"
           --baseline portable/android/AI-Drive-Offline_v0.10.1-usb.1.apk
           --candidate portable/android/AI-Drive-Offline_v0.10.1-usb.2.apk
           --evidence runtime-evidence
+          --fresh-candidate
+          --usb-memory
       - name: Retain screenshots, UI XML and logs even if runtime fails
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
