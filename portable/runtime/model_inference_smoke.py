@@ -82,8 +82,92 @@ def preference(data, key):
     raw = data.get('applicationState', {}).get('preferences', {}).get(key)
     if not isinstance(raw, str):
         return None
-    value = json.loads(raw)
+    try:
+        value = json.loads(raw)
+    except json.JSONDecodeError as error:
+        raise RuntimeError(f'Preference JSON parse failed for {key}: {error.msg}; '
+                           f'pos={error.pos}, line={error.lineno}, column={error.colno}') from error
     return value.get('state') if isinstance(value, dict) else None
+
+
+def examine_slot(name, raw):
+    """Decode the same core envelope/body contract, returning metadata without payload text."""
+    meta = {'name': name, 'present': True, 'raw_characters': len(raw),
+            'raw_utf8_bytes': len(raw.encode('utf-8')), 'valid': False,
+            'envelope_valid': False, 'checksum_valid': False, 'body_valid': False}
+    layer = 'envelope'
+    try:
+        if len(raw.encode('utf-16-le')) // 2 > 32 * 1024 * 1024 + 1024:
+            raise ValueError('snapshot_exceeds_core_character_limit')
+        envelope = json.loads(raw)
+        if (not isinstance(envelope, dict) or envelope.get('format') != 'chatterui-usb-memory-v1'
+                or not isinstance(envelope.get('body'), str) or not isinstance(envelope.get('sha256'), str)):
+            raise ValueError('unsupported_envelope_format_or_fields')
+        meta['envelope_valid'] = True
+        meta['body_characters'] = len(envelope['body'])
+        layer = 'checksum'
+        if hashlib.sha256(envelope['body'].encode('utf-8')).hexdigest() != envelope['sha256']:
+            raise ValueError('body_sha256_mismatch')
+        meta['checksum_valid'] = True
+        layer = 'body'
+        data = json.loads(envelope['body'])
+        if not isinstance(data, dict):
+            raise ValueError('body_is_not_an_object')
+        if ('processedUserMessages' in data and
+                (not isinstance(data['processedUserMessages'], list)
+                 or any(not isinstance(key, str) for key in data['processedUserMessages']))):
+            raise ValueError('invalid_message_provenance')
+        revision = data.get('revision')
+        if (data.get('version') != 1 or type(revision) is not int or not 1 <= revision <= 2**53 - 1
+                or not isinstance(data.get('entries'), list) or not isinstance(data.get('conversations'), list)):
+            raise ValueError('unsupported_body_version_revision_or_collections')
+        for entry in data['entries']:
+            if (not isinstance(entry, dict) or not isinstance(entry.get('id'), str)
+                    or entry.get('kind') not in ('fact', 'preference', 'note')
+                    or not all(isinstance(entry.get(key), str) for key in ('text', 'createdAt', 'updatedAt'))
+                    or not isinstance(entry.get('source'), dict)
+                    or entry['source'].get('type') not in ('manual', 'user-message')):
+                raise ValueError('invalid_memory_entry_record')
+        for conversation in data['conversations']:
+            if (not isinstance(conversation, dict) or not isinstance(conversation.get('id'), str)
+                    or not isinstance(conversation.get('messages'), list)):
+                raise ValueError('invalid_conversation_record')
+            for message in conversation['messages']:
+                if (not isinstance(message, dict) or message.get('role') not in ('user', 'assistant', 'system')
+                        or not isinstance(message.get('text'), str)):
+                    raise ValueError('invalid_conversation_message_record')
+        meta.update({'valid': True, 'body_valid': True, 'revision': revision})
+        return data, meta
+    except json.JSONDecodeError as error:
+        meta.update({'error_layer': layer, 'error_type': 'JSONDecodeError', 'error': error.msg,
+                     'error_position': error.pos, 'error_line': error.lineno, 'error_column': error.colno})
+    except ValueError as error:
+        meta.update({'error_layer': layer, 'error_type': 'ValueError', 'error': str(error)})
+    return None, meta
+
+
+def select_verified_snapshot(raw_slots):
+    """Follow core.readDrive: recover one invalid slot; reject conflicting equal revisions."""
+    valid, metadata = [], []
+    for name, raw in raw_slots:
+        if raw is None:
+            metadata.append({'name': name, 'present': False, 'valid': False})
+            continue
+        data, meta = examine_slot(name, raw)
+        metadata.append(meta)
+        if data is not None:
+            valid.append((data['revision'], name, data))
+    valid.sort(key=lambda item: item[0], reverse=True)
+    summary = {'slots': metadata, 'recovered_invalid_other': any(
+        item.get('present') and not item['valid'] for item in metadata)}
+    if valid:
+        if (len(valid) > 1 and valid[0][0] == valid[1][0]
+                and json.dumps(valid[0][2], ensure_ascii=False, separators=(',', ':')) !=
+                json.dumps(valid[1][2], ensure_ascii=False, separators=(',', ':'))):
+            raise InvariantError('Conflicting verified equal-revision snapshots; metadata=' + json.dumps(summary))
+        summary.update({'selected_slot': valid[0][1], 'selected_revision': valid[0][0]})
+        return valid[0][2], summary
+    return None, summary
 
 
 def completed_reply(data, prompt, baseline_ids):
@@ -165,6 +249,33 @@ class InferenceTest(_USBTest):
         super().__init__(smoke)
         self.prompt = 'Say hello in three words. Session Inference' + uuid.uuid4().hex[:10]
         self.model_name, self.baseline_ids = None, set()
+        self.last_slot_diagnostics, self._last_diagnostic_text = {}, None
+        self._reported_invalid_slot = False
+
+    def _snapshots(self):
+        samples = []
+        for name in ('drive-memory-a.json', 'drive-memory-b.json'):
+            path = self.base + '/' + name
+            if self.s.adb('shell', 'test', '-f', path, check=False).returncode:
+                samples.append((name, None))
+            else:
+                samples.append((name, self.s.shell('cat', path)))
+        data, metadata = select_verified_snapshot(samples)
+        self.last_slot_diagnostics = metadata
+        text = json.dumps(metadata, sort_keys=True)
+        self.s.write('inference-snapshot-read-metadata.json', json.dumps(metadata, indent=2) + '\n')
+        if text != self._last_diagnostic_text:
+            with (self.s.evidence / 'inference-snapshot-read-metadata.jsonl').open('a') as stream:
+                stream.write(text + '\n')
+            self._last_diagnostic_text = text
+        if metadata['recovered_invalid_other'] and not self._reported_invalid_slot:
+            report_annotation('warning', 'Actual snapshot read encountered an invalid slot; '
+                              'using only highest verified valid snapshot under core recovery contract. '
+                              'Current read metadata: ' + text)
+            self._reported_invalid_slot = True
+        if data is None:
+            raise RuntimeError('No verified snapshot in current operation; metadata=' + text)
+        return data
 
     def _icon(self, glyph, header=False):
         target = self._wait('Visible enabled unique native icon',
@@ -218,6 +329,7 @@ class InferenceTest(_USBTest):
                         and config.get('devices') in ([], ['CPU'])) else None
 
     def configure(self):
+        previous_revision = self.current_revision
         self._top()
         self._tap_xml(self._find('Choose a model'), 'Choose a model')
         self._tap('Settings')
@@ -227,12 +339,37 @@ class InferenceTest(_USBTest):
         xml = self._screen()
         if _nodes(xml, 'Backend Device'):
             self._tap('CPU')
-        data = self._wait('Exact real UI engine settings saved on virtual removable volume',
-                          self._configuration, 45)
+        def newer_configuration():
+            result = self._configuration()
+            return result if result and result['revision'] > previous_revision else None
+        try:
+            data = self._wait('Exact real UI engine settings in a subsequent verified snapshot',
+                              newer_configuration, 45)
+        except Exception as error:
+            raise RuntimeError(str(error) + '; current slot metadata=' +
+                               json.dumps(self.last_slot_diagnostics, sort_keys=True)) from error
         self.current_revision = data['revision']
         self._tap('Models')  # Header is Model Settings here, so the footer label is unique.
+        self.s.shell('input', 'keyevent', 'KEYCODE_BACK')
+        self._top()
+
+        def connected_with_verified_save():
+            xml = self._screen()
+            counters = [int(match[1]) for node in ET.fromstring(xml).iter('node')
+                        if (match := re.search(r'Verified save #(\d+)', node.get('text', '')))]
+            return _nodes(xml, 'Drive connected') and counters and max(counters) >= data['revision']
+        self._wait('Actual Drive connected and current verified-save counter after shrinking settings',
+                   connected_with_verified_save, 30)
+        self.s.capture('model-settings-verified-drive-status')
+        report_annotation('notice', 'model-settings-durable-save: PASS ' + json.dumps({
+            'context_tokens': 1024, 'cpu_threads': 2, 'batch_tokens': 16,
+            'previous_revision': previous_revision, 'verified_revision': data['revision'],
+            'actual_drive_connected': True, 'actual_verified_save_counter': True,
+            'current_slot_metadata': self.last_slot_diagnostics}, sort_keys=True))
+        self._tap_xml(self._find('Choose a model'), 'Choose a model')
         return {'context_tokens': 1024, 'cpu_threads': 2, 'batch_tokens': 16,
-                'gpu_layers': 0, 'settings_entered_through_real_ui': True}
+                'gpu_layers': 0, 'settings_entered_through_real_ui': True,
+                'subsequent_verified_revision': data['revision'], 'drive_status_ui_verified': True}
 
     def select_model(self):
         self._icon(FILE_ADD, header=True)
@@ -314,7 +451,11 @@ class InferenceTest(_USBTest):
         self.s.shell('input', 'keyevent', 'KEYCODE_BACK')
         self._top()
         self._tap_xml(self._find('Chats'), 'Chats')
-        self._find('Characters')
+        data = self._wait('Initial Home application snapshot', self._snapshots, 30)
+        characters = [row for row in rows(data, 'characters') if row.get('type') == 'character']
+        if len(characters) != 1 or not characters[0].get('name'):
+            raise InvariantError('The new disposable session does not have exactly one default character')
+        self._find(characters[0]['name'])
         self._swipe('right')
         self._tap('Sampler')
         self._numeric('Generated Tokens', 16)
@@ -331,9 +472,6 @@ class InferenceTest(_USBTest):
 
         data = self._wait('Real Generated Tokens setting saved on removable volume', sample_config, 45)
         self.s.shell('input', 'keyevent', 'KEYCODE_BACK')
-        characters = [row for row in rows(data, 'characters') if row.get('type') == 'character']
-        if len(characters) != 1 or not characters[0].get('name'):
-            raise InvariantError('The new disposable session does not have exactly one default character')
         self._tap(characters[0]['name'])
         self._wait('Loaded-model chat input', lambda: _nodes(self._screen(), 'Message...'), 30)
         data = self._wait('Initial chat snapshot', self._snapshots, 30)
@@ -481,8 +619,8 @@ def run(args):
                           ('candidate-startup', lambda: smoke.launch('candidate')),
                           ('virtual-removable-fixture', test.fixture),
                           ('virtual-removable-saf-grant', test.grant),
-                          ('verified-full-model-fixture', lambda: stage_model(smoke, directory)),
                           ('low-memory-model-settings', test.configure),
+                          ('verified-full-model-fixture', lambda: stage_model(smoke, directory)),
                           ('genuine-external-model-selection', test.select_model),
                           ('real-full-model-load', test.load_model),
                           ('real-chat-setup', test.configure_chat),
