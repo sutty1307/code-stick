@@ -1,0 +1,94 @@
+{
+  "version": "0.10.1-usb.4",
+  "version_code": 4,
+  "apk_path": "/workspace/android-drive-kit/build-results/AI-Drive-Offline_v0.10.1-usb.4.apk",
+  "apk_sha256": "c833e55ff089903f3bc0e084f10b91516590fa5d9945138723e4ba466508d549",
+  "source_path": "/workspace/shared/downloads/AI-Drive-Offline-v0.10.1-usb.4-source.zip",
+  "source_sha256": "1a775d19b53faa8556a295880c303ef5e5f17bf1682d669c59ce79203072722e",
+  "source_archive_files": 347,
+  "source_archive_bytes": 3811006,
+  "source_bytes_and_membership_match_current_fork": true,
+  "source_zip_crc_verified": true,
+  "typescript": {
+    "command": "node node_modules/typescript/bin/tsc --noEmit",
+    "exit_code": 0
+  },
+  "tests": [
+    {
+      "scope": "core, Android adapter and real SQLite application bridge",
+      "passed": 43,
+      "failed": 0
+    },
+    {
+      "scope": "controlled asynchronous file copy helper and actual caller sequencing/rejections",
+      "file": "tests/file-copy.test.cjs",
+      "passed": 13,
+      "failed": 0
+    },
+    {
+      "scope": "offline toolkit",
+      "config": "lib/driveTools/jest.config.cjs",
+      "passed": 64,
+      "failed": 0
+    },
+    {
+      "scope": "RAM settings/session values",
+      "config": "lib/storage/session-values.jest.config.cjs",
+      "passed": 25,
+      "failed": 0
+    },
+    {
+      "scope": "bounded memory prompt retrieval",
+      "config": "lib/engine/DataSources/drive-memory-source.jest.config.cjs",
+      "passed": 26,
+      "failed": 0
+    }
+  ],
+  "total_software_tests_passed": 171,
+  "copy_regression_control": {
+    "baseline": "unchanged usb.3 source from exact archived SHA145b6b4e16cef04956553c16269d5dbbafd11d52fb10d964ec19542e5d7fae4e",
+    "test_name": "copy helper waits for native bytes before reporting success",
+    "expected_baseline_exit_code": 1,
+    "actual_baseline_exit_code": 1,
+    "baseline_failure": "helper resolves true while native copy is still pending",
+    "evidence": "/workspace/android-drive-kit/build-tools/BASELINE-COPY-CONTROL-usb3.txt"
+  },
+  "eslint": {
+    "errors": 0,
+    "warnings": 1,
+    "scope": [
+      "lib/utils/File.ts",
+      "lib/state/Characters.ts",
+      "lib/engine/Tokenizer.ts",
+      "lib/state/Chat.ts",
+      "lib/state/BackgroundImage.ts",
+      "app.config.js",
+      "tests/file-copy.test.cjs"
+    ],
+    "commonjs_environment": "ESLint API overrideConfig defines Node __dirname as readonly because upstream Expo configuration disables it; no source/test-rule suppression"
+  },
+  "prettier": {
+    "exit_code": 0,
+    "scope": [
+      "lib/utils/File.ts",
+      "lib/state/Characters.ts",
+      "lib/engine/Tokenizer.ts",
+      "lib/state/Chat.ts",
+      "lib/state/BackgroundImage.ts",
+      "app.config.js",
+      "FORK-NOTES.md",
+      "BUILD-ANDROID-OFFLINE.md",
+      "tests/file-copy.test.cjs"
+    ]
+  },
+  "build_provenance": "/workspace/android-drive-kit/build-results/AI-Drive-Offline_v0.10.1-usb.4.build.json",
+  "upgrade_metadata_verification": "/workspace/android-drive-kit/build-results/AI-Drive-Offline_v0.10.1-usb.4-upgrade-verification.json",
+  "actual_android_runtime_tested_for_this_version": false,
+  "actual_android_phone_tested": false,
+  "physical_usb_tested": false,
+  "android_model_inference_tested": false,
+  "full_kit_created": false,
+  "latest_pointer_modified": false,
+  "git_push_or_release_performed": false,
+  "private_signing_files_in_source_archive": false
+}

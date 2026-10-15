@@ -16,12 +16,12 @@ import xml.etree.ElementTree as ET
 PACKAGE = 'com.codestick.aidrive'
 COMPONENT = PACKAGE + '/com.Vali98.ChatterUI.MainActivity'
 BASELINE_SHA256 = '937b9d098130525d72dbbbf428868c4a66794927a801fe55d6a8899278cb28e2'
-# Exact reviewed usb.3 APK; v1 remains the immutable upgrade baseline.
-CANDIDATE_SHA256 = '68cdd45ed4bae858be353d9fa49a6437f3d8831c512d617d616a90f4e3a08f74'
-CANDIDATE_VERSION_CODE = 3
+# Exact reviewed usb.4 APK; v1 remains the immutable upgrade baseline.
+CANDIDATE_SHA256 = 'c833e55ff089903f3bc0e084f10b91516590fa5d9945138723e4ba466508d549'
+CANDIDATE_VERSION_CODE = 4
 API = 35
 IMAGE = f'system-images;android-{API};google_apis;x86_64'
-AVD = f'ai_drive_runtime_usb3_api{API}'
+AVD = f'ai_drive_runtime_usb4_api{API}'
 SERIAL = 'emulator-5554'
 
 
@@ -89,7 +89,7 @@ class Smoke:
     def __init__(self, sdk, evidence, env):
         self.sdk, self.evidence, self.env = Path(sdk), Path(evidence), env
         self.adb_path = self.sdk / 'platform-tools/adb'
-        self.results = {'test': f'API{API} KVM usb.3 startup and v1 upgrade smoke', 'physical_phone_tested': False,
+        self.results = {'test': f'API{API} KVM usb.4 startup and v1 upgrade smoke', 'physical_phone_tested': False,
                         'physical_usb_tested': False, 'model_inference_tested': False,
                         'usb_memory_persistence_tested': False, 'phases': {}}
 
@@ -332,14 +332,14 @@ def run(args):
         smoke, emulator, logcat, handles = Smoke(args.sdk, evidence, env), None, None, []
         smoke.results['test_mode'] = 'fresh-candidate' if args.fresh_candidate else 'baseline-upgrade'
         if args.fresh_candidate:
-            smoke.results['test'] = f'API{API} KVM fresh usb.3 candidate startup smoke; no baseline or upgrade test'
+            smoke.results['test'] = f'API{API} KVM fresh usb.4 candidate startup smoke; no baseline or upgrade test'
         setup_stage = 'KVM prerequisites'
         try:
             if platform.machine() != 'x86_64' or not os.access('/dev/kvm', os.R_OK | os.W_OK):
                 raise RuntimeError('This test requires an x86_64 hosted VM with usable /dev/kvm; no TCG fallback')
             setup_stage = 'APK SHA-256 verification'
             if not re.fullmatch(r'[0-9a-f]{64}', CANDIDATE_SHA256):
-                raise RuntimeError('The reviewed usb.3 candidate APK SHA-256 pin is invalid')
+                raise RuntimeError('The reviewed usb.4 candidate APK SHA-256 pin is invalid')
             apks = [('candidate', args.candidate, CANDIDATE_SHA256)]
             if not args.fresh_candidate:
                 apks.insert(0, ('baseline', args.baseline, BASELINE_SHA256))

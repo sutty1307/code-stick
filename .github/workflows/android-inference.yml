@@ -1,24 +1,24 @@
-name: Android usb.3 exact APK full model inference
+name: Android usb.4 exact APK full model inference
 
-# LOCAL PROPOSAL. Root reviews and integrates; this file has not been pushed/run.
+# Verify the exact repaired offline APK with the real full model on Android.
 on:
   push:
-    branches: [repair/android-runtime-usb3]
+    branches: [repair/android-runtime-usb4]
     paths:
       - .github/workflows/android-inference.yml
       - portable/runtime/model_inference_smoke.py
-      - portable/android/AI-Drive-Offline_v0.10.1-usb.3.apk
+      - portable/android/AI-Drive-Offline_v0.10.1-usb.4.apk
 
 permissions:
   contents: read
 
 concurrency:
-  group: android-full-model-inference-usb3
+  group: android-full-model-inference-usb4
   cancel-in-progress: false
 
 jobs:
   inference:
-    if: github.repository == 'sutty1307/code-stick' && github.ref == 'refs/heads/repair/android-runtime-usb3'
+    if: github.repository == 'sutty1307/code-stick' && github.ref == 'refs/heads/repair/android-runtime-usb4'
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
@@ -45,14 +45,14 @@ jobs:
         run: >-
           python3 portable/runtime/model_inference_smoke.py
           --sdk "$ANDROID_HOME"
-          --candidate portable/android/AI-Drive-Offline_v0.10.1-usb.3.apk
-          --evidence inference-evidence-usb3
+          --candidate portable/android/AI-Drive-Offline_v0.10.1-usb.4.apk
+          --evidence inference-evidence-usb4
       - name: Retain actual screenshots, UI XML, logcat and results
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: Android-full-model-usb3-${{ github.run_id }}-${{ github.run_attempt }}
-          path: inference-evidence-usb3/
+          name: Android-full-model-usb4-${{ github.run_id }}-${{ github.run_attempt }}
+          path: inference-evidence-usb4/
           retention-days: 14
           if-no-files-found: warn
           compression-level: 6

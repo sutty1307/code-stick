@@ -1,0 +1,49 @@
+{
+  "baselines": [
+    {
+      "sha256": "937b9d098130525d72dbbbf428868c4a66794927a801fe55d6a8899278cb28e2",
+      "application_id": "com.codestick.aidrive",
+      "version_code": 1,
+      "version": "0.10.1-usb.1",
+      "certificate_sha256": [
+        "9a286ca73cc5ef45bc6a474773209317433639aa9fdc068e65a63dea10d3b551"
+      ]
+    },
+    {
+      "sha256": "aab31bcdf39f623cd21c30e02db0b1c16674e4ec27c77fb28f9cef7f5d422c1b",
+      "application_id": "com.codestick.aidrive",
+      "version_code": 2,
+      "version": "0.10.1-usb.2",
+      "certificate_sha256": [
+        "9a286ca73cc5ef45bc6a474773209317433639aa9fdc068e65a63dea10d3b551"
+      ]
+    },
+    {
+      "sha256": "68cdd45ed4bae858be353d9fa49a6437f3d8831c512d617d616a90f4e3a08f74",
+      "application_id": "com.codestick.aidrive",
+      "version_code": 3,
+      "version": "0.10.1-usb.3",
+      "certificate_sha256": [
+        "9a286ca73cc5ef45bc6a474773209317433639aa9fdc068e65a63dea10d3b551"
+      ]
+    }
+  ],
+  "candidate": {
+    "sha256": "c833e55ff089903f3bc0e084f10b91516590fa5d9945138723e4ba466508d549",
+    "application_id": "com.codestick.aidrive",
+    "version_code": 4,
+    "version": "0.10.1-usb.4",
+    "certificate_sha256": [
+      "9a286ca73cc5ef45bc6a474773209317433639aa9fdc068e65a63dea10d3b551"
+    ]
+  },
+  "baseline_apks_unchanged": true,
+  "usb2_and_usb3_source_archives_unchanged": true,
+  "same_signing_certificate": true,
+  "higher_version_code": true,
+  "embedded_config_and_provenance_match": true,
+  "public_default_character_asset_unchanged": true,
+  "metadata_upgrade_compatible": true,
+  "runtime_upgrade_tested": false,
+  "actual_android_phone_tested": false
+}

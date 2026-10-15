@@ -1,26 +1,26 @@
-name: Android usb.3 fresh and v1 upgrade runtime checks
+name: Android usb.4 fresh and v1 upgrade runtime checks
 
-# Local proposal. Root owns integration into the isolated usb.3 repair branch.
+# Verify the exact usb.4 APK on fresh installation and over the signed v1 baseline.
 on:
   push:
-    branches: [repair/android-runtime-usb3]
+    branches: [repair/android-runtime-usb4]
     paths:
       - .github/workflows/android-runtime.yml
       - portable/runtime/runtime_smoke.py
       - portable/runtime/usb_memory_smoke.py
-      - portable/android/AI-Drive-Offline_v0.10.1-usb.3.apk
+      - portable/android/AI-Drive-Offline_v0.10.1-usb.4.apk
 
 permissions:
   contents: read
 
 concurrency:
-  group: android-runtime-usb3
+  group: android-runtime-usb4
   cancel-in-progress: false
 
 jobs:
   runtime:
-    name: Android usb.3 ${{ matrix.mode }}
-    if: github.repository == 'sutty1307/code-stick' && github.ref == 'refs/heads/repair/android-runtime-usb3'
+    name: Android usb.4 ${{ matrix.mode }}
+    if: github.repository == 'sutty1307/code-stick' && github.ref == 'refs/heads/repair/android-runtime-usb4'
     runs-on: ubuntu-24.04
     timeout-minutes: 40
     strategy:
@@ -50,21 +50,21 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends libpulse0
-      - name: Test exact usb.3 candidate in ${{ matrix.mode }} mode
+      - name: Test exact usb.4 candidate in ${{ matrix.mode }} mode
         timeout-minutes: 30
         run: >-
           python3 portable/runtime/runtime_smoke.py
           --sdk "$ANDROID_HOME"
           --baseline portable/android/AI-Drive-Offline_v0.10.1-usb.1.apk
-          --candidate portable/android/AI-Drive-Offline_v0.10.1-usb.3.apk
-          --evidence runtime-evidence-usb3-${{ matrix.mode }}
+          --candidate portable/android/AI-Drive-Offline_v0.10.1-usb.4.apk
+          --evidence runtime-evidence-usb4-${{ matrix.mode }}
           ${{ matrix.arguments }}
       - name: Retain screenshots, UI XML and logs even if runtime fails
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: Android-runtime-usb3-${{ matrix.mode }}-${{ github.run_id }}-${{ github.run_attempt }}
-          path: runtime-evidence-usb3-${{ matrix.mode }}/
+          name: Android-runtime-usb4-${{ matrix.mode }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: runtime-evidence-usb4-${{ matrix.mode }}/
           retention-days: 14
           if-no-files-found: warn
           compression-level: 6

@@ -29,7 +29,7 @@ from usb_memory_smoke import _USBTest, _bounds, _nodes, _root_rows, InvariantErr
 API = 35
 IMAGE = 'system-images;android-35;google_apis;x86_64'
 AVD = 'ai_drive_real_inference_api35'
-APK_SHA256 = '68cdd45ed4bae858be353d9fa49a6437f3d8831c512d617d616a90f4e3a08f74'
+APK_SHA256 = 'c833e55ff089903f3bc0e084f10b91516590fa5d9945138723e4ba466508d549'
 MODEL_FILE = 'Llama-3.2-3B-Instruct-abliterated.Q4_K_M.gguf'
 MODEL_BYTES = 2019377472
 MODEL_SHA256 = 'e1f2b428e316d8bd1cb5ca13e9649329e299d951fbcee6b3cd0e9f1d646c9fa7'
@@ -231,6 +231,21 @@ def completed_reply(data, prompt, baseline_ids):
     if len(candidates) > 1:
         raise InvariantError('Multiple new generated assistant replies found for the one fixture prompt')
     return candidates[0] if candidates else None
+
+
+def visible_reply_words(text):
+    """Remove only paired inline Markdown markers that the real renderer hides.
+
+    Native timings, exact durable text and archive matching remain mandatory.
+    Preserve words, case and punctuation; unsupported markup still fails closed.
+    """
+    patterns = (r'\*\*([^*\n]+)\*\*', r'__([^_\n]+)__', r'~~([^~\n]+)~~',
+                r'`([^`\n]+)`', r'(?<!\*)\*([^*\n]+)\*(?!\*)',
+                r'(?<!\w)_([^_\n]+)_(?!\w)')
+    for _ in range(2):
+        for pattern in patterns:
+            text = re.sub(pattern, r'\1', text)
+    return text.split()
 
 
 def icon_target(xml, glyph, header=False):
@@ -476,7 +491,7 @@ class InferenceTest(_USBTest):
             self._tap('Show internal storage')
             self._tap('Show roots')
         self._tap(primary[0]['title'])
-        self._tap('Download')
+        self._tap_xml(self._find('Download'), 'Download')
         self._tap(MODEL_FILE)
 
         def selected():
@@ -599,7 +614,8 @@ class InferenceTest(_USBTest):
                     return None
                 # Actual rendered output must match durable output; hidden snapshot text alone cannot pass.
                 text = ' '.join(node.get('text', '') for node in ET.fromstring(xml).iter('node'))
-                if not all(word in text for word in reply['text'].split()):
+                words = visible_reply_words(reply['text'])
+                if not words or not all(word in text for word in words):
                     return None
                 return reply
 
@@ -654,7 +670,7 @@ def run(args):
         Path(env['ANDROID_AVD_HOME']).mkdir()
         Path(env['ANDROID_USER_HOME']).mkdir()
         smoke, emulator, logcat, handles = Smoke(args.sdk, evidence, env), None, None, []
-        smoke.results.update({'test': 'API35 exact usb.3 APK full 3B inference with public Download model',
+        smoke.results.update({'test': 'API35 exact usb.4 APK full 3B inference with public Download model',
                               'phone_model_storage': 'Download', 'model_on_removable_storage_tested': False,
                               'guest_ram_mib': 6144, 'fresh_install_only': True})
         stage = 'prerequisites'
@@ -707,7 +723,7 @@ def run(args):
                 if re.search(rf'^package:{re.escape(PACKAGE)}\s*$', packages, re.MULTILINE):
                     raise InvariantError('Candidate already installed on new isolated AVD')
                 test = InferenceTest(smoke)
-                phases = [('candidate-install', lambda: smoke.install(args.candidate, 3)),
+                phases = [('candidate-install', lambda: smoke.install(args.candidate, 4)),
                           ('candidate-startup', lambda: smoke.launch('candidate')),
                           ('virtual-removable-fixture', test.fixture),
                           ('virtual-removable-saf-grant', test.grant),
