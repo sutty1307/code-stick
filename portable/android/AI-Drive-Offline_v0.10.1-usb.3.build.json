@@ -1,0 +1,31 @@
+{
+  "build_method": "Source Metro/Hermes bundle with verified matching publisher native shell",
+  "application_id": "com.codestick.aidrive",
+  "application_name": "AI Drive Offline",
+  "version": "0.10.1-usb.3",
+  "version_code": 3,
+  "apk_sha256": "68cdd45ed4bae858be353d9fa49a6437f3d8831c512d617d616a90f4e3a08f74",
+  "publisher_native_apk_sha256": "ec051d90bc9f82587a726b525976494bacef50bc8a7dd0e3789b859373121753",
+  "source_package_lock_sha256": "c288c0e0ee6ed50c945c80d9346bd8fcd00a29a8bff98c8e67d6392c8273807d",
+  "source_public_config_sha256": "e93242018a6778bb33e8d55947af1d2db1732cbbf26dc239d6fc398d1052feda",
+  "source_bundle_sha256": "a802f3a20f6c0ec80f9a3998f92611b239a0a623a07fa732fe67e7f8e76fd94e",
+  "react_native": "0.86.3",
+  "expo_sdk": "57.0.0",
+  "hermes_bytecode": 98,
+  "preserved_dex_and_native_files": 55,
+  "native_files_byte_identical": true,
+  "zip_crc_verified": true,
+  "zip_alignment_verified": true,
+  "architecture": [
+    "arm64-v8a"
+  ],
+  "minimum_android_sdk": 24,
+  "internet_permission": false,
+  "network_state_permission": false,
+  "allow_backup": false,
+  "cleartext_traffic": false,
+  "debuggable": false,
+  "ota_updates": false,
+  "private_signing_key_included": false,
+  "actual_android_phone_tested": false
+}

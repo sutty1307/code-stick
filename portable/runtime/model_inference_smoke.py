@@ -29,7 +29,7 @@ from usb_memory_smoke import _USBTest, _bounds, _nodes, _root_rows, InvariantErr
 API = 35
 IMAGE = 'system-images;android-35;google_apis;x86_64'
 AVD = 'ai_drive_real_inference_api35'
-APK_SHA256 = 'aab31bcdf39f623cd21c30e02db0b1c16674e4ec27c77fb28f9cef7f5d422c1b'
+APK_SHA256 = '68cdd45ed4bae858be353d9fa49a6437f3d8831c512d617d616a90f4e3a08f74'
 MODEL_FILE = 'Llama-3.2-3B-Instruct-abliterated.Q4_K_M.gguf'
 MODEL_BYTES = 2019377472
 MODEL_SHA256 = 'e1f2b428e316d8bd1cb5ca13e9649329e299d951fbcee6b3cd0e9f1d646c9fa7'
@@ -253,14 +253,28 @@ class InferenceTest(_USBTest):
         self._reported_invalid_slot = False
 
     def _snapshots(self):
-        samples = []
+        samples, read_errors = [], {}
         for name in ('drive-memory-a.json', 'drive-memory-b.json'):
             path = self.base + '/' + name
             if self.s.adb('shell', 'test', '-f', path, check=False).returncode:
                 samples.append((name, None))
             else:
-                samples.append((name, self.s.shell('cat', path)))
+                try:
+                    samples.append((name, self.s.shell('cat', path)))
+                except (RuntimeError, subprocess.TimeoutExpired) as error:
+                    # usb.3 replaces the inactive document. It may disappear
+                    # between test -f and cat; the verified partner remains valid.
+                    missing = self.s.adb('shell', 'test', '-f', path, check=False).returncode != 0
+                    samples.append((name, None))
+                    read_errors[name] = {'name': name, 'present': not missing, 'valid': False,
+                                         'error_layer': 'read', 'error_type': type(error).__name__,
+                                         'missing_after_existence_check': missing}
         data, metadata = select_verified_snapshot(samples)
+        for index, item in enumerate(metadata['slots']):
+            if item['name'] in read_errors:
+                metadata['slots'][index] = read_errors[item['name']]
+        metadata['recovered_invalid_other'] = any(
+            item.get('present') and not item['valid'] for item in metadata['slots'])
         self.last_slot_diagnostics = metadata
         text = json.dumps(metadata, sort_keys=True)
         self.s.write('inference-snapshot-read-metadata.json', json.dumps(metadata, indent=2) + '\n')
@@ -562,7 +576,7 @@ def run(args):
         Path(env['ANDROID_AVD_HOME']).mkdir()
         Path(env['ANDROID_USER_HOME']).mkdir()
         smoke, emulator, logcat, handles = Smoke(args.sdk, evidence, env), None, None, []
-        smoke.results.update({'test': 'API35 exact APK full 3B inference with public Download model',
+        smoke.results.update({'test': 'API35 exact usb.3 APK full 3B inference with public Download model',
                               'phone_model_storage': 'Download', 'model_on_removable_storage_tested': False,
                               'guest_ram_mib': 6144, 'fresh_install_only': True})
         stage = 'prerequisites'
@@ -615,7 +629,7 @@ def run(args):
                 if re.search(rf'^package:{re.escape(PACKAGE)}\s*$', packages, re.MULTILINE):
                     raise InvariantError('Candidate already installed on new isolated AVD')
                 test = InferenceTest(smoke)
-                phases = [('candidate-install', lambda: smoke.install(args.candidate, 2)),
+                phases = [('candidate-install', lambda: smoke.install(args.candidate, 3)),
                           ('candidate-startup', lambda: smoke.launch('candidate')),
                           ('virtual-removable-fixture', test.fixture),
                           ('virtual-removable-saf-grant', test.grant),

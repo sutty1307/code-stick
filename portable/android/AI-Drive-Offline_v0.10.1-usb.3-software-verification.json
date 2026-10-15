@@ -1,0 +1,76 @@
+{
+  "version": "0.10.1-usb.3",
+  "version_code": 3,
+  "apk_path": "/workspace/android-drive-kit/build-results/AI-Drive-Offline_v0.10.1-usb.3.apk",
+  "apk_sha256": "68cdd45ed4bae858be353d9fa49a6437f3d8831c512d617d616a90f4e3a08f74",
+  "source_path": "/workspace/shared/downloads/AI-Drive-Offline-v0.10.1-usb.3-source.zip",
+  "source_sha256": "145b6b4e16cef04956553c16269d5dbbafd11d52fb10d964ec19542e5d7fae4e",
+  "source_archive_files": 346,
+  "source_bytes_and_membership_match_current_fork": true,
+  "source_zip_crc_verified": true,
+  "typescript": {
+    "command": "node node_modules/typescript/bin/tsc --noEmit",
+    "exit_code": 0
+  },
+  "tests": [
+    {
+      "scope": "core, Android adapter and SQLite application bridge",
+      "command": "node --test lib/driveMemory/core.test.cjs lib/driveMemory/android.test.cjs tests/drive-bridge.test.cjs",
+      "passed": 43,
+      "failed": 0
+    },
+    {
+      "scope": "offline toolkit",
+      "config": "lib/driveTools/jest.config.cjs",
+      "passed": 64,
+      "failed": 0
+    },
+    {
+      "scope": "RAM settings/session values",
+      "config": "lib/storage/session-values.jest.config.cjs",
+      "passed": 25,
+      "failed": 0
+    },
+    {
+      "scope": "bounded memory prompt retrieval",
+      "config": "lib/engine/DataSources/drive-memory-source.jest.config.cjs",
+      "passed": 26,
+      "failed": 0
+    }
+  ],
+  "total_software_tests_passed": 158,
+  "eslint": {
+    "errors": 0,
+    "warnings": 12,
+    "scope": [
+      "lib/driveMemory/core.ts",
+      "lib/driveMemory/android.ts",
+      "lib/driveMemory/core.test.cjs",
+      "lib/driveMemory/android.test.cjs",
+      "app.config.js"
+    ],
+    "commonjs_environment": "ESLint API overrideConfig defines Node __dirname as readonly because upstream Expo configuration disables it; no source/test-rule suppression"
+  },
+  "prettier": {
+    "exit_code": 0,
+    "scope": [
+      "lib/driveMemory/core.ts",
+      "lib/driveMemory/android.ts",
+      "lib/driveMemory/core.test.cjs",
+      "lib/driveMemory/android.test.cjs",
+      "app.config.js",
+      "FORK-NOTES.md",
+      "BUILD-ANDROID-OFFLINE.md"
+    ]
+  },
+  "build_provenance": "/workspace/android-drive-kit/build-results/AI-Drive-Offline_v0.10.1-usb.3.build.json",
+  "upgrade_metadata_verification": "/workspace/android-drive-kit/build-results/AI-Drive-Offline_v0.10.1-usb.3-upgrade-verification.json",
+  "actual_android_runtime_tested_for_this_version": false,
+  "actual_android_phone_tested": false,
+  "physical_usb_tested": false,
+  "android_model_inference_tested": false,
+  "full_kit_created": false,
+  "latest_pointer_modified": false,
+  "git_push_or_release_performed": false,
+  "private_signing_files_in_source_archive": false
+}
