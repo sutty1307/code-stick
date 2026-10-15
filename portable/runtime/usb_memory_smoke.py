@@ -57,6 +57,37 @@ def _root_rows(output):
     return rows
 
 
+def _labeled_input(xml, label):
+    """Return a genuine adjacent field, or None when it is still offscreen."""
+    labels = _nodes(xml, label)
+    if len(labels) != 1:
+        raise InvariantError(f'Input label is ambiguous: {label}')
+    left, top, right, bottom = _bounds(labels[0])
+    root = ET.fromstring(xml)
+    # These two forms have separate sibling labels. Never associate a title
+    # with the later Memory text field merely because its own field is clipped.
+    next_labels = [_bounds(node)[1] for node in root.iter('node')
+                   if node.get('class') == 'android.widget.TextView'
+                   and node.get('text') in ('Note title (optional)', 'Memory text')
+                   and node.get('text') != label and _bounds(node)
+                   and _bounds(node)[1] >= bottom]
+    fence = min(next_labels) if next_labels else None
+    candidates = []
+    for node in root.iter('node'):
+        bounds = _bounds(node)
+        if (node.get('class') == 'android.widget.EditText' and bounds
+                and node.get('enabled') != 'false' and bounds[1] >= bottom
+                and bounds[0] < right and bounds[2] > left
+                and (fence is None or bounds[1] < fence)):
+            candidates.append((bounds[1] - bottom, node, bounds))
+    candidates.sort(key=lambda item: item[0])
+    if not candidates or candidates[0][0] > 400:
+        return None
+    if len(candidates) > 1 and candidates[0][0] == candidates[1][0]:
+        raise InvariantError(f'Multiple adjacent EditTexts for the actual {label!r} label')
+    return candidates[0][1:]
+
+
 class _USBTest:
     def __init__(self, smoke):
         self.s = smoke
@@ -172,23 +203,18 @@ class _USBTest:
     def _fill(self, label, value):
         if not re.fullmatch(r'[A-Za-z0-9]+', value):
             raise RuntimeError('Only locally generated ASCII fixture markers may be typed')
-        xml = self._find(label)
-        root = ET.fromstring(xml)
-        labels = _nodes(xml, label)
-        if len(labels) != 1:
-            raise RuntimeError(f'Input label is ambiguous: {label}')
-        label_bounds = _bounds(labels[0])
-        candidates = []
-        for node in root.iter('node'):
-            bounds = _bounds(node)
-            if (node.get('class') == 'android.widget.EditText' and bounds
-                    and node.get('enabled') != 'false' and bounds[1] >= label_bounds[3]
-                    and bounds[0] < label_bounds[2] and bounds[2] > label_bounds[0]):
-                candidates.append((bounds[1] - label_bounds[3], node, bounds))
-        candidates.sort(key=lambda item: item[0])
-        if not candidates or candidates[0][0] > 400:
-            raise RuntimeError(f'No EditText directly below the actual {label!r} label')
-        _, node, (left, top, right, bottom) = candidates[0]
+        selected = None
+        for attempt in range(4):
+            selected = _labeled_input(self._find(label), label)
+            if selected:
+                break
+            if attempt < 3:
+                # A label can be visible at the viewport edge while its field
+                # is not. Scroll, then reacquire BOTH from the fresh real XML.
+                self._swipe('up')
+        if selected is None:
+            raise RuntimeError(f'No EditText directly below the actual {label!r} label after 3 bounded scrolls')
+        node, (left, top, right, bottom) = selected
         if node.get('text'):
             raise RuntimeError(f'{label} is not blank; refusing to overwrite unexpected state')
         self.s.shell('input', 'tap', str((left + right) // 2), str((top + bottom) // 2))
