@@ -17,8 +17,9 @@ PACKAGE = 'com.codestick.aidrive'
 COMPONENT = PACKAGE + '/com.Vali98.ChatterUI.MainActivity'
 BASELINE_SHA256 = '937b9d098130525d72dbbbf428868c4a66794927a801fe55d6a8899278cb28e2'
 CANDIDATE_SHA256 = 'aab31bcdf39f623cd21c30e02db0b1c16674e4ec27c77fb28f9cef7f5d422c1b'
-IMAGE = 'system-images;android-30;google_apis;x86_64'
-AVD = 'ai_drive_runtime_api30'
+API = 35
+IMAGE = f'system-images;android-{API};google_apis;x86_64'
+AVD = f'ai_drive_runtime_api{API}'
 SERIAL = 'emulator-5554'
 
 
@@ -80,7 +81,7 @@ class Smoke:
     def __init__(self, sdk, evidence, env):
         self.sdk, self.evidence, self.env = Path(sdk), Path(evidence), env
         self.adb_path = self.sdk / 'platform-tools/adb'
-        self.results = {'test': 'API30 KVM startup and upgrade smoke', 'physical_phone_tested': False,
+        self.results = {'test': f'API{API} KVM startup and upgrade smoke', 'physical_phone_tested': False,
                         'physical_usb_tested': False, 'model_inference_tested': False,
                         'usb_memory_persistence_tested': False, 'phases': {}}
 
@@ -292,7 +293,7 @@ def run(args):
             if installed.returncode:
                 raise RuntimeError(f'sdkmanager exited {installed.returncode}; stderr: {installed.stderr[-1200:]}; stdout: {installed.stdout[-400:]}')
             setup_stage = 'installed SDK image properties'
-            smoke.write('system-image-source.properties', (args.sdk / 'system-images/android-30/google_apis/x86_64/source.properties').read_text())
+            smoke.write('system-image-source.properties', (args.sdk / f'system-images/android-{API}/google_apis/x86_64/source.properties').read_text())
             setup_stage = 'emulator version'
             smoke.write('emulator-version.txt', smoke.command([args.sdk / 'emulator/emulator', '-version']).stdout)
             setup_stage = 'emulator KVM acceleration check'
@@ -325,8 +326,8 @@ def run(args):
             props = {key: smoke.shell('getprop', key) for key in ['ro.product.cpu.abilist', 'ro.dalvik.vm.native.bridge', 'ro.dalvik.vm.isa.arm64', 'ro.build.version.sdk']}
             smoke.write('guest-runtime-properties.json', json.dumps(props, indent=2))
             if ('arm64-v8a' not in props['ro.product.cpu.abilist'] or props['ro.dalvik.vm.native.bridge'] != 'libndk_translation.so'
-                    or props['ro.dalvik.vm.isa.arm64'] != 'x86_64' or props['ro.build.version.sdk'] != '30'):
-                raise RuntimeError('The Google API image does not advertise the required ARM64 native translation')
+                    or props['ro.dalvik.vm.isa.arm64'] != 'x86_64' or props['ro.build.version.sdk'] != str(API)):
+                raise RuntimeError(f'The Google API {API} image does not advertise the required ARM64 native translation: {props}')
             setup_stage = 'app runtime phases'
             baseline = smoke.phase('baseline-install', lambda: smoke.install(args.baseline, 1))
             if baseline:
