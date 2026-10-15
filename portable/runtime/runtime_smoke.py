@@ -26,7 +26,7 @@ def report_annotation(kind, message):
     """Emit a bounded native CI diagnostic directly from this execution."""
     # A single bounded annotation is a failure summary, not an artifact/file relay.
     # Escape workflow-command data so exception text cannot create new commands.
-    message = message[:2000]
+    message = message[:6000]
     message = message.replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
     print(f'::{kind}::{message}', flush=True)
 
@@ -206,7 +206,18 @@ class Smoke:
         while time.monotonic() < until:
             pid = self.shell('pidof', PACKAGE, check=False)
             if not pid or (initial is not None and initial != pid):
-                raise RuntimeError('Application process exited or restarted during the startup observation')
+                crash = self.shell('logcat', '-d', '-b', 'crash', '-v', 'brief', check=False)
+                lines = crash.splitlines()
+                anchor = next((i for i, line in enumerate(lines) if PACKAGE in line), None)
+                crash_detail = ''
+                if anchor is not None:
+                    crash_detail = '\n'.join(lines[max(0, anchor - 3):anchor + 45])[:4500]
+                if not crash_detail.strip():
+                    crash_detail = self.shell('logcat', '-d', '-v', 'brief', '-s',
+                                              'AndroidRuntime:E', 'ReactNativeJS:E', 'libc:F',
+                                              check=False)[-4500:]
+                raise RuntimeError('Application process exited or restarted during startup. '
+                                   f'Android crash diagnostic: {crash_detail or "No crash message returned"}')
             initial = pid
             if self.shell('pidof', 'system_server') != self.results['stable_system_server_pid']:
                 raise RuntimeError('Android framework restarted during application startup')
