@@ -103,6 +103,19 @@ class _USBTest:
         # ambiguous controls at distinct positions are not.
         positions = {_bounds(node) for node in matches}
         if len(positions) > 1:
+            text_targets = [node for node in matches
+                            if node.get('class') == 'android.widget.TextView'
+                            and node.get('text', '').casefold() == label.casefold()]
+            if len(text_targets) == 1:
+                target = _bounds(text_targets[0])
+                left, top, right, bottom = target
+                if all(outer[0] <= left and outer[1] <= top
+                       and outer[2] >= right and outer[3] >= bottom
+                       for outer in positions):
+                    # One label plus its containing accessible Pressable is one
+                    # control. Distinct or disjoint matching controls stay fatal.
+                    positions = {target}
+        if len(positions) > 1:
             raise InvariantError(f'Ambiguous enabled UI targets for {label!r}')
         if len(positions) != 1:
             raise RuntimeError(f'Expected one enabled visible UI target for {label!r}; found {len(positions)}')
