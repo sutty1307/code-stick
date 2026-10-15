@@ -270,6 +270,42 @@ def icon_target(xml, glyph, header=False):
     return next(iter(positions)) if positions else None
 
 
+def home_drawer_visible(xml):
+    # Drawer.Body only renders these source-defined route controls while open.
+    # The underlying AI Bot label can remain in Accessibility XML under its overlay.
+    return bool(_nodes(xml, 'Drive Memory') and _nodes(xml, 'Sampler'))
+
+
+class InferenceSmoke(Smoke):
+    """Keep every result/capture, reserving native notices for the final proof.
+
+    GitHub limits notice annotations per step. Four fixture notices plus the
+    explicit onboarding/settings/load/reply notices below total at most eight.
+    The shared runtime helper and its fresh/upgrade behavior are unchanged.
+    """
+    notice_phases = {'candidate-install', 'candidate-startup', 'verified-full-model-fixture',
+                     'genuine-external-model-selection'}
+
+    def phase(self, label, operation):
+        started = time.monotonic()
+        try:
+            self.shell('logcat', '-c', check=False)
+            details = operation() or {}
+            self.results['phases'][label] = {'passed': True,
+                'elapsed_seconds': round(time.monotonic() - started, 2), **details}
+            if label in self.notice_phases:
+                report_annotation('notice', f'{label}: PASS ' + json.dumps(details, sort_keys=True))
+            return True
+        except Exception as error:
+            self.results['phases'][label] = {'passed': False,
+                'elapsed_seconds': round(time.monotonic() - started, 2), 'error': str(error)}
+            report_annotation('error', f'{label}: {type(error).__name__}: {error}')
+            return False
+        finally:
+            self.capture(label)
+            self.save()
+
+
 class InferenceTest(_USBTest):
     def __init__(self, smoke):
         super().__init__(smoke)
@@ -579,7 +615,24 @@ class InferenceTest(_USBTest):
 
         data = self._wait('Real Generated Tokens setting saved on removable volume', sample_config, 45)
         self.s.shell('input', 'keyevent', 'KEYCODE_BACK')
-        self._tap(self.onboarding_character['name'])
+        def returned_home():
+            xml = self._screen()
+            return xml if (_nodes(xml, self.onboarding_character['name'])
+                           and not _nodes(xml, 'Generated Tokens')) else None
+        xml = self._wait('Actual Home after returning from Sampler', returned_home, 30)
+        # RouteList pushes Sampler without closing its global settings drawer.
+        # Close the actual overlay before using a visible underlying card label;
+        # otherwise those coordinates can hit drawer UserInfo → Edit User.
+        if home_drawer_visible(xml):
+            self.s.shell('input', 'keyevent', 'KEYCODE_BACK')
+        def uncovered_home():
+            xml = self._screen()
+            return xml if (_nodes(xml, self.onboarding_character['name'])
+                           and not home_drawer_visible(xml)
+                           and not _nodes(xml, 'Edit User')) else None
+        xml = self._wait('Uncovered AI Bot Home card with drawer closed', uncovered_home, 30)
+        self.s.write('chat-home-drawer-closed.xml', xml)
+        self._tap_xml(xml, self.onboarding_character['name'])
         self._wait('Loaded-model chat input', lambda: _nodes(self._screen(), 'Message...'), 30)
         data = self._wait('Initial chat snapshot', self._snapshots, 30)
         self.baseline_ids = {str(row['id']) for row in rows(data, 'chat_entries')}
@@ -669,7 +722,7 @@ def run(args):
                     'ANDROID_HOME': str(args.sdk.resolve()), 'ANDROID_SDK_ROOT': str(args.sdk.resolve())})
         Path(env['ANDROID_AVD_HOME']).mkdir()
         Path(env['ANDROID_USER_HOME']).mkdir()
-        smoke, emulator, logcat, handles = Smoke(args.sdk, evidence, env), None, None, []
+        smoke, emulator, logcat, handles = InferenceSmoke(args.sdk, evidence, env), None, None, []
         smoke.results.update({'test': 'API35 exact usb.4 APK full 3B inference with public Download model',
                               'phone_model_storage': 'Download', 'model_on_removable_storage_tested': False,
                               'guest_ram_mib': 6144, 'fresh_install_only': True})
