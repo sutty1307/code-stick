@@ -35,6 +35,11 @@ jobs:
           fi
           test -r /dev/kvm
           test -w /dev/kvm
+      - name: Install Android emulator runtime dependency
+        timeout-minutes: 5
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends libpulse0
       - name: Test exact baseline, upgrade, startup and visible local calculator
         timeout-minutes: 25
         run: >-
