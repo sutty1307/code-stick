@@ -1,5 +1,34 @@
 # Validation record
 
+## October 15, 2026 — deployment dependency repair
+
+- Located the existing application on `sutty1307/code-stick`, branch
+  `depositdesk-launch`, source revision
+  `4842dfe9b260091ec8d97a5f0d00f847127e7f76`. The repair was prepared in an
+  isolated checkout; the existing application and records were preserved.
+- Reproduced the installation failure with
+  `python3 -m pip install --dry-run --ignore-installed --no-deps --no-cache-dir -r requirements.txt`:
+  the available package index has no `gunicorn==26.2.2`. The official PyPI
+  version endpoint also returned 404. The upstream GitHub 26.2.2 release exists.
+- Replaced the version-only requirement with that release's upstream commit
+  `8d98faa9a13d3399a7bea81b5169e5cd72225395` source archive and SHA-256
+  `b42561d72978f30c97b65ea1ba54b0171dfe7f1ef8603b13085647cacec2077d`.
+  This keeps Gunicorn 26.2.2 and normal TLS/checksum verification.
+- A fresh Python 3.12 virtual environment installed the corrected requirements;
+  `pip check` found no broken requirements. The actual Gunicorn process reports
+  **26.2.2**, runs two workers with four threads each, and passes readiness,
+  owner login, fictional simulator draft/release/status, password rotation,
+  rejection of the old password/session, and record-retention checks through
+  `python tests/check_gunicorn.py`.
+- All 100 Python tests pass, including real loopback HTTP tests and mocked cloud
+  and provider tests. Both JavaScript syntax checks pass. No browser interaction
+  or actual cloud/provider verification is implied by those checks.
+- No deployment, Google sign-in, billable cloud resource, bank connection or
+  real transfer was performed. Public hosting, Docker, nginx/systemd and HTTPS
+  certificate issuance/renewal remain unverified. A changed application bundle
+  does not bypass the installer's existing-version guard; preserve any previous
+  installation and follow its documented backup/upgrade procedure.
+
 ## September 17, 2026 — Google Cloud installer
 
 - Source was published to `sutty1307/code-stick`, branch `depositdesk-launch`,

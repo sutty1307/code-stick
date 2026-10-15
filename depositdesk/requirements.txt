@@ -1,3 +1,4 @@
 # Only required for deployment; the application and tests use Python's standard library.
-# Official upstream patch release; see VALIDATION.md for the local package-index limitation.
-gunicorn==26.2.2
+# Official 26.2.2 release source; PyPI does not supply that patch release.
+# Pin its immutable upstream commit and verify the downloaded archive bytes.
+gunicorn @ https://github.com/benoitc/gunicorn/archive/8d98faa9a13d3399a7bea81b5169e5cd72225395.tar.gz#sha256=b42561d72978f30c97b65ea1ba54b0171dfe7f1ef8603b13085647cacec2077d
