@@ -27,6 +27,7 @@ from runtime_smoke import Smoke, PACKAGE, SERIAL, digest, report_annotation
 from usb_memory_smoke import _USBTest, _bounds, _nodes, _root_rows, InvariantError
 from no_idle_ui_probe.run_probe import decode_result, COMPONENT as PROBE_COMPONENT
 from generated_chat_restart import run_generated_chat_restart
+from picker_navigation import open_visible_download
 
 API = 35
 IMAGE = 'system-images;android-35;google_apis;x86_64'
@@ -981,7 +982,7 @@ class InferenceTest(_USBTest):
             self._tap('Show internal storage')
             self._tap('Show roots')
         self._tap(primary[0]['title'])
-        self._tap_xml(self._find('Download'), 'Download')
+        download_navigation = open_visible_download(self)
         self._tap(MODEL_FILE)
 
         def selected():
@@ -1010,6 +1011,7 @@ class InferenceTest(_USBTest):
         self.current_revision = data['revision']
         self._wait('Actual unique model play icon', lambda: icon_target(self._screen(), PLAY), 30)
         return {'selected_through_genuine_documents_ui': True, 'model_bytes': MODEL_BYTES,
+                'download_directory_navigation': download_navigation,
                 'model_location': 'public phone Download; NOT removable USB',
                 'model_name_from_actual_metadata': self.model_name}
 
