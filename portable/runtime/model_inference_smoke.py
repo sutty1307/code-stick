@@ -27,11 +27,23 @@ from runtime_smoke import Smoke, PACKAGE, SERIAL, digest, report_annotation
 from usb_memory_smoke import _USBTest, _bounds, _nodes, _root_rows, InvariantError
 from no_idle_ui_probe.run_probe import decode_result, COMPONENT as PROBE_COMPONENT
 from generated_chat_restart import run_generated_chat_restart
-from picker_navigation import open_visible_download
+from picker_search import select_exact_file_by_search
 
 API = 35
 IMAGE = 'system-images;android-35;google_apis;x86_64'
 AVD = 'ai_drive_real_inference_api35'
+
+
+def select_test_api(api):
+    """Compare only explicit official Android images; preserve API35 by default."""
+    global API, IMAGE, AVD
+    if type(api) is not int or api not in (35, 36):
+        raise InvariantError('Unknown official Android diagnostic API')
+    API = api
+    IMAGE = f'system-images;android-{api};google_apis;x86_64'
+    AVD = f'ai_drive_real_inference_api{api}'
+
+
 APK_SHA256 = 'c833e55ff089903f3bc0e084f10b91516590fa5d9945138723e4ba466508d549'
 MODEL_FILE = 'Llama-3.2-3B-Instruct-abliterated.Q4_K_M.gguf'
 MODEL_BYTES = 2019377472
@@ -982,8 +994,9 @@ class InferenceTest(_USBTest):
             self._tap('Show internal storage')
             self._tap('Show roots')
         self._tap(primary[0]['title'])
-        download_navigation = open_visible_download(self)
-        self._tap(MODEL_FILE)
+        download_navigation = select_exact_file_by_search(
+            self, MODEL_FILE, emit=lambda label, data: report_annotation(
+                'error', label + ': ' + json.dumps(data, sort_keys=True)))
 
         def selected():
             data = self._snapshots()
@@ -1134,6 +1147,7 @@ class InferenceTest(_USBTest):
 
             reply = self._wait('New completed native-model reply and durable conversation', finished, 295)
             result = {'actual_full_model_inference': True, 'durable_conversation_verified': True,
+                      'android_api': API,
                       'model_profile': MODEL_PROFILE, 'model_sha256': MODEL_SHA256,
                       'model_filename': MODEL_FILE, 'cpu_threads': CPU_THREADS,
                       'virtual_removable_snapshot_sha256_verified': True,
@@ -1145,6 +1159,7 @@ class InferenceTest(_USBTest):
             self.s.results['model_inference_tested'] = True
             self.s.results['real_model_inference'] = result
             report_annotation('notice', 'real-model-inference: PASS ' + json.dumps({
+                'android_api': API,
                 'model_profile': MODEL_PROFILE, 'model_sha256': MODEL_SHA256,
                 'model_filename': MODEL_FILE, 'cpu_threads': CPU_THREADS,
                 'actual_model_output': reply['text'][:400],
@@ -1170,12 +1185,14 @@ def stage_model(smoke, directory):
     if size != str(MODEL_BYTES) or not checksum or checksum[0] != MODEL_SHA256:
         raise InvariantError('Full GGUF failed its independent Android-side size/SHA-256 check')
     return {'model_bytes': MODEL_BYTES, 'model_sha256': MODEL_SHA256,
+            'android_api': API, 'android_runtime_properties': smoke.results['android_runtime_properties'],
             'runner_and_android_checksums_verified': True,
             'model_location': 'public phone Download; NOT removable USB'}
 
 
 def run(args):
     select_test_profile(getattr(args, 'model_profile', '3b'), getattr(args, 'cpu_threads', 2))
+    select_test_api(getattr(args, 'android_api', 35))
     evidence = args.evidence.resolve()
     if evidence.exists():
         raise RuntimeError('Use a new evidence directory')
@@ -1188,7 +1205,8 @@ def run(args):
         Path(env['ANDROID_AVD_HOME']).mkdir()
         Path(env['ANDROID_USER_HOME']).mkdir()
         smoke, emulator, logcat, handles = InferenceSmoke(args.sdk, evidence, env), None, None, []
-        smoke.results.update({'test': 'API35 exact usb.4 APK pinned full-model inference comparison',
+        smoke.results.update({'test': f'API{API} exact usb.4 APK pinned full-model inference comparison',
+                              'android_api': API, 'official_system_image': IMAGE,
                               'model_profile': MODEL_PROFILE, 'model_sha256': MODEL_SHA256,
                               'model_filename': MODEL_FILE, 'cpu_threads': CPU_THREADS,
                               'phone_model_storage': 'Download', 'model_on_removable_storage_tested': False,
@@ -1208,7 +1226,7 @@ def run(args):
                 if installed.returncode:
                     raise RuntimeError('SDK installation failed: ' + installed.stderr[-1200:])
                 smoke.write('system-image-source.properties',
-                            (args.sdk / 'system-images/android-35/google_apis/x86_64/source.properties').read_text())
+                            (args.sdk / f'system-images/android-{API}/google_apis/x86_64/source.properties').read_text())
                 stage = 'isolated 6GiB AVD creation'
                 smoke.command([args.sdk / 'cmdline-tools/latest/bin/avdmanager', 'create', 'avd', '--name', AVD,
                                '--package', IMAGE, '--device', 'pixel_2', '--force'], timeout=90, input_text='no\n')
@@ -1225,12 +1243,14 @@ def run(args):
                 smoke.wait_boot(maximum=240)
                 smoke.shell('input', 'keyevent', '82')
                 props = {key: smoke.shell('getprop', key) for key in ['ro.product.cpu.abilist',
-                    'ro.dalvik.vm.native.bridge', 'ro.dalvik.vm.isa.arm64', 'ro.build.version.sdk']}
+                    'ro.dalvik.vm.native.bridge', 'ro.dalvik.vm.isa.arm64', 'ro.build.version.sdk',
+                    'ro.berberis.version', 'ro.ndk_translation.version']}
+                smoke.results['android_runtime_properties'] = props
                 smoke.write('guest-runtime-properties.json', json.dumps(props, indent=2))
                 if ('arm64-v8a' not in props['ro.product.cpu.abilist']
                         or props['ro.dalvik.vm.native.bridge'] != 'libndk_translation.so'
-                        or props['ro.dalvik.vm.isa.arm64'] != 'x86_64' or props['ro.build.version.sdk'] != '35'):
-                    raise InvariantError('Official API35 image lacks the required advertised ARM64 translation')
+                        or props['ro.dalvik.vm.isa.arm64'] != 'x86_64' or props['ro.build.version.sdk'] != str(API)):
+                    raise InvariantError(f'Official API{API} image lacks the required advertised ARM64 translation')
                 smoke.write('guest-meminfo.txt', smoke.shell('cat', '/proc/meminfo'))
                 smoke.write('guest-free-storage.txt', smoke.shell('df', '-k', '/sdcard'))
                 log = (evidence / 'logcat.txt').open('w')
@@ -1290,7 +1310,7 @@ def run(args):
                     stream.write('## Real Android full-model inference experiment\n\n')
                     for name, result in smoke.results['phases'].items():
                         stream.write(f"- {name}: {'PASS' if result['passed'] else 'FAIL'}\n")
-                    stream.write('\nExact APK; official API35 x86/ARM translation. Full GGUF in phone Download; '
+                    stream.write(f'\nExact APK; official API{API} x86/ARM translation. Full GGUF in phone Download; '
                                  'snapshots on debug simulated removable storage. No physical phone, USB/SD, '
                                  'model-on-removable-storage or real-phone speed claim.\n')
 
@@ -1302,4 +1322,5 @@ if __name__ == '__main__':
     parser.add_argument('--evidence', type=Path, required=True)
     parser.add_argument('--model-profile', choices=tuple(MODEL_PROFILES), default='3b')
     parser.add_argument('--cpu-threads', type=int, choices=(1, 2), default=2)
+    parser.add_argument('--android-api', type=int, choices=(35, 36), default=35)
     raise SystemExit(run(parser.parse_args()))
