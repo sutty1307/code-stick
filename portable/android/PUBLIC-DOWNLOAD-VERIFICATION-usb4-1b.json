@@ -1,0 +1,125 @@
+{
+  "all_nine_github_sha256_digests_present": true,
+  "assets": {
+    "AI-Drive-Offline-AGPL-3.0.txt": {
+      "id": 646879242,
+      "sha256": "8486a10c4393cee1c25392769ddd3b2d6c242d6ec7928e1414efff7dfb2f07ef",
+      "size_bytes": 34523
+    },
+    "AI-Drive-Offline-v0.10.1-usb.4-source.zip": {
+      "id": 646879204,
+      "sha256": "1a775d19b53faa8556a295880c303ef5e5f17bf1682d669c59ce79203072722e",
+      "size_bytes": 3811006
+    },
+    "AI-Drive-Offline_v0.10.1-usb.4.apk": {
+      "id": 646879076,
+      "sha256": "c833e55ff089903f3bc0e084f10b91516590fa5d9945138723e4ba466508d549",
+      "size_bytes": 67666025
+    },
+    "After-You-Plug-It-In-usb4.png": {
+      "id": 646879394,
+      "sha256": "d48bc0ee2de1a1f823e0d124987580a92fd781664bcc80d8b45f1ae732b94c81",
+      "size_bytes": 1847154
+    },
+    "Android-AI-Drive-Picture-Guide.pdf": {
+      "id": 646879353,
+      "sha256": "87cd4e58ced224f7041129ec8cf280249ef3d9be0cd71215dc66f14fc4a2dc85",
+      "size_bytes": 5252922
+    },
+    "Android-Drive-Kit-with-Memory-v0.10.1-usb.4-1B.zip": {
+      "id": 646877625,
+      "sha256": "d90726fe9c3ff5f4817d5971e85359229c4a0c709623c5e38f1a47fd43d249fb",
+      "size_bytes": 1047648992
+    },
+    "Llama-3.2-Community-License.txt": {
+      "id": 646879274,
+      "sha256": "8cc15535a8a34b41888f644b339a1a9eb428af793a4f5e24df58a3e5b1487d74",
+      "size_bytes": 7669
+    },
+    "Llama-3.2-NOTICE.txt": {
+      "id": 646879319,
+      "sha256": "3bc2d1a6b360a03d172058198631b931c9aadf01650892fb0d25b93c6b8f0025",
+      "size_bytes": 116
+    },
+    "SHA256SUMS.txt": {
+      "id": 646879433,
+      "sha256": "1fe748ce05d4675175f778e963d7d359b4b5f2f908f0db88d767b420b47353ed",
+      "size_bytes": 804
+    }
+  },
+  "complete_zip_below_two_gib": true,
+  "credentials_used": false,
+  "draft": false,
+  "eight_manifest_digests_match_server_digests": true,
+  "expected_asset_count": 9,
+  "expected_target_checked": true,
+  "finished_utc": "2026-10-16T09:50:38.141006+00:00",
+  "metadata_verified": true,
+  "payload_files_saved": false,
+  "prerelease": true,
+  "public_downloads": {
+    "AI-Drive-Offline-v0.10.1-usb.4-source.zip": {
+      "elapsed_seconds": 0.55,
+      "final_hostname": "release-assets.githubusercontent.com",
+      "http_status": 200,
+      "matches_github_digest": true,
+      "sha256": "1a775d19b53faa8556a295880c303ef5e5f17bf1682d669c59ce79203072722e",
+      "size_bytes": 3811006
+    },
+    "AI-Drive-Offline_v0.10.1-usb.4.apk": {
+      "elapsed_seconds": 1.99,
+      "final_hostname": "release-assets.githubusercontent.com",
+      "http_status": 200,
+      "matches_github_digest": true,
+      "sha256": "c833e55ff089903f3bc0e084f10b91516590fa5d9945138723e4ba466508d549",
+      "size_bytes": 67666025
+    },
+    "After-You-Plug-It-In-usb4.png": {
+      "elapsed_seconds": 0.52,
+      "final_hostname": "release-assets.githubusercontent.com",
+      "http_status": 200,
+      "matches_github_digest": true,
+      "sha256": "d48bc0ee2de1a1f823e0d124987580a92fd781664bcc80d8b45f1ae732b94c81",
+      "size_bytes": 1847154
+    },
+    "Android-AI-Drive-Picture-Guide.pdf": {
+      "elapsed_seconds": 0.54,
+      "final_hostname": "release-assets.githubusercontent.com",
+      "http_status": 200,
+      "matches_github_digest": true,
+      "sha256": "87cd4e58ced224f7041129ec8cf280249ef3d9be0cd71215dc66f14fc4a2dc85",
+      "size_bytes": 5252922
+    },
+    "Android-Drive-Kit-with-Memory-v0.10.1-usb.4-1B.zip": {
+      "elapsed_seconds": 26.82,
+      "final_hostname": "release-assets.githubusercontent.com",
+      "http_status": 200,
+      "matches_github_digest": true,
+      "sha256": "d90726fe9c3ff5f4817d5971e85359229c4a0c709623c5e38f1a47fd43d249fb",
+      "size_bytes": 1047648992
+    },
+    "SHA256SUMS.txt": {
+      "elapsed_seconds": 0.38,
+      "final_hostname": "release-assets.githubusercontent.com",
+      "http_status": 200,
+      "matches_github_digest": true,
+      "sha256": "1fe748ce05d4675175f778e963d7d359b4b5f2f908f0db88d767b420b47353ed",
+      "size_bytes": 804
+    }
+  },
+  "public_https_stream_readback_completed": true,
+  "public_https_stream_readback_performed": true,
+  "public_https_stream_readback_requested": true,
+  "published_at": "2026-10-16T09:50:05Z",
+  "release_id": 414788435,
+  "release_url": "https://github.com/sutty1307/code-stick/releases/tag/android-usb-memory-preview-v0.10.1-usb.4-1b",
+  "repository": "sutty1307/code-stick",
+  "retries_or_alternate_downloads": false,
+  "reviewed_apk_source_pdf_picture_pins_match": true,
+  "started_utc": "2026-10-16T09:50:07.305434+00:00",
+  "success": true,
+  "tag": "android-usb-memory-preview-v0.10.1-usb.4-1b",
+  "target_commit": "7ef1f157b1a38c2f7396ef9c61dfaa9cc275a8fc",
+  "version": "0.10.1-usb.4",
+  "version_code": 4
+}

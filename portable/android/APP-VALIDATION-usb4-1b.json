@@ -1,0 +1,1310 @@
+{
+  "document_status": "final",
+  "prepared_utc": "2026-10-16T09:40:23.353352+00:00",
+  "release_gate": {
+    "status": "required emulator runtime gates passed",
+    "scope": "Evidence for reviewed preview assembly; user authorization is external to this record. Public whole-download verification and physical-device testing are separate.",
+    "public_release_authorized_by_this_document": false,
+    "full_kit_or_seed_rebuild_authorized_by_this_document": false,
+    "normal_github_access_restored": true,
+    "existing_nonfinal_local_kit_preserved": true,
+    "required_same_job_phases": [
+      "real-model-inference",
+      "real-generated-chat-restart"
+    ],
+    "actual_run_id": 38880538406,
+    "actual_job_id": 116905926139,
+    "actual_test_commit": "868c30e2fc84dfc0b6b2a3e826d4724d093cc8d4",
+    "public_downloads_verified": false,
+    "physical_phone_or_usb_tested": false
+  },
+  "apk_build": {
+    "build_method": "Source Metro/Hermes bundle with verified matching publisher native shell",
+    "application_id": "com.codestick.aidrive",
+    "application_name": "AI Drive Offline",
+    "version": "0.10.1-usb.4",
+    "version_code": 4,
+    "apk_sha256": "c833e55ff089903f3bc0e084f10b91516590fa5d9945138723e4ba466508d549",
+    "publisher_native_apk_sha256": "ec051d90bc9f82587a726b525976494bacef50bc8a7dd0e3789b859373121753",
+    "source_package_lock_sha256": "c288c0e0ee6ed50c945c80d9346bd8fcd00a29a8bff98c8e67d6392c8273807d",
+    "source_public_config_sha256": "9447aa6e2f86409bfe36ee8f9963a88012dd5f4b853345da3b715ebd7453a046",
+    "source_bundle_sha256": "b503b763f1d99da61842b6ef8305ba88075f404ebbc78280512ef7fcf6bec24e",
+    "react_native": "0.86.3",
+    "expo_sdk": "57.0.0",
+    "hermes_bytecode": 98,
+    "preserved_dex_and_native_files": 55,
+    "native_files_byte_identical": true,
+    "zip_crc_verified": true,
+    "zip_alignment_verified": true,
+    "architecture": [
+      "arm64-v8a"
+    ],
+    "minimum_android_sdk": 24,
+    "internet_permission": false,
+    "network_state_permission": false,
+    "allow_backup": false,
+    "cleartext_traffic": false,
+    "debuggable": false,
+    "ota_updates": false,
+    "private_signing_key_included": false,
+    "actual_android_phone_tested": false
+  },
+  "corresponding_source": {
+    "path": "sources/AI-Drive-Offline-v0.10.1-usb.4-source.zip",
+    "sha256": "1a775d19b53faa8556a295880c303ef5e5f17bf1682d669c59ce79203072722e",
+    "file_count": 347,
+    "size_bytes": 3811006,
+    "matches_current_source_byte_for_byte": true,
+    "crc_verified": true
+  },
+  "software_validation": {
+    "total_software_tests_passed": 171,
+    "tests": [
+      {
+        "scope": "core, Android adapter and real SQLite application bridge",
+        "passed": 43,
+        "failed": 0
+      },
+      {
+        "scope": "controlled asynchronous file copy helper and actual caller sequencing/rejections",
+        "file": "tests/file-copy.test.cjs",
+        "passed": 13,
+        "failed": 0
+      },
+      {
+        "scope": "offline toolkit",
+        "config": "lib/driveTools/jest.config.cjs",
+        "passed": 64,
+        "failed": 0
+      },
+      {
+        "scope": "RAM settings/session values",
+        "config": "lib/storage/session-values.jest.config.cjs",
+        "passed": 25,
+        "failed": 0
+      },
+      {
+        "scope": "bounded memory prompt retrieval",
+        "config": "lib/engine/DataSources/drive-memory-source.jest.config.cjs",
+        "passed": 26,
+        "failed": 0
+      }
+    ],
+    "typescript": {
+      "command": "node node_modules/typescript/bin/tsc --noEmit",
+      "exit_code": 0
+    },
+    "eslint": {
+      "errors": 0,
+      "warnings": 1,
+      "scope": [
+        "lib/utils/File.ts",
+        "lib/state/Characters.ts",
+        "lib/engine/Tokenizer.ts",
+        "lib/state/Chat.ts",
+        "lib/state/BackgroundImage.ts",
+        "app.config.js",
+        "tests/file-copy.test.cjs"
+      ],
+      "commonjs_environment": "ESLint API overrideConfig defines Node __dirname as readonly because upstream Expo configuration disables it; no source/test-rule suppression"
+    },
+    "prettier": {
+      "exit_code": 0,
+      "scope": [
+        "lib/utils/File.ts",
+        "lib/state/Characters.ts",
+        "lib/engine/Tokenizer.ts",
+        "lib/state/Chat.ts",
+        "lib/state/BackgroundImage.ts",
+        "app.config.js",
+        "FORK-NOTES.md",
+        "BUILD-ANDROID-OFFLINE.md",
+        "tests/file-copy.test.cjs"
+      ]
+    },
+    "software_tests_are_not_android_runtime_testing": true,
+    "software_report": "apps/AI-Drive-Offline_v0.10.1-usb.4-software-verification.json",
+    "software_report_sha256": "f8fb1b55d7328b5410eab79c97118d3247482c4d60bbd551ad44d9b7ffc21120"
+  },
+  "native_metadata_verification": {
+    "same_signing_certificate_as_usb1_usb2_usb3": true,
+    "signer_certificate_sha256": "9a286ca73cc5ef45bc6a474773209317433639aa9fdc068e65a63dea10d3b551",
+    "higher_version_code": true,
+    "embedded_config_and_provenance_match": true,
+    "native_files_preserved": 55,
+    "native_files_byte_identical": true,
+    "metadata_upgrade_compatible": true,
+    "runtime_upgrade_evidence": "Actualv1startup/calculator to v4code4sameUID10209/startup/calculator passed all7 phases in run38698466745 attempt1.",
+    "public_default_character_asset_unchanged": true,
+    "metadata_report": "apps/AI-Drive-Offline_v0.10.1-usb.4-upgrade-verification.json",
+    "metadata_report_sha256": "03163300fad52784368215a0182515f925d9690434fd7e28a01290d5c0031fc1"
+  },
+  "known_usb2_storage_failure": {
+    "version": "0.10.1-usb.2",
+    "apk_sha256": "aab31bcdf39f623cd21c30e02db0b1c16674e4ec27c77fb28f9cef7f5d422c1b",
+    "run_id": 38694467014,
+    "run_url": "https://github.com/sutty1307/code-stick/actions/runs/38694467014",
+    "test_commit": "f942890708f2ad389cd05e4b2d2bc5ae979a7221",
+    "overall_job_conclusion": "failure",
+    "failure_stage": "low-memory-model-settings before model inference",
+    "observed_behavior": "Replacing an inactive snapshot with a shorter write left one trailing character in drive-memory-a.json; exact read-back rejected it. The valid drive-memory-b.json revision 4 survived, while requested model settings were not durably saved.",
+    "requested_settings": {
+      "context": 1024,
+      "threads": 2,
+      "batch": 16
+    },
+    "invalid_snapshot": {
+      "name": "drive-memory-a.json",
+      "raw_characters": 73180,
+      "raw_utf8_bytes": 73208,
+      "json_error": "Extra data",
+      "json_error_position": 73179
+    },
+    "surviving_snapshot": {
+      "name": "drive-memory-b.json",
+      "revision": 4,
+      "valid": true
+    },
+    "exact_failure_annotation": "low-memory-model-settings: RuntimeError: Exact real UI engine settings in a subsequent verified snapshot did not complete in 45s: condition not met. Actual visible controls: Model Settings | CPU Settings | Max Context | Threads | 1024 | Batch | 2 | 16 | Context Shift | Advanced Settings | Show Model Name In Chat | Automatically Load Model On Chat | Save Local KV | Saves the KV cache on generations, allowing you to continue sessions after closing the app. Must use the same model for this to function properly. Saving the KV | Models | Settings; current slot metadata={\"recovered_invalid_other\": true, \"selected_revision\": 4, \"selected_slot\": \"drive-memory-b.json\", \"slots\": [{\"body_valid\": false, \"checksum_valid\": false, \"envelope_valid\": false, \"error\": \"Extra data\", \"error_column\": 73180, \"error_layer\": \"envelope\", \"error_line\": 1, \"error_position\": 73179, \"error_type\": \"JSONDecodeError\", \"name\": \"drive-memory-a.json\", \"present\": true, \"raw_characters\": 73180, \"raw_utf8_bytes\": 73208, \"valid\": false}, {\"body_characters\": 71300, \"body_valid\": true, \"checksum_valid\": true, \"envelope_valid\": true, \"name\": \"drive-memory-b.json\", \"present\": true, \"raw_characters\": 73180, \"raw_utf8_bytes\": 73208, \"revision\": 4, \"valid\": true}]}",
+    "local_observation_sha256": "a0f575037c474726b9e3a25543fa6e2eb5e0b0f57ffb590ecdc7df4c08c25d08",
+    "publication_status": "usb.2 complete release draft remains unpublished"
+  },
+  "retained_snapshot_repair": {
+    "behavior": "Delete and recreate only the inactive SAF snapshot document, then write and verify it; preserve the active verified snapshot through every step.",
+    "safety_checks": [
+      "Required adapter deletion method",
+      "Reject active-slot URI aliases",
+      "Validate recreated slot filename and URI",
+      "Android deletion restricted to removable snapshot names and readable file documents",
+      "Retain exact read-back, SHA-256, failure visibility, recovery and durable forget behavior"
+    ],
+    "source_file_sha256": {
+      "lib/driveMemory/core.ts": "988a9c03c32cde7dbaae609da9ab13d2f096ffae97e7a253f11fc522b51faaa9",
+      "lib/driveMemory/android.ts": "ad068bc44082f970263b1ecb55c43aaafd8d3a73a38268cbad7c5e12bf1ea8c3",
+      "lib/driveMemory/core.test.cjs": "e0f227e85ad1cb6f63dce39231b494719e7e9b5d717c3adae44f2514cf634005",
+      "lib/driveMemory/android.test.cjs": "d44dcf73d2f0a0be1263fe9b0319a758cf276d8120294b0e4a407e11f3138af3"
+    },
+    "regression_negative_control": {
+      "baseline_original_core_result": "The new shorter nontruncating-provider regression fails against the unchanged original core with USB write verification failed.",
+      "repaired_tests_result": "Core/adapter regression checks remain part of the171current application tests.",
+      "baseline_control_sha256": "b0d60fa3e5115c823e6f2a45f0a3123977fccf33d06f4723d8f54abbc33cc790",
+      "local_baseline_control_record": "/workspace/android-drive-kit/delivery/snapshot-replace-proposal/BASELINE-CONTROL.txt"
+    },
+    "actual_usb3_android_result": "Historical usb.3 results; not counted as usb.4 evidence.",
+    "actual_usb4_android_result": "Exact v4 shorter1024/2/16 settings persisted with both snapshots SHA-valid in run38699688529; fact/note forms and force-stop restore passed independently in run38698466745 attempt2."
+  },
+  "usb4_async_copy_repair": {
+    "source_confirmed_defect": "Expo SDK 57 File.copy returns a Promise. The usb.3 async wrapper did not await it, so it reported success before the native copy finished and could miss rejection. The default-character caller also did not await the wrapper before reading the copied PNG.",
+    "repair_scope": "Await the native file copy and caller sequencing; include failure/rejection checks in affected file-copy callers.",
+    "source_file_sha256": {
+      "lib/utils/File.ts": "f412ec1e5d325b857edaa67126b671c53c92f93ad750f4497a1e812c0ad9a2b9",
+      "lib/state/Characters.ts": "a054a0379dfaf876ca1538adc45e1e417ec47d555b5bdfb9ab44b15ede5b3e64",
+      "lib/engine/Tokenizer.ts": "4f32fc1ed35e372f2633de4565072a5970e0bf4979d157c999a18435800d8ab9",
+      "lib/state/Chat.ts": "625795e8b54774488fc68745898db4af6995fdd8d04471db8fcfb64115d14e16",
+      "lib/state/BackgroundImage.ts": "dbcde49535267b89956e2af2e3ebb3ddfd07c2ee5e54a49f1778408eaaea9d7d",
+      "tests/file-copy.test.cjs": "946ae15a0c8c03855cc0966f7b57c232610aeccdee2c59b736c2c39ddb1c5d3b"
+    },
+    "copy_regression_negative_control": {
+      "baseline": "unchanged usb.3 source from exact archived SHA145b6b4e16cef04956553c16269d5dbbafd11d52fb10d964ec19542e5d7fae4e",
+      "test_name": "copy helper waits for native bytes before reporting success",
+      "expected_baseline_exit_code": 1,
+      "actual_baseline_exit_code": 1,
+      "baseline_failure": "helper resolves true while native copy is still pending",
+      "evidence": "/workspace/android-drive-kit/build-tools/BASELINE-COPY-CONTROL-usb3.txt"
+    },
+    "negative_control_sha256": "398f93c48238bb6d52fdae8a1d6f93e7597158c1bcd23e752eb00c1c25322f58",
+    "new_controlled_copy_tests_passed": 13,
+    "runtime_scope": "Exact usb.4 APK passed the separate fresh install/memory and signed upgrade checks. Selected 1B model reply and same generated-chat restart also passed in run38880538406, job116905926139; see android_model_inference for actual native notices. Physical phone/USB and Android media durability remain untested."
+  },
+  "fresh_candidate_and_simulated_usb": {
+    "status": "passed",
+    "run_id": 38698466745,
+    "run_attempt": 2,
+    "run_url": "https://github.com/sutty1307/code-stick/actions/runs/38698466745",
+    "test_commit": "aaf0a208556694cf774af76ba28a41dac81ff8e0",
+    "job_id": 116306529124,
+    "job_conclusion": "success",
+    "environment": "API35 Google APIs x86_64 Android emulator with ARM64 native translation",
+    "actual_phase_evidence_supplied": true,
+    "passed_phase_count": 9,
+    "actual_passed_phases": {
+      "virtual-removable-model-route": {
+        "passed": true,
+        "native_annotation": "virtual-removable-model-route: PASS {\"actual_ui_controls_verified\": [\"Choose a model\", \"Models\", \"Settings\", \"Model Settings\", \"CPU Settings\"], \"model_route_verified\": true}",
+        "actual_ui_controls_verified": [
+          "Choose a model",
+          "Models",
+          "Settings",
+          "Model Settings",
+          "CPU Settings"
+        ],
+        "model_route_verified": true
+      },
+      "virtual-removable-force-stop-restore": {
+        "passed": true,
+        "native_annotation": "virtual-removable-force-stop-restore: PASS {\"app_data_cleared\": false, \"force_stop_restart_restored_fact_and_note\": true, \"restored_revision\": 5}",
+        "app_data_cleared": false,
+        "force_stop_restart_restored_fact_and_note": true,
+        "restored_revision": 5
+      },
+      "virtual-removable-note-form": {
+        "passed": true,
+        "native_annotation": "virtual-removable-note-form: PASS {\"manual_form_saved\": \"note\", \"revision\": 4, \"saved_card_visible\": true, \"snapshot_sha256_verified\": true}",
+        "manual_form_saved": "note",
+        "revision": 4,
+        "saved_card_visible": true,
+        "snapshot_sha256_verified": true
+      },
+      "virtual-removable-fact-form": {
+        "passed": true,
+        "native_annotation": "virtual-removable-fact-form: PASS {\"manual_form_saved\": \"fact\", \"revision\": 3, \"saved_card_visible\": true, \"snapshot_sha256_verified\": true}",
+        "manual_form_saved": "fact",
+        "revision": 3,
+        "saved_card_visible": true,
+        "snapshot_sha256_verified": true
+      },
+      "virtual-removable-saf-grant": {
+        "passed": true,
+        "native_annotation": "virtual-removable-saf-grant: PASS {\"genuine_saf_ui_grant\": true, \"initial_revision\": 2, \"simulated_removable_storage\": true}",
+        "genuine_saf_ui_grant": true,
+        "initial_revision": 2,
+        "simulated_removable_storage": true
+      },
+      "virtual-removable-fixture": {
+        "passed": true,
+        "native_annotation": "virtual-removable-fixture: PASS {\"newly_created_disk_only\": true, \"simulated_removable_storage\": true}",
+        "newly_created_disk_only": true,
+        "simulated_removable_storage": true
+      },
+      "candidate-calculator": {
+        "passed": true,
+        "native_annotation": "candidate-calculator: PASS {\"expected_visible_result\": \"(12 + 8) * 3 = 60\", \"real_ui_result_verified\": true}",
+        "expected_visible_result": "(12 + 8) * 3 = 60",
+        "real_ui_result_verified": true
+      },
+      "candidate-startup": {
+        "passed": true,
+        "native_annotation": "candidate-startup: PASS {\"actual_ui_controls_verified\": [\"Choose USB memory folder\", \"Offline Toolkit\"], \"am_launch_elapsed_seconds\": 9.35, \"am_launch_status\": \"ok\", \"foreground_activity_verified\": true, \"process_stable_seconds\": 20, \"ready_elapsed_seconds\": 36.54}",
+        "actual_ui_controls_verified": [
+          "Choose USB memory folder",
+          "Offline Toolkit"
+        ],
+        "am_launch_elapsed_seconds": 9.35,
+        "am_launch_status": "ok",
+        "foreground_activity_verified": true,
+        "process_stable_seconds": 20,
+        "ready_elapsed_seconds": 36.54
+      },
+      "candidate-fresh-install": {
+        "passed": true,
+        "native_annotation": "candidate-fresh-install: PASS {\"install_kind\": \"fresh\", \"uid\": \"10209\", \"version_code\": 4}",
+        "install_kind": "fresh",
+        "uid": "10209",
+        "version_code": 4
+      }
+    },
+    "fact_note_force_stop_restore_in_v4": "Verified saved fact and note visible after force-stop/relaunch, app data not cleared, restored snapshot revision5",
+    "generated_chat_restart_recovery_in_v4": "not verified",
+    "physical_phone_tested": false,
+    "physical_usb_tested": false,
+    "attempt1": "Dedicated fresh job timed out during SDK installation before APK execution; its result is not an app failure."
+  },
+  "android_model_inference": {
+    "status": "passed",
+    "run_id": 38880538406,
+    "run_url": "https://github.com/sutty1307/code-stick/actions/runs/38880538406",
+    "test_commit": "868c30e2fc84dfc0b6b2a3e826d4724d093cc8d4",
+    "run_attempt": 1,
+    "job_id": 116905926139,
+    "job_conclusion": "success",
+    "environment": "API 36 Google APIs x86_64 Android emulator with ARM64 native translation",
+    "android_api": 36,
+    "apk_sha256": "c833e55ff089903f3bc0e084f10b91516590fa5d9945138723e4ba466508d549",
+    "model_sha256": "68336c25367576f49b29f01ee9034658b51bbded6a7f215e934d997de96301e0",
+    "model_filename": "Llama-3.2-1B-Instruct-abliterated.Q4_K_M.gguf",
+    "model_profile": "1b-comparison",
+    "cpu_threads": 2,
+    "requested_model_settings": {
+      "max_context": 1024,
+      "threads": 2,
+      "batch": 16
+    },
+    "actual_phase_evidence_supplied": true,
+    "actual_passed_phases": {
+      "real-generated-chat-restart": {
+        "passed": true,
+        "native_annotation": "real-generated-chat-restart: PASS {\"actual_user_and_assistant_bubbles_visible\": true, \"all_conversations_migration_tested\": false, \"app_data_cleared\": false, \"assistant_entry_id\": 2, \"chat_id\": 1, \"elapsed_seconds\": 11.15, \"exact_timings_swipes_archive_preserved\": true, \"generated_chat_restarted_and_restored\": true, \"grants_changed\": false, \"new_pid\": \"10038\", \"old_pid\": \"4154\", \"physical_usb_tested\": false, \"sanctioned_force_stop_only_pid_reset\": true, \"snapshot_revision_after\": 18, \"snapshot_revision_before\": 17, \"user_entry_id\": 1}",
+        "actual_user_and_assistant_bubbles_visible": true,
+        "all_conversations_migration_tested": false,
+        "app_data_cleared": false,
+        "assistant_entry_id": 2,
+        "chat_id": 1,
+        "elapsed_seconds": 11.15,
+        "exact_timings_swipes_archive_preserved": true,
+        "generated_chat_restarted_and_restored": true,
+        "grants_changed": false,
+        "new_pid": "10038",
+        "old_pid": "4154",
+        "physical_usb_tested": false,
+        "sanctioned_force_stop_only_pid_reset": true,
+        "snapshot_revision_after": 18,
+        "snapshot_revision_before": 17,
+        "user_entry_id": 1
+      },
+      "real-model-inference": {
+        "passed": true,
+        "native_annotation": "real-model-inference: PASS {\"actual_model_output\": \"session inference 590ddeb14a\", \"android_api\": 36, \"cpu_threads\": 2, \"model_filename\": \"Llama-3.2-1B-Instruct-abliterated.Q4_K_M.gguf\", \"model_location\": \"public phone Download; NOT removable USB\", \"model_profile\": \"1b-comparison\", \"model_sha256\": \"68336c25367576f49b29f01ee9034658b51bbded6a7f215e934d997de96301e0\", \"native_timings\": {\"cache_n\": 81, \"predicted_ms\": 9926.456999999999, \"predicted_n\": 7, \"predicted_per_second\": 0.7051861505066712, \"predicted_per_token_ms\": 1418.0652857142854, \"prompt_ms\": 165209.689, \"prompt_n\": 73, \"prompt_per_second\": 0.4418627045536052, \"prompt_per_token_ms\": 2263.146424657534}, \"physical_phone_tested\": false, \"predicted_tokens\": 7, \"snapshot_revision\": 17}",
+        "actual_model_output": "session inference 590ddeb14a",
+        "android_api": 36,
+        "cpu_threads": 2,
+        "model_filename": "Llama-3.2-1B-Instruct-abliterated.Q4_K_M.gguf",
+        "model_location": "public phone Download; NOT removable USB",
+        "model_profile": "1b-comparison",
+        "model_sha256": "68336c25367576f49b29f01ee9034658b51bbded6a7f215e934d997de96301e0",
+        "native_timings": {
+          "cache_n": 81,
+          "predicted_ms": 9926.456999999999,
+          "predicted_n": 7,
+          "predicted_per_second": 0.7051861505066712,
+          "predicted_per_token_ms": 1418.0652857142854,
+          "prompt_ms": 165209.689,
+          "prompt_n": 73,
+          "prompt_per_second": 0.4418627045536052,
+          "prompt_per_token_ms": 2263.146424657534
+        },
+        "physical_phone_tested": false,
+        "predicted_tokens": 7,
+        "snapshot_revision": 17
+      },
+      "real-model-load": {
+        "passed": true,
+        "native_annotation": "real-model-load: PASS {\"actual_full_model_loaded\": true, \"load_elapsed_seconds\": 8.49, \"model_location\": \"public phone Download; NOT physical USB\", \"model_sha256\": \"68336c25367576f49b29f01ee9034658b51bbded6a7f215e934d997de96301e0\"}",
+        "actual_full_model_loaded": true,
+        "load_elapsed_seconds": 8.49,
+        "model_location": "public phone Download; NOT physical USB",
+        "model_sha256": "68336c25367576f49b29f01ee9034658b51bbded6a7f215e934d997de96301e0"
+      },
+      "genuine-external-model-selection": {
+        "passed": true,
+        "native_annotation": "genuine-external-model-selection: PASS {\"download_directory_navigation\": {\"app_import_or_model_execution_claimed\": false, \"exact_enabled_filename_result_tapped\": true, \"exact_search_query_verified\": true, \"filename\": \"Llama-3.2-1B-Instruct-abliterated.Q4_K_M.gguf\", \"genuine_documents_ui_search\": true}, \"model_bytes\": 955445792, \"model_location\": \"public phone Download; NOT removable USB\", \"model_name_from_actual_metadata\": \"Llama 3.2 1B Instruct Abliterated\", \"selected_through_genuine_documents_ui\": true}",
+        "download_directory_navigation": {
+          "app_import_or_model_execution_claimed": false,
+          "exact_enabled_filename_result_tapped": true,
+          "exact_search_query_verified": true,
+          "filename": "Llama-3.2-1B-Instruct-abliterated.Q4_K_M.gguf",
+          "genuine_documents_ui_search": true
+        },
+        "model_bytes": 955445792,
+        "model_location": "public phone Download; NOT removable USB",
+        "model_name_from_actual_metadata": "Llama 3.2 1B Instruct Abliterated",
+        "selected_through_genuine_documents_ui": true
+      },
+      "verified-full-model-fixture": {
+        "passed": true,
+        "native_annotation": "verified-full-model-fixture: PASS {\"android_api\": 36, \"android_runtime_properties\": {\"ro.berberis.version\": \"16.0.0\", \"ro.build.version.sdk\": \"36\", \"ro.dalvik.vm.isa.arm64\": \"x86_64\", \"ro.dalvik.vm.native.bridge\": \"libndk_translation.so\", \"ro.ndk_translation.version\": \"\", \"ro.product.cpu.abilist\": \"x86_64,arm64-v8a\"}, \"model_bytes\": 955445792, \"model_location\": \"public phone Download; NOT removable USB\", \"model_sha256\": \"68336c25367576f49b29f01ee9034658b51bbded6a7f215e934d997de96301e0\", \"runner_and_android_checksums_verified\": true}",
+        "android_api": 36,
+        "android_runtime_properties": {
+          "ro.berberis.version": "16.0.0",
+          "ro.build.version.sdk": "36",
+          "ro.dalvik.vm.isa.arm64": "x86_64",
+          "ro.dalvik.vm.native.bridge": "libndk_translation.so",
+          "ro.ndk_translation.version": "",
+          "ro.product.cpu.abilist": "x86_64,arm64-v8a"
+        },
+        "model_bytes": 955445792,
+        "model_location": "public phone Download; NOT removable USB",
+        "model_sha256": "68336c25367576f49b29f01ee9034658b51bbded6a7f215e934d997de96301e0",
+        "runner_and_android_checksums_verified": true
+      },
+      "model-settings-durable-save": {
+        "passed": true,
+        "native_annotation": "model-settings-durable-save: PASS {\"actual_drive_connected\": true, \"actual_verified_save_counter\": true, \"batch_tokens\": 16, \"context_tokens\": 1024, \"cpu_threads\": 2, \"current_slot_metadata\": {\"recovered_invalid_other\": false, \"selected_revision\": 5, \"selected_slot\": \"drive-memory-a.json\", \"slots\": [{\"body_characters\": 71299, \"body_valid\": true, \"checksum_valid\": true, \"envelope_valid\": true, \"name\": \"drive-memory-a.json\", \"present\": true, \"raw_characters\": 73179, \"raw_utf8_bytes\": 73207, \"revision\": 5, \"valid\": true}, {\"body_characters\": 71300, \"body_valid\": true, \"checksum_valid\": true, \"envelope_valid\": true, \"name\": \"drive-memory-b.json\", \"present\": true, \"raw_characters\": 73180, \"raw_utf8_bytes\": 73208, \"revision\": 4, \"valid\": true}]}, \"previous_revision\": 2, \"verified_revision\": 5}",
+        "actual_drive_connected": true,
+        "actual_verified_save_counter": true,
+        "batch_tokens": 16,
+        "context_tokens": 1024,
+        "cpu_threads": 2,
+        "current_slot_metadata": {
+          "recovered_invalid_other": false,
+          "selected_revision": 5,
+          "selected_slot": "drive-memory-a.json",
+          "slots": [
+            {
+              "body_characters": 71299,
+              "body_valid": true,
+              "checksum_valid": true,
+              "envelope_valid": true,
+              "name": "drive-memory-a.json",
+              "present": true,
+              "raw_characters": 73179,
+              "raw_utf8_bytes": 73207,
+              "revision": 5,
+              "valid": true
+            },
+            {
+              "body_characters": 71300,
+              "body_valid": true,
+              "checksum_valid": true,
+              "envelope_valid": true,
+              "name": "drive-memory-b.json",
+              "present": true,
+              "raw_characters": 73180,
+              "raw_utf8_bytes": 73208,
+              "revision": 4,
+              "valid": true
+            }
+          ]
+        },
+        "previous_revision": 2,
+        "verified_revision": 5
+      },
+      "actual-default-ai-bot-onboarding": {
+        "passed": true,
+        "native_annotation": "actual-default-ai-bot-onboarding: PASS {\"actual_ai_bot_card_visible\": true, \"no_character_created_by_harness\": true, \"verified_revision\": 2, \"verified_snapshot_ai_bot_identity\": {\"id\": 2, \"name\": \"AI Bot\", \"type\": \"character\"}}",
+        "actual_ai_bot_card_visible": true,
+        "no_character_created_by_harness": true,
+        "verified_revision": 2,
+        "verified_snapshot_ai_bot_identity": {
+          "id": 2,
+          "name": "AI Bot",
+          "type": "character"
+        }
+      },
+      "candidate-startup": {
+        "passed": true,
+        "native_annotation": "candidate-startup: PASS {\"actual_ui_controls_verified\": [\"Choose USB memory folder\", \"Offline Toolkit\"], \"am_launch_elapsed_seconds\": 11.0, \"am_launch_status\": \"ok\", \"foreground_activity_verified\": true, \"pid\": \"4154\", \"process_stable_seconds\": 20, \"ready_elapsed_seconds\": 37.66}",
+        "actual_ui_controls_verified": [
+          "Choose USB memory folder",
+          "Offline Toolkit"
+        ],
+        "am_launch_elapsed_seconds": 11.0,
+        "am_launch_status": "ok",
+        "foreground_activity_verified": true,
+        "pid": "4154",
+        "process_stable_seconds": 20,
+        "ready_elapsed_seconds": 37.66
+      },
+      "candidate-install": {
+        "passed": true,
+        "native_annotation": "candidate-install: PASS {\"install_kind\": \"fresh\", \"uid\": \"10216\", \"version_code\": 4}",
+        "install_kind": "fresh",
+        "uid": "10216",
+        "version_code": 4
+      }
+    },
+    "actual_failed_phases": {},
+    "android_full_model_loaded": true,
+    "generated_reply_verified": true,
+    "generated_reply_outcome": "Actual native output, timings, SHA-valid saved records and archive verified; same generated chat restored after real force-stop/relaunch.",
+    "chat_response_and_chat_restart_recovery_verified": true,
+    "generated_chat_restart_recovery_in_v4": "Verified one exact generated chat after force-stop/relaunch without data/grant changes; all-conversation migration untested.",
+    "phone_model_location": "public phone Download; not removable USB",
+    "model_on_removable_storage_tested": false,
+    "physical_phone_tested": false,
+    "physical_usb_tested": false,
+    "load_elapsed_seconds": 8.49
+  },
+  "model": {
+    "filename": "Llama-3.2-1B-Instruct-abliterated.Q4_K_M.gguf",
+    "size_bytes": 955445792,
+    "sha256": "68336c25367576f49b29f01ee9034658b51bbded6a7f215e934d997de96301e0",
+    "publisher": "mradermacher",
+    "repository": "mradermacher/Llama-3.2-1B-Instruct-abliterated-GGUF",
+    "revision": "becf36858832feddfea0ace2fabf791797571999",
+    "download_url": "https://huggingface.co/mradermacher/Llama-3.2-1B-Instruct-abliterated-GGUF/resolve/becf36858832feddfea0ace2fabf791797571999/Llama-3.2-1B-Instruct-abliterated.Q4_K_M.gguf?download=true",
+    "payload_verified_against_publisher": true,
+    "packaging_profile": "llama32-1b-q4km",
+    "native_profile": "1b-comparison",
+    "requested_model_settings": {
+      "max_context": 1024,
+      "threads": 2,
+      "batch": 16
+    },
+    "linux_cpu_inference": "Exact selected 1B file returned Hello. in the actual Linux smoke record; complete original record remains in MODEL-VALIDATION.json. Linux output is separate from Android execution.",
+    "android_inference": "Actual selected 1B native reply and same-chat restart passed in run 38880538406, job 116905926139; output and timings preserved in android_model_inference.",
+    "base_lineage_independently_verified": false,
+    "provenance_document": "models/MODEL-PROVENANCE.json"
+  },
+  "guide": {
+    "pages": 2,
+    "pdf_path": "PICTURE-GUIDE.pdf",
+    "pdf_sha256": "87cd4e58ced224f7041129ec8cf280249ef3d9be0cd71215dc66f14fc4a2dc85",
+    "ordered_images": [
+      {
+        "path": "customer-guide/First-Install-usb4.png",
+        "sha256": "dcc9e6e89038f2653a731655159bc04adc0e6b65a6d3c9bb7c4d66bf434ef994"
+      },
+      {
+        "path": "customer-guide/After-You-Plug-It-In-usb4.png",
+        "sha256": "d48bc0ee2de1a1f823e0d124987580a92fd781664bcc80d8b45f1ae732b94c81"
+      }
+    ],
+    "model_settings": {
+      "max_context": 1024,
+      "threads": 2,
+      "batch": 16
+    },
+    "selected_model_filename": "Llama-3.2-1B-Instruct-abliterated.Q4_K_M.gguf",
+    "screens_are_illustrations": true,
+    "manual_install_and_open_required": true,
+    "usb_insertion_autolaunch_claimed": false
+  },
+  "physical_android_device": "not tested",
+  "physical_usb_detach_reconnect": "not tested",
+  "grapheneos": "not tested",
+  "phone_performance_and_retail_readiness": "not validated",
+  "limits": [
+    "Exact usb.4 fresh nine-phase memory checks and signed seven-phase upgrade checks passed independently; their preserved records remain separate from selected-model reply testing.",
+    "Actual API 36 emulator job 116905926139 in run 38880538406 passed one native generated reply and restoration of that same chat. This does not validate every conversation, alternate reply, preference type or profile text item.",
+    "Earlier selected 1B API 35/API 36 reply-only jobs and failed 3B response checks remain historical comparisons with their original failed job conclusions.",
+    "The actual output session inference 590ddeb14a proves generation and persistence, not response quality or broad instruction-following. Native prompt processing took about 165.21 seconds and generation about 9.93 seconds in this translated emulator; no physical-phone speed is asserted.",
+    "An x86_64 Android emulator with ARM64 native translation is not a physical phone.",
+    "Memory used simulated removable storage; models used public phone Download. Model loading directly from physical USB or SD has not been tested.",
+    "Complete text history, preferences and profile text are supported by the storage design; runtime proves fact/note restore and one generated-chat restore. Every stored object or migration scenario has not been tested.",
+    "Android media durability for portraits, backgrounds and attachments has not been verified.",
+    "Physical phone/USB/SD, detach/reconnect, GrapheneOS, phone performance and readiness for sale remain untested.",
+    "Snapshot checksums and exact read-back do not provide OS flush, encryption, authenticity or safe removal guarantees.",
+    "Public release asset whole-download verification is a subsequent delivery check; these reviewed inputs alone do not establish public download readiness."
+  ],
+  "signed_upgrade": {
+    "status": "passed",
+    "run_id": 38698466745,
+    "run_attempt": 1,
+    "run_url": "https://github.com/sutty1307/code-stick/actions/runs/38698466745",
+    "test_commit": "aaf0a208556694cf774af76ba28a41dac81ff8e0",
+    "job_id": 116300573999,
+    "actual_passed_phases": {
+      "candidate-calculator": {
+        "passed": true,
+        "native_annotation": "candidate-calculator: PASS {\"expected_visible_result\": \"(12 + 8) * 3 = 60\", \"real_ui_result_verified\": true}",
+        "expected_visible_result": "(12 + 8) * 3 = 60",
+        "real_ui_result_verified": true
+      },
+      "candidate-startup": {
+        "passed": true,
+        "native_annotation": "candidate-startup: PASS {\"actual_ui_controls_verified\": [\"Choose USB memory folder\", \"Offline Toolkit\"], \"am_launch_elapsed_seconds\": 3.3, \"am_launch_status\": \"ok\", \"foreground_activity_verified\": true, \"process_stable_seconds\": 20, \"ready_elapsed_seconds\": 26.24}",
+        "actual_ui_controls_verified": [
+          "Choose USB memory folder",
+          "Offline Toolkit"
+        ],
+        "am_launch_elapsed_seconds": 3.3,
+        "am_launch_status": "ok",
+        "foreground_activity_verified": true,
+        "process_stable_seconds": 20,
+        "ready_elapsed_seconds": 26.24
+      },
+      "upgrade-identity": {
+        "passed": true,
+        "native_annotation": "upgrade-identity: PASS {\"baseline_uid\": \"10209\", \"candidate_uid\": \"10209\"}",
+        "baseline_uid": "10209",
+        "candidate_uid": "10209"
+      },
+      "candidate-upgrade": {
+        "passed": true,
+        "native_annotation": "candidate-upgrade: PASS {\"install_kind\": \"upgrade\", \"uid\": \"10209\", \"version_code\": 4}",
+        "install_kind": "upgrade",
+        "uid": "10209",
+        "version_code": 4
+      },
+      "baseline-calculator": {
+        "passed": true,
+        "native_annotation": "baseline-calculator: PASS {\"expected_visible_result\": \"(12 + 8) * 3 = 60\", \"real_ui_result_verified\": true}",
+        "expected_visible_result": "(12 + 8) * 3 = 60",
+        "real_ui_result_verified": true
+      },
+      "baseline-startup": {
+        "passed": true,
+        "native_annotation": "baseline-startup: PASS {\"actual_ui_controls_verified\": [\"Choose USB memory folder\", \"Offline Toolkit\"], \"am_launch_elapsed_seconds\": 7.83, \"am_launch_status\": \"ok\", \"foreground_activity_verified\": true, \"process_stable_seconds\": 20, \"ready_elapsed_seconds\": 31.64}",
+        "actual_ui_controls_verified": [
+          "Choose USB memory folder",
+          "Offline Toolkit"
+        ],
+        "am_launch_elapsed_seconds": 7.83,
+        "am_launch_status": "ok",
+        "foreground_activity_verified": true,
+        "process_stable_seconds": 20,
+        "ready_elapsed_seconds": 31.64
+      },
+      "baseline-install": {
+        "passed": true,
+        "native_annotation": "baseline-install: PASS {\"install_kind\": \"fresh\", \"uid\": \"10209\", \"version_code\": 1}",
+        "install_kind": "fresh",
+        "uid": "10209",
+        "version_code": 1
+      }
+    }
+  },
+  "historical_usb3_runtime": {
+    "version": "0.10.1-usb.3",
+    "not_a_usb4_pass": true,
+    "memory_and_upgrade_run": 38696828973,
+    "memory_and_upgrade_conclusion": "success bothjobs; fresh9phases including fact/note snapshot and force-stoprestore, upgrade7phases",
+    "native_full_model_load_run": 38695481482,
+    "native_model_load_elapsed_seconds": 14.21,
+    "generated_reply_verified": false
+  },
+  "evidence_sources": [
+    {
+      "path": "/workspace/android-drive-kit/runtime-test/actions-run-38698466745-attempt-2/RESUMED-2026-10-16.json",
+      "sha256": "4d55f3bde34740f9cd50df8e1d37d96d2594d95eff0652a1061565c49bb165ee",
+      "source": "Parent retrieved ordinary GitHub run/job/check-annotation APIs; no diagnostic artifact retrieval",
+      "scope_role": "Preserved actual fresh-memory evidence"
+    },
+    {
+      "path": "/workspace/android-drive-kit/runtime-test/actions-run-38699688529/RESUMED-2026-10-16.json",
+      "sha256": "dfa8ef4aaa864542cc539c709f0e30885f734751875175953f81e150f57886fa",
+      "source": "Parent retrieved ordinary GitHub run/job/check-annotation APIs; no diagnostic artifact retrieval",
+      "scope_role": "Historical failed 3B comparison only"
+    },
+    {
+      "path": "/workspace/android-drive-kit/delivery/finalize-usb4/APP-VALIDATION.usb.4.RUNTIME-PROPOSAL-2026-10-16.json",
+      "sha256": "96333b284ab8f467a15393846a89177862f6418532df0bcb795f8255b3cc2ebd",
+      "source": "Preserved original proposal; selected proof sections copied with values and native annotations unchanged. Active model/guide/gate fields replaced for selected 1B."
+    },
+    {
+      "path": "/workspace/android-drive-kit/runtime-test/actions-run-38878627822/fresh-native-diagnostic.json",
+      "sha256": "766504aa31366d25350fd633c04588248bd114a84680b2694ccb78c394ec165e",
+      "source": "Normal GitHub Checks annotations summarized by runtime monitor; prior native replies only, restart unverified."
+    },
+    {
+      "path": "/workspace/android-drive-kit/runtime-test/actions-run-38878627822/latest.json",
+      "sha256": "b27fcaeb7b5e500fd56b5ab89484db6a5c548fce385a2f2727b88f920f8f8710",
+      "source": "Normal GitHub run/job/check-annotation API responses; no artifact/log archive retrieval. Historical native annotations copied verbatim."
+    },
+    {
+      "path": "/workspace/android-drive-kit/runtime-test/actions-run-38880538406/latest.json",
+      "sha256": "27b85acd5d61766ea208553b8b0b1da8e7b80ff26b544115af3682ef05ee73f7",
+      "source": "Actual successful run/job and raw native Checks annotations used for all final phase values.",
+      "scope_role": "Active final same-job API 36 reply and restart evidence"
+    },
+    {
+      "path": "/workspace/android-drive-kit/runtime-test/actions-run-38880538406/fresh-native-diagnostic.json",
+      "sha256": "1972c66efd32803c9eecd3fd6ae7790bed58c21fb5cabe9717b173787e5dc7de",
+      "source": "Actual successful-run native diagnostic summary; supplementary to raw annotations.",
+      "scope_role": "Active final same-job API 36 reply and restart evidence"
+    }
+  ],
+  "historical_comparisons": {
+    "scope": "Prior observations only; these fields do not fill or pass the active final-job gate.",
+    "earlier_active_3b_model": {
+      "filename": "Llama-3.2-3B-Instruct-abliterated.Q4_K_M.gguf",
+      "size_bytes": 2019377472,
+      "sha256": "e1f2b428e316d8bd1cb5ca13e9649329e299d951fbcee6b3cd0e9f1d646c9fa7",
+      "payload_verified_against_publisher": true,
+      "cloud_cpu_inference": "Previously passed with llama.cpp b11429; separate from Android execution",
+      "android_inference": "Full exact GGUF native load passed13.96s in run38699688529; strict short-response verification exceeded300s, with output/recovery unverified."
+    },
+    "earlier_active_3b_guide": {
+      "pages": 2,
+      "ordered_images": [
+        {
+          "path": "customer-guide/First-Install-usb4.png",
+          "sha256": "dcc9e6e89038f2653a731655159bc04adc0e6b65a6d3c9bb7c4d66bf434ef994"
+        },
+        {
+          "path": "customer-guide/After-You-Plug-It-In-usb4.png",
+          "sha256": "fb2721c560d7f89a1b25d9cd608709c2d48b489e8e3f60e3bf69a6f21a8d7eb8"
+        }
+      ],
+      "model_settings": {
+        "max_context": 1024,
+        "threads": 2,
+        "batch": 16
+      },
+      "screens_are_illustrations": true
+    },
+    "earlier_3b_inference_failed_verification": {
+      "status": "verification failed; generated reply unverified",
+      "run_id": 38699688529,
+      "run_url": "https://github.com/sutty1307/code-stick/actions/runs/38699688529",
+      "test_commit": "d8213af75d8bb76b221ecdaecfac8723b1910a42",
+      "apk_sha256": "c833e55ff089903f3bc0e084f10b91516590fa5d9945138723e4ba466508d549",
+      "model_sha256": "e1f2b428e316d8bd1cb5ca13e9649329e299d951fbcee6b3cd0e9f1d646c9fa7",
+      "actual_phase_evidence_supplied": true,
+      "previous_v4_attempt": {
+        "run_id": 38698466718,
+        "test_commit": "aaf0a208556694cf774af76ba28a41dac81ff8e0",
+        "failure": "Harness tapped AI Bot beneath open Home drawer, opening Edit User. Corrected harness closes detected drawer first. App APK unchanged.",
+        "actual_passed_phases": {
+          "genuine-external-model-selection": {
+            "passed": true,
+            "native_annotation": "genuine-external-model-selection: PASS"
+          },
+          "verified-full-model-fixture": {
+            "passed": true,
+            "native_annotation": "verified-full-model-fixture: PASS"
+          },
+          "low-memory-model-settings": {
+            "passed": true,
+            "native_annotation": "low-memory-model-settings: PASS"
+          },
+          "model-settings-durable-save": {
+            "passed": true,
+            "native_annotation": "model-settings-durable-save: PASS {\"actual_drive_connected\": true, \"actual_verified_save_counter\": true, \"batch_tokens\": 16, \"context_tokens\": 1024, \"cpu_threads\": 2, \"current_slot_metadata\": {\"recovered_invalid_other\": false, \"selected_revision\": 5, \"selected_slot\": \"drive-memory-a.json\", \"slots\": [{\"body_characters\": 71299, \"body_valid\": true, \"checksum_valid\": true, \"envelope_valid\": true, \"name\": \"drive-memory-a.json\", \"present\": true, \"raw_characters\": 73179, \"raw_utf8_bytes\": 73207, \"revision\": 5, \"valid\": true}, {\"body_characters\": 71300, \"body_valid\": true, \"checksum_valid\": true, \"envelope_valid\": true, \"name\": \"drive-memory-b.json\", \"present\": true, \"raw_characters\": 73180, \"raw_utf8_bytes\": 73208, \"revision\": 4, \"valid\": true}]}, \"previous_revision\": 2, \"verified_revision\": 5}",
+            "actual_drive_connected": true,
+            "actual_verified_save_counter": true,
+            "batch_tokens": 16,
+            "context_tokens": 1024,
+            "cpu_threads": 2,
+            "current_slot_metadata": {
+              "recovered_invalid_other": false,
+              "selected_revision": 5,
+              "selected_slot": "drive-memory-a.json",
+              "slots": [
+                {
+                  "body_characters": 71299,
+                  "body_valid": true,
+                  "checksum_valid": true,
+                  "envelope_valid": true,
+                  "name": "drive-memory-a.json",
+                  "present": true,
+                  "raw_characters": 73179,
+                  "raw_utf8_bytes": 73207,
+                  "revision": 5,
+                  "valid": true
+                },
+                {
+                  "body_characters": 71300,
+                  "body_valid": true,
+                  "checksum_valid": true,
+                  "envelope_valid": true,
+                  "name": "drive-memory-b.json",
+                  "present": true,
+                  "raw_characters": 73180,
+                  "raw_utf8_bytes": 73208,
+                  "revision": 4,
+                  "valid": true
+                }
+              ]
+            },
+            "previous_revision": 2,
+            "verified_revision": 5
+          },
+          "actual-default-ai-bot-onboarding": {
+            "passed": true,
+            "native_annotation": "actual-default-ai-bot-onboarding: PASS {\"actual_ai_bot_card_visible\": true, \"no_character_created_by_harness\": true, \"verified_revision\": 2, \"verified_snapshot_ai_bot_identity\": {\"id\": 2, \"name\": \"AI Bot\", \"type\": \"character\"}}",
+            "actual_ai_bot_card_visible": true,
+            "no_character_created_by_harness": true,
+            "verified_revision": 2,
+            "verified_snapshot_ai_bot_identity": {
+              "id": 2,
+              "name": "AI Bot",
+              "type": "character"
+            }
+          },
+          "virtual-removable-saf-grant": {
+            "passed": true,
+            "native_annotation": "virtual-removable-saf-grant: PASS {\"genuine_saf_ui_grant\": true, \"initial_revision\": 2, \"simulated_removable_storage\": true}",
+            "genuine_saf_ui_grant": true,
+            "initial_revision": 2,
+            "simulated_removable_storage": true
+          },
+          "virtual-removable-fixture": {
+            "passed": true,
+            "native_annotation": "virtual-removable-fixture: PASS {\"newly_created_disk_only\": true, \"simulated_removable_storage\": true}",
+            "newly_created_disk_only": true,
+            "simulated_removable_storage": true
+          },
+          "candidate-startup": {
+            "passed": true,
+            "native_annotation": "candidate-startup: PASS {\"actual_ui_controls_verified\": [\"Choose USB memory folder\", \"Offline Toolkit\"], \"am_launch_elapsed_seconds\": 4.21, \"am_launch_status\": \"ok\", \"foreground_activity_verified\": true, \"process_stable_seconds\": 20, \"ready_elapsed_seconds\": 27.28}",
+            "actual_ui_controls_verified": [
+              "Choose USB memory folder",
+              "Offline Toolkit"
+            ],
+            "am_launch_elapsed_seconds": 4.21,
+            "am_launch_status": "ok",
+            "foreground_activity_verified": true,
+            "process_stable_seconds": 20,
+            "ready_elapsed_seconds": 27.28
+          },
+          "candidate-install": {
+            "passed": true,
+            "native_annotation": "candidate-install: PASS {\"install_kind\": \"fresh\", \"uid\": \"10209\", \"version_code\": 4}",
+            "install_kind": "fresh",
+            "uid": "10209",
+            "version_code": 4
+          }
+        },
+        "direct_native_load_notice": "Not exposed due step notice cap; no v4 load timing asserted."
+      },
+      "phone_model_location": "public Download; not removable USB",
+      "model_on_removable_storage_tested": false,
+      "run_attempt": 1,
+      "job_id": 116304578283,
+      "job_conclusion": "failure",
+      "actual_passed_phases": {
+        "real-model-load": {
+          "passed": true,
+          "native_annotation": "real-model-load: PASS {\"actual_full_model_loaded\": true, \"load_elapsed_seconds\": 13.96, \"model_location\": \"public phone Download; NOT physical USB\", \"model_sha256\": \"e1f2b428e316d8bd1cb5ca13e9649329e299d951fbcee6b3cd0e9f1d646c9fa7\"}",
+          "actual_full_model_loaded": true,
+          "load_elapsed_seconds": 13.96,
+          "model_location": "public phone Download; NOT physical USB",
+          "model_sha256": "e1f2b428e316d8bd1cb5ca13e9649329e299d951fbcee6b3cd0e9f1d646c9fa7"
+        },
+        "genuine-external-model-selection": {
+          "passed": true,
+          "native_annotation": "genuine-external-model-selection: PASS {\"model_bytes\": 2019377472, \"model_location\": \"public phone Download; NOT removable USB\", \"model_name_from_actual_metadata\": \"Models\", \"selected_through_genuine_documents_ui\": true}",
+          "model_bytes": 2019377472,
+          "model_location": "public phone Download; NOT removable USB",
+          "model_name_from_actual_metadata": "Models",
+          "selected_through_genuine_documents_ui": true
+        },
+        "verified-full-model-fixture": {
+          "passed": true,
+          "native_annotation": "verified-full-model-fixture: PASS {\"model_bytes\": 2019377472, \"model_location\": \"public phone Download; NOT removable USB\", \"model_sha256\": \"e1f2b428e316d8bd1cb5ca13e9649329e299d951fbcee6b3cd0e9f1d646c9fa7\", \"runner_and_android_checksums_verified\": true}",
+          "model_bytes": 2019377472,
+          "model_location": "public phone Download; NOT removable USB",
+          "model_sha256": "e1f2b428e316d8bd1cb5ca13e9649329e299d951fbcee6b3cd0e9f1d646c9fa7",
+          "runner_and_android_checksums_verified": true
+        },
+        "model-settings-durable-save": {
+          "passed": true,
+          "native_annotation": "model-settings-durable-save: PASS {\"actual_drive_connected\": true, \"actual_verified_save_counter\": true, \"batch_tokens\": 16, \"context_tokens\": 1024, \"cpu_threads\": 2, \"current_slot_metadata\": {\"recovered_invalid_other\": false, \"selected_revision\": 5, \"selected_slot\": \"drive-memory-a.json\", \"slots\": [{\"body_characters\": 71299, \"body_valid\": true, \"checksum_valid\": true, \"envelope_valid\": true, \"name\": \"drive-memory-a.json\", \"present\": true, \"raw_characters\": 73179, \"raw_utf8_bytes\": 73207, \"revision\": 5, \"valid\": true}, {\"body_characters\": 71300, \"body_valid\": true, \"checksum_valid\": true, \"envelope_valid\": true, \"name\": \"drive-memory-b.json\", \"present\": true, \"raw_characters\": 73180, \"raw_utf8_bytes\": 73208, \"revision\": 4, \"valid\": true}]}, \"previous_revision\": 2, \"verified_revision\": 5}",
+          "actual_drive_connected": true,
+          "actual_verified_save_counter": true,
+          "batch_tokens": 16,
+          "context_tokens": 1024,
+          "cpu_threads": 2,
+          "current_slot_metadata": {
+            "recovered_invalid_other": false,
+            "selected_revision": 5,
+            "selected_slot": "drive-memory-a.json",
+            "slots": [
+              {
+                "body_characters": 71299,
+                "body_valid": true,
+                "checksum_valid": true,
+                "envelope_valid": true,
+                "name": "drive-memory-a.json",
+                "present": true,
+                "raw_characters": 73179,
+                "raw_utf8_bytes": 73207,
+                "revision": 5,
+                "valid": true
+              },
+              {
+                "body_characters": 71300,
+                "body_valid": true,
+                "checksum_valid": true,
+                "envelope_valid": true,
+                "name": "drive-memory-b.json",
+                "present": true,
+                "raw_characters": 73180,
+                "raw_utf8_bytes": 73208,
+                "revision": 4,
+                "valid": true
+              }
+            ]
+          },
+          "previous_revision": 2,
+          "verified_revision": 5
+        },
+        "actual-default-ai-bot-onboarding": {
+          "passed": true,
+          "native_annotation": "actual-default-ai-bot-onboarding: PASS {\"actual_ai_bot_card_visible\": true, \"no_character_created_by_harness\": true, \"verified_revision\": 2, \"verified_snapshot_ai_bot_identity\": {\"id\": 2, \"name\": \"AI Bot\", \"type\": \"character\"}}",
+          "actual_ai_bot_card_visible": true,
+          "no_character_created_by_harness": true,
+          "verified_revision": 2,
+          "verified_snapshot_ai_bot_identity": {
+            "id": 2,
+            "name": "AI Bot",
+            "type": "character"
+          }
+        },
+        "candidate-startup": {
+          "passed": true,
+          "native_annotation": "candidate-startup: PASS {\"actual_ui_controls_verified\": [\"Choose USB memory folder\", \"Offline Toolkit\"], \"am_launch_elapsed_seconds\": 9.91, \"am_launch_status\": \"ok\", \"foreground_activity_verified\": true, \"pid\": \"3811\", \"process_stable_seconds\": 20, \"ready_elapsed_seconds\": 36.19}",
+          "actual_ui_controls_verified": [
+            "Choose USB memory folder",
+            "Offline Toolkit"
+          ],
+          "am_launch_elapsed_seconds": 9.91,
+          "am_launch_status": "ok",
+          "foreground_activity_verified": true,
+          "pid": "3811",
+          "process_stable_seconds": 20,
+          "ready_elapsed_seconds": 36.19
+        },
+        "candidate-install": {
+          "passed": true,
+          "native_annotation": "candidate-install: PASS {\"install_kind\": \"fresh\", \"uid\": \"10209\", \"version_code\": 4}",
+          "install_kind": "fresh",
+          "uid": "10209",
+          "version_code": 4
+        }
+      },
+      "actual_failed_phases": {
+        "real-short-model-response": {
+          "passed": false,
+          "native_annotation": "real-short-model-response: BudgetExceeded: Operation exceeded its 300-second budget",
+          "failure_type": "BudgetExceeded",
+          "budget_seconds": 300
+        }
+      },
+      "android_full_model_loaded": true,
+      "load_elapsed_seconds": 13.96,
+      "generated_reply_verified": false,
+      "generated_reply_outcome": "No strict successful response proof; timeout cause not established by the bounded phase failure.",
+      "chat_response_and_chat_restart_recovery_verified": false
+    },
+    "earlier_usb4_async_copy_runtime_observation": "Actual default AI Bot card and identity verified in run38699688529; full model loaded13.96s. Strict generated response verification exceeded300s and has not passed.",
+    "earlier_1b_native_reply_with_restart_unverified": {
+      "run_id": 38878627822,
+      "run_url": "https://github.com/sutty1307/code-stick/actions/runs/38878627822",
+      "test_commit": "7c44255e3adfe12b141fcb2f689b3c7c7f298439",
+      "overall_run_conclusion": "failure",
+      "counts_as_active_final_run_evidence": false,
+      "same_job_reply_and_restart_pass_established": false,
+      "actual_diagnostic_record": {
+        "observed_at": "2026-10-16T09:22:42.221745+00:00",
+        "run_id": 38878627822,
+        "head_sha": "7c44255e3adfe12b141fcb2f689b3c7c7f298439",
+        "status": "completed",
+        "conclusion": "failure",
+        "html_url": "https://github.com/sutty1307/code-stick/actions/runs/38878627822",
+        "source": "current normal GitHub check-run native annotations only; no artifact or log archive retrieval",
+        "jobs": [
+          {
+            "job_id": 116899661381,
+            "job_name": "inference (1b-comparison, 2 threads, API35)",
+            "status": "completed",
+            "conclusion": "failure",
+            "started_at": "2026-10-16T09:10:27Z",
+            "completed_at": "2026-10-16T09:22:29Z",
+            "strict_native_and_durable_inference_pass_notice": {
+              "actual_model_output": "Session. Inference. 59c138b79a.",
+              "android_api": 35,
+              "cpu_threads": 2,
+              "model_filename": "Llama-3.2-1B-Instruct-abliterated.Q4_K_M.gguf",
+              "model_location": "public phone Download; NOT removable USB",
+              "model_profile": "1b-comparison",
+              "model_sha256": "68336c25367576f49b29f01ee9034658b51bbded6a7f215e934d997de96301e0",
+              "physical_phone_tested": false,
+              "predicted_tokens": 12,
+              "snapshot_revision": 17
+            },
+            "phase_proofs": {
+              "real-model-inference": {
+                "actual_model_output": "Session. Inference. 59c138b79a.",
+                "android_api": 35,
+                "cpu_threads": 2,
+                "model_filename": "Llama-3.2-1B-Instruct-abliterated.Q4_K_M.gguf",
+                "model_location": "public phone Download; NOT removable USB",
+                "model_profile": "1b-comparison",
+                "model_sha256": "68336c25367576f49b29f01ee9034658b51bbded6a7f215e934d997de96301e0",
+                "physical_phone_tested": false,
+                "predicted_tokens": 12,
+                "snapshot_revision": 17
+              },
+              "real-model-load": {
+                "actual_full_model_loaded": true,
+                "load_elapsed_seconds": 10.68,
+                "model_location": "public phone Download; NOT physical USB",
+                "model_sha256": "68336c25367576f49b29f01ee9034658b51bbded6a7f215e934d997de96301e0"
+              },
+              "genuine-external-model-selection": {
+                "download_directory_navigation": {
+                  "app_import_or_model_execution_claimed": false,
+                  "exact_enabled_filename_result_tapped": true,
+                  "exact_search_query_verified": true,
+                  "filename": "Llama-3.2-1B-Instruct-abliterated.Q4_K_M.gguf",
+                  "genuine_documents_ui_search": true
+                },
+                "model_bytes": 955445792,
+                "model_location": "public phone Download; NOT removable USB",
+                "model_name_from_actual_metadata": "Llama 3.2 1B Instruct Abliterated",
+                "selected_through_genuine_documents_ui": true
+              },
+              "verified-full-model-fixture": {
+                "android_api": 35,
+                "android_runtime_properties": {
+                  "ro.berberis.version": "0.2.3",
+                  "ro.build.version.sdk": "35",
+                  "ro.dalvik.vm.isa.arm64": "x86_64",
+                  "ro.dalvik.vm.native.bridge": "libndk_translation.so",
+                  "ro.ndk_translation.version": "0.2.3",
+                  "ro.product.cpu.abilist": "x86_64,arm64-v8a"
+                },
+                "model_bytes": 955445792,
+                "model_location": "public phone Download; NOT removable USB",
+                "model_sha256": "68336c25367576f49b29f01ee9034658b51bbded6a7f215e934d997de96301e0",
+                "runner_and_android_checksums_verified": true
+              },
+              "model-settings-durable-save": {
+                "actual_drive_connected": true,
+                "actual_verified_save_counter": true,
+                "batch_tokens": 16,
+                "context_tokens": 1024,
+                "cpu_threads": 2,
+                "current_slot_metadata": {
+                  "recovered_invalid_other": false,
+                  "selected_revision": 5,
+                  "selected_slot": "drive-memory-a.json",
+                  "slots": [
+                    {
+                      "body_characters": 71299,
+                      "body_valid": true,
+                      "checksum_valid": true,
+                      "envelope_valid": true,
+                      "name": "drive-memory-a.json",
+                      "present": true,
+                      "raw_characters": 73179,
+                      "raw_utf8_bytes": 73207,
+                      "revision": 5,
+                      "valid": true
+                    },
+                    {
+                      "body_characters": 71300,
+                      "body_valid": true,
+                      "checksum_valid": true,
+                      "envelope_valid": true,
+                      "name": "drive-memory-b.json",
+                      "present": true,
+                      "raw_characters": 73180,
+                      "raw_utf8_bytes": 73208,
+                      "revision": 4,
+                      "valid": true
+                    }
+                  ]
+                },
+                "previous_revision": 2,
+                "verified_revision": 5
+              }
+            },
+            "restart_pass_established": false,
+            "error_annotations": [
+              "Process completed with exit code 1.",
+              "real-generated-chat-restart: RuntimeError: Exact restored generated chat in actual UI and genuine USB snapshot did not complete in 35s: condition not met. Actual visible controls: \uf4c1 | \uf21a | \uf1fd | AI Bot | 9:17:31\u202fAM | #1 | 0s | \u2066Session. Inference. 59c138b79a.\u2069 | Prompt: 0.33 t/s | 222.06s    Text Gen: 0.60 t/s | 19.98s | \uf4b3 | \uf237 | 1 / 1 | \uf1b6 | \uf4f6 | User | 9:17:30\u202fAM | #0 | \u2066Say hello in three words. Session Inference59c138b79a\u2069 | Start of chat | \uf487 | Choose a model | \uf427 | \uf4cf | No Model Loaded | \ue163"
+            ]
+          },
+          {
+            "job_id": 116899661657,
+            "job_name": "inference (1b-comparison, 2 threads, API36)",
+            "status": "completed",
+            "conclusion": "failure",
+            "started_at": "2026-10-16T09:10:27Z",
+            "completed_at": "2026-10-16T09:21:39Z",
+            "strict_native_and_durable_inference_pass_notice": {
+              "actual_model_output": "Hello there.",
+              "android_api": 36,
+              "cpu_threads": 2,
+              "model_filename": "Llama-3.2-1B-Instruct-abliterated.Q4_K_M.gguf",
+              "model_location": "public phone Download; NOT removable USB",
+              "model_profile": "1b-comparison",
+              "model_sha256": "68336c25367576f49b29f01ee9034658b51bbded6a7f215e934d997de96301e0",
+              "physical_phone_tested": false,
+              "predicted_tokens": 2,
+              "snapshot_revision": 17
+            },
+            "phase_proofs": {
+              "real-model-inference": {
+                "actual_model_output": "Hello there.",
+                "android_api": 36,
+                "cpu_threads": 2,
+                "model_filename": "Llama-3.2-1B-Instruct-abliterated.Q4_K_M.gguf",
+                "model_location": "public phone Download; NOT removable USB",
+                "model_profile": "1b-comparison",
+                "model_sha256": "68336c25367576f49b29f01ee9034658b51bbded6a7f215e934d997de96301e0",
+                "physical_phone_tested": false,
+                "predicted_tokens": 2,
+                "snapshot_revision": 17
+              },
+              "real-model-load": {
+                "actual_full_model_loaded": true,
+                "load_elapsed_seconds": 8.59,
+                "model_location": "public phone Download; NOT physical USB",
+                "model_sha256": "68336c25367576f49b29f01ee9034658b51bbded6a7f215e934d997de96301e0"
+              },
+              "genuine-external-model-selection": {
+                "download_directory_navigation": {
+                  "app_import_or_model_execution_claimed": false,
+                  "exact_enabled_filename_result_tapped": true,
+                  "exact_search_query_verified": true,
+                  "filename": "Llama-3.2-1B-Instruct-abliterated.Q4_K_M.gguf",
+                  "genuine_documents_ui_search": true
+                },
+                "model_bytes": 955445792,
+                "model_location": "public phone Download; NOT removable USB",
+                "model_name_from_actual_metadata": "Llama 3.2 1B Instruct Abliterated",
+                "selected_through_genuine_documents_ui": true
+              },
+              "verified-full-model-fixture": {
+                "android_api": 36,
+                "android_runtime_properties": {
+                  "ro.berberis.version": "16.0.0",
+                  "ro.build.version.sdk": "36",
+                  "ro.dalvik.vm.isa.arm64": "x86_64",
+                  "ro.dalvik.vm.native.bridge": "libndk_translation.so",
+                  "ro.ndk_translation.version": "",
+                  "ro.product.cpu.abilist": "x86_64,arm64-v8a"
+                },
+                "model_bytes": 955445792,
+                "model_location": "public phone Download; NOT removable USB",
+                "model_sha256": "68336c25367576f49b29f01ee9034658b51bbded6a7f215e934d997de96301e0",
+                "runner_and_android_checksums_verified": true
+              },
+              "model-settings-durable-save": {
+                "actual_drive_connected": true,
+                "actual_verified_save_counter": true,
+                "batch_tokens": 16,
+                "context_tokens": 1024,
+                "cpu_threads": 2,
+                "current_slot_metadata": {
+                  "recovered_invalid_other": false,
+                  "selected_revision": 5,
+                  "selected_slot": "drive-memory-a.json",
+                  "slots": [
+                    {
+                      "body_characters": 71299,
+                      "body_valid": true,
+                      "checksum_valid": true,
+                      "envelope_valid": true,
+                      "name": "drive-memory-a.json",
+                      "present": true,
+                      "raw_characters": 73179,
+                      "raw_utf8_bytes": 73207,
+                      "revision": 5,
+                      "valid": true
+                    },
+                    {
+                      "body_characters": 71300,
+                      "body_valid": true,
+                      "checksum_valid": true,
+                      "envelope_valid": true,
+                      "name": "drive-memory-b.json",
+                      "present": true,
+                      "raw_characters": 73180,
+                      "raw_utf8_bytes": 73208,
+                      "revision": 4,
+                      "valid": true
+                    }
+                  ]
+                },
+                "previous_revision": 2,
+                "verified_revision": 5
+              }
+            },
+            "restart_pass_established": false,
+            "error_annotations": [
+              "Process completed with exit code 1.",
+              "real-generated-chat-restart: RuntimeError: Exact restored generated chat in actual UI and genuine USB snapshot did not complete in 35s: condition not met. Actual visible controls: \uf4c1 | \uf21a | \uf1fd | AI Bot | 9:17:54\u202fAM | #1 | 0s | \u2066Hello there.\u2069 | Prompt: 0.46 t/s | 161.57s    Text Gen: 0.66 t/s | 3.01s | \uf4b3 | \uf237 | 1 / 1 | \uf1b6 | \uf4f6 | User | 9:17:53\u202fAM | #0 | \u2066Say hello in three words. Session Inferenceb06fb5ae3c\u2069 | Start of chat | \uf487 | Choose a model | \uf427 | \uf4cf | No Model Loaded | \ue163"
+            ]
+          }
+        ],
+        "source_backed_restart_probe_mismatch": {
+          "source_file": "lib/markdown/Markdown.tsx",
+          "source_lines": [
+            279,
+            281
+          ],
+          "actual_ltr_textgroup_prefix": "U+2066",
+          "actual_rtl_textgroup_prefix": "U+2067",
+          "actual_textgroup_suffix": "U+2069",
+          "probe_comparison": "exact_bubble_visible normalizes whitespace only; actual controls retain directional isolate wrappers",
+          "no_app_restore_defect_proven": true,
+          "after_restart_raw_record_equality_not_yet_evaluated": "bubble predicate fails before _snapshots/reply_identity checks"
+        }
+      },
+      "raw_native_annotations": [
+        {
+          "job_id": 116899661381,
+          "job_name": "inference (1b-comparison, 2 threads, API35)",
+          "job_conclusion": "failure",
+          "messages": [
+            "real-generated-chat-restart: RuntimeError: Exact restored generated chat in actual UI and genuine USB snapshot did not complete in 35s: condition not met. Actual visible controls: \uf4c1 | \uf21a | \uf1fd | AI Bot | 9:17:31\u202fAM | #1 | 0s | \u2066Session. Inference. 59c138b79a.\u2069 | Prompt: 0.33 t/s | 222.06s    Text Gen: 0.60 t/s | 19.98s | \uf4b3 | \uf237 | 1 / 1 | \uf1b6 | \uf4f6 | User | 9:17:30\u202fAM | #0 | \u2066Say hello in three words. Session Inference59c138b79a\u2069 | Start of chat | \uf487 | Choose a model | \uf427 | \uf4cf | No Model Loaded | \ue163",
+            "real-model-inference: PASS {\"actual_model_output\": \"Session. Inference. 59c138b79a.\", \"android_api\": 35, \"cpu_threads\": 2, \"model_filename\": \"Llama-3.2-1B-Instruct-abliterated.Q4_K_M.gguf\", \"model_location\": \"public phone Download; NOT removable USB\", \"model_profile\": \"1b-comparison\", \"model_sha256\": \"68336c25367576f49b29f01ee9034658b51bbded6a7f215e934d997de96301e0\", \"physical_phone_tested\": false, \"predicted_tokens\": 12, \"snapshot_revision\": 17}"
+          ]
+        },
+        {
+          "job_id": 116899661657,
+          "job_name": "inference (1b-comparison, 2 threads, API36)",
+          "job_conclusion": "failure",
+          "messages": [
+            "real-generated-chat-restart: RuntimeError: Exact restored generated chat in actual UI and genuine USB snapshot did not complete in 35s: condition not met. Actual visible controls: \uf4c1 | \uf21a | \uf1fd | AI Bot | 9:17:54\u202fAM | #1 | 0s | \u2066Hello there.\u2069 | Prompt: 0.46 t/s | 161.57s    Text Gen: 0.66 t/s | 3.01s | \uf4b3 | \uf237 | 1 / 1 | \uf1b6 | \uf4f6 | User | 9:17:53\u202fAM | #0 | \u2066Say hello in three words. Session Inferenceb06fb5ae3c\u2069 | Start of chat | \uf487 | Choose a model | \uf427 | \uf4cf | No Model Loaded | \ue163",
+            "real-model-inference: PASS {\"actual_model_output\": \"Hello there.\", \"android_api\": 36, \"cpu_threads\": 2, \"model_filename\": \"Llama-3.2-1B-Instruct-abliterated.Q4_K_M.gguf\", \"model_location\": \"public phone Download; NOT removable USB\", \"model_profile\": \"1b-comparison\", \"model_sha256\": \"68336c25367576f49b29f01ee9034658b51bbded6a7f215e934d997de96301e0\", \"physical_phone_tested\": false, \"predicted_tokens\": 2, \"snapshot_revision\": 17}"
+          ]
+        }
+      ]
+    }
+  },
+  "selected_packaging_profile": {
+    "profile_id": "llama32-1b-q4km",
+    "document_status": "final",
+    "source_profile_path": "/tmp/ai-drive-1b-final-reviewed-20261016/PROFILE.json",
+    "source_profile_sha256": "42195782f47d52626ab232badac9f6f3ae917df724c1ae4429928f383ded8d0e",
+    "reviewed_overlay_file_count": 14,
+    "reviewed_files_sha256": {
+      "MODEL-VALIDATION.json": "90a2f42b8cb8f3cdb2e6f08521b2593a387d1d406ecdaf0bf493d683a4c37790",
+      "MODEL-VALIDATION.md": "2c4f5c4dc532f85cce1d6831bc4cd12124c158e2d2c68ee870b1fea0247720fa",
+      "PICTURE-GUIDE.pdf": "87cd4e58ced224f7041129ec8cf280249ef3d9be0cd71215dc66f14fc4a2dc85",
+      "README.md": "a8a4797b4e7a6448b24ee27d9d3e1c9656cc83f11c7a140aa8a614c176b908ca",
+      "REFERENCE-AND-LICENSE-NOTES.txt": "182e7b677af4562b7737eff02e892936a91dca4e80f45c42ac236c18ba1a8b76",
+      "START-HERE.html": "26e0f4afdcb8ef935fc860a3f87c010a332679018ce77c48fd3b5940ad7977ab",
+      "START-HERE.txt": "0b79ad5498ff65a327511eb59adc01e7a688feb758338b282da7e90b9ab0d31b",
+      "customer-guide/After-You-Plug-It-In-usb4.png": "d48bc0ee2de1a1f823e0d124987580a92fd781664bcc80d8b45f1ae732b94c81",
+      "customer-guide/First-Install-usb4.png": "dcc9e6e89038f2653a731655159bc04adc0e6b65a6d3c9bb7c4d66bf434ef994",
+      "models/LLAMA-3.2-LICENSE.txt": "8cc15535a8a34b41888f644b339a1a9eb428af793a4f5e24df58a3e5b1487d74",
+      "models/MODEL-CARD.md": "a2c3b545873ba32d3522f922294c2332d91a22d5cc711dbae8455a4c1bf7fd6b",
+      "models/MODEL-DOWNLOAD.txt": "394f46e5bb84b35bfea4a66d454384417e8d676c575ab4f49cc55af18c430b2b",
+      "models/MODEL-PROVENANCE.json": "e05e2ee2ab1b0fd8ba5c7a3247ab817d803425da66e183597c5b386733b75f72",
+      "models/NOTICE.txt": "3bc2d1a6b360a03d172058198631b931c9aadf01650892fb0d25b93c6b8f0025"
+    },
+    "these_pins_do_not_authorize_assembly_or_publication": true
+  },
+  "persistent_memory_validation_scope": {
+    "designed_persistent_text_scope": [
+      "Complete stored conversation history and alternate replies",
+      "Stored preferences",
+      "Saved facts and notes",
+      "Profile text"
+    ],
+    "prompt_context_scope": "Complete stored history is separate from the bounded subset provided to each model prompt.",
+    "actual_android_emulator_scope": {
+      "evidence_reference": "fresh_candidate_and_simulated_usb",
+      "genuine_saf_folder_grant_and_two_slot_snapshot_checks": true,
+      "manual_fact_and_note_saved_and_visible": true,
+      "fact_and_note_restored_after_force_stop_without_data_clear": true,
+      "generated_chat_history_restored_after_force_stop": "Passed one exact generated conversation: raw records, active swipes, timings and archive preserved; both user and assistant bubbles visible after force-stop/relaunch.",
+      "complete_history_with_every_alternate_reply_durability_tested": false,
+      "profile_text_durability_after_force_stop_tested": false,
+      "all_preference_types_durability_after_force_stop_tested": false,
+      "model_settings_saved_in_sha_valid_snapshots_reference": "android_model_inference.actual_passed_phases.model-settings-durable-save",
+      "generated_chat_restart_evidence_reference": "android_model_inference.actual_passed_phases.real-generated-chat-restart"
+    },
+    "media_durability_android_tested": false,
+    "media_scope": "No Android durability claim for portraits, backgrounds, attachments or every personal media asset.",
+    "physical_phone_tested": false,
+    "physical_usb_tested": false,
+    "physical_sd_tested": false,
+    "physical_drive_detach_reconnect_tested": false,
+    "model_on_removable_storage_tested": false,
+    "storage_scope": "Memory used a newly created disposable virtual removable volume through genuine SAF UI; model files used public phone Download.",
+    "storage_security_scope": "Readable plaintext snapshots with checksum/read-back checks; no encryption, authentication or OS flush guarantee.",
+    "all_conversations_migration_tested": false
+  },
+  "media_durability_android_tested": false,
+  "model_on_removable_storage_tested": false,
+  "runtime_test_harness_review": {
+    "apk_or_application_source_modified_for_final_run": false,
+    "test_commit": "868c30e2fc84dfc0b6b2a3e826d4724d093cc8d4",
+    "scope": "The harness recognizes source-rendered outer LRI/PDI wrappers and the native clickable ViewGroup message ancestor; exact text and raw persisted identity checks remain.",
+    "source_renderer": {
+      "path": "lib/markdown/Markdown.tsx",
+      "sha256": "f1567785987a8dca502dae7e4cfd58832e659a12c0f5d207b6e9c92462b20a88",
+      "lines": [
+        279,
+        281
+      ],
+      "ltr_prefix": "U+2066",
+      "suffix": "U+2069"
+    },
+    "reviewed_test_helper": {
+      "path": "/workspace/android-drive-kit/delivery/restart-bidi-proposal-20261016/generated_chat_restart.py",
+      "sha256": "f1bc27c9caf1a0b8204920c4b384398c23014bbdf382bcc66141005939ad7a13"
+    },
+    "unsupported_or_nested_bidi_controls_rejected": true,
+    "raw_snapshot_text_swipes_timings_and_archive_not_normalized": true,
+    "review_reference": "/workspace/android-drive-kit/delivery/restart-bidi-proposal-20261016/README.md"
+  }
+}

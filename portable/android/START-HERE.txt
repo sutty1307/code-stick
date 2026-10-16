@@ -1,13 +1,15 @@
 AI DRIVE OFFLINE — AFTER YOU PLUG IN
+Built with Llama. Llama 3.2 1B Instruct Abliterated, Q4_K_M.
 
-Open PICTURE-GUIDE.pdf for the current one-page illustrated guide.
-START-HERE.html shows that same guide offline.
-The standalone picture is customer-guide/After-You-Plug-It-In-usb2.png.
-The older four-page guide is customer-guide/Earlier-Illustrations-usb1.pdf.
+Open PICTURE-GUIDE.pdf for the current two-page illustrated guide:
+page 1 installs the app once per phone; page 2 connects memory and the model.
+START-HERE.html shows both pages offline. Standalone pictures:
+customer-guide/First-Install-usb4.png
+customer-guide/After-You-Plug-It-In-usb4.png
 
 FIRST USE — DRIVE ALREADY CONNECTED TO YOUR ANDROID PHONE
 1. Unlock the phone. Open Files > USB drive > Android-Drive-Kit > apps.
-   Tap AI-Drive-Offline_v0.10.1-usb.2.apk.
+   Tap AI-Drive-Offline_v0.10.1-usb.4.apk.
    Already installed? Open AI Drive Offline and continue at step 3.
 2. If prompted, tap Settings and enable Allow from this source for the file
    manager opening the APK. Go Back, then Install > Open.
@@ -20,9 +22,10 @@ FIRST USE — DRIVE ALREADY CONNECTED TO YOUR ANDROID PHONE
 5. Tap Choose a model in Drive Memory. In the model manager, tap the
    document-plus icon > Use External Model.
    Choose USB > Android-Drive-Kit > models >
-   Llama-3.2-3B-Instruct-abliterated.Q4_K_M.gguf
-6. Tap the bottom Settings tab. Edit Max Context to 2048, dismiss the
-   keyboard, then tap the Models tab. No Save button is needed.
+   Llama-3.2-1B-Instruct-abliterated.Q4_K_M.gguf
+6. Tap the bottom Settings tab. Set Max Context to 1024, Threads to 2
+   and Batch to 16. Dismiss the keyboard, then tap the Models tab.
+   No Save button is needed.
 7. Tap the circular play button beside the model. Wait until Model Loaded
    shows the model's name. Leave the drive connected.
 8. Go Back to Drive Memory, tap Chats, then AI Bot. Type in Message...
@@ -33,9 +36,8 @@ FINDING THE MODEL SCREEN
   tap Choose a model above the message box in a chat.
 - Drive Memory has no menu button. For the menu route, tap Chats, then
   the top-left menu > Models. Both routes open the model manager.
-- The current one-page picture guide shows the Choose a model shortcut.
-  Earlier-Illustrations-usb1.pdf preserves the previous four-page guide;
-  use this text and the current one-page guide for this version.
+- The current picture guide shows installation and the Choose a model shortcut.
+  Use this text and the current two-page guide for this version.
 
 KEEP THE DRIVE CONNECTED WHILE USING THE APP.
 No account or subscription is needed for this local model.
@@ -82,10 +84,11 @@ Replace ID with the actual ID returned by /memories or /notes.
 Only commands you submit run tools; model replies cannot run them.
 
 WHEN FINISHED
-1. Open menu > Drive Memory > Save and disconnect.
-2. Confirm Save and disconnect. Let saving finish.
-3. If a model remains loaded, tap Chats > menu > Models and tap its red X.
-4. Use Eject if the phone offers it, then remove the drive.
+1. Open Drive Memory (Chats > menu > Drive Memory if needed).
+2. Tap Save and disconnect, then confirm Save and disconnect in the dialog.
+3. Keep the drive connected while saving/checking finishes. If an error appears,
+   keep it connected and resolve the error; do not unplug during a failed save.
+4. After a successful disconnect, use Eject if the phone offers it, then unplug.
 
 Personal data clears from the app session; saved files remain on the USB.
 If saving fails, keep the drive connected and resolve the error before
@@ -102,19 +105,18 @@ QUICK HELP
   folder. Select the same USB folder and Allow.
 - No reply: connect memory and confirm Models shows Model Loaded with
   the model's name. Load the model before opening your chat.
-- Load fails or the app closes: close other apps. Use Max Context 2048;
-  try 1024 if needed. Reselect the .gguf with Use External Model.
+- Load fails or the app closes: close other apps. In Models > Settings,
+  use Max Context 1024, Threads 2 and Batch 16. Reselect the .gguf with
+  Use External Model. Phone memory and USB support affect compatibility.
 - An interrupted snapshot may restore an earlier verified save. Check
   recent messages and memories; keep the USB files for recovery.
 - Each snapshot allows about 32 million characters. A full save fails
   visibly; it never silently cuts history. Resolve a save error before
   disconnecting. Memory entries allow up to 2,000 characters each.
 
-Built with Llama. Guide for AI Drive Offline 0.10.1-usb.2.
+Built with Llama. Guide for AI Drive Offline 0.10.1-usb.4.
 Screens are illustrations; Android wording may vary.
-Fresh install, update, startup, calculator, saved fact/note recovery and
-the model-screen shortcut passed in an API 35 Android emulator. Saved facts
-and notes used a simulated removable drive, not a physical USB device.
+Read APP-VALIDATION.json for actual evidence and limits for this exact installer
+and selected model. Model Loaded alone does not establish a generated reply.
 Actual Android phone and physical USB-drive compatibility remain untested.
-The included model has not yet generated a response inside this Android app.
 Licenses and technical validation notes are included elsewhere in this kit.

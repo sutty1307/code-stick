@@ -1,48 +1,44 @@
-# Android downloads: AI Drive Offline
+# Code Stick for Android — offline preview
 
-**The complete Android USB kit is being assembled and checked; its download is not public yet.**
+**Built with Llama.** Llama 3.2 1B Instruct Abliterated, with persistent USB memory.
 
-Real AI replies using **Llama 3.2 1B Instruct Abliterated** have passed on
-Android 15 and 16 emulators. The generated-chat restart check has now passed on
-Android 16 too. The installer below is available for app installation only; it does
-not contain the model or the complete USB kit.
+**[Download the complete kit — one ZIP, 1.05 GB](https://github.com/sutty1307/code-stick/releases/download/android-usb-memory-preview-v0.10.1-usb.4-1b/Android-Drive-Kit-with-Memory-v0.10.1-usb.4-1B.zip)**
 
-**[Download the Android app installer — usb.4, 67.7 MB](https://github.com/sutty1307/code-stick/raw/refs/heads/repair/android-runtime-usb4/portable/android/AI-Drive-Offline_v0.10.1-usb.4.apk)**
+The ZIP contains the Android installer, full model, picture guide and matching
+source/license files. You do not need three separate downloads.
 
-1. Open this page in **Chrome on the Android phone** and tap the installer link.
-2. When the download finishes, open **Files > Downloads** and tap
-   `AI-Drive-Offline_v0.10.1-usb.4.apk`.
-3. If Android asks, tap **Settings > Allow from this source**, then go back and
-   tap **Install > Open**. The permission may be for Files or Chrome, depending
-   on which app opened the APK.
-4. Open **AI Drive Offline**. No account is required. Android requires you to
-   install and open the app manually; connecting a USB drive does not start it.
+1. On your Android phone, open this page in **Chrome** and download the ZIP.
+2. Open **Files > Downloads**, tap the ZIP and choose **Extract**.
+3. Copy the complete **Android-Drive-Kit** folder to your USB drive or SD card.
+4. With the drive connected to the phone, open **PICTURE-GUIDE.pdf** or
+   **START-HERE.html** inside that folder and follow the pictures.
 
-App installation, USB preference/note persistence and actual model replies have
-passed emulator tests. The exact generated conversation was also restored after
-force-stop/relaunch. A physical phone and physical USB drive remain untested.
-[Recorded Android model tests](https://github.com/sutty1307/code-stick/actions/runs/38880538406).
+Install **AI-Drive-Offline_v0.10.1-usb.4.apk** once per compatible ARM64 Android
+phone. After that, open **AI Drive Offline** manually. Inserting a drive does
+not launch the app. The same app can be used with additional prepared drives;
+choose the memory folder and model on the drive you want to use.
 
-## Picture guide
+[Open the two-page picture guide](https://github.com/sutty1307/code-stick/releases/download/android-usb-memory-preview-v0.10.1-usb.4-1b/Android-AI-Drive-Picture-Guide.pdf)
 
-[Open or download the two-page picture guide (PDF)](https://github.com/sutty1307/code-stick/raw/refs/heads/portable/android-usb-download/portable/android/Android-AI-Drive-Picture-Guide-usb4.pdf)
+The pictures begin after the prepared drive is connected. They are illustrations;
+Android wording can vary.
 
-These are illustrations, not actual screenshots. They show the intended steps
-**after the app and model files are already on a USB drive**. Those prepared files
-are not offered as a finished kit here yet; the complete ZIP download is being
-assembled and checked.
-For the installer downloaded above, use **Files > Downloads** as described above.
+![Install once on the phone](pictures/First-Install-usb4.png)
 
-![First install on an Android phone, with files already on the USB drive](pictures/First-Install-usb4.png)
+![Connect USB memory and load the selected 1B model](pictures/After-You-Plug-It-In-usb4-1b.png)
 
-![Intended steps after plugging in the prepared USB drive; complete-kit verification remains in progress](pictures/After-You-Plug-It-In-usb4.png)
+Full stored chats, preferences, facts and notes save to the selected removable
+folder. Wait for **Verified save #**. When finished, use **Save and disconnect**,
+wait for it to finish successfully, then eject/unplug. Memory files are plaintext.
+The app has no Internet permission and the local model needs no subscription.
 
-## File verification and source
+This is a preview. Installation, an actual model reply, saved memory and
+restoring the same generated chat after restarting passed Android emulator tests.
+Those tests used the model in phone storage and memory on simulated removable
+storage. A physical phone, physical USB/SD drive and loading the model from one
+remain untested. See **APP-VALIDATION.json** inside the ZIP for exact evidence.
 
-Installer: **67,666,025 bytes**. SHA-256:
-`c833e55ff089903f3bc0e084f10b91516590fa5d9945138723e4ba466508d549`.
-
-For developers: [corresponding modified application source](https://github.com/sutty1307/code-stick/raw/refs/heads/repair/android-runtime-usb4/portable/android/AI-Drive-Offline-v0.10.1-usb.4-source.zip)
-and [AGPL-3.0 license](AI-Drive-Offline-AGPL-3.0.txt). You do not need the source
-archive to install the app. Source archive: **3,811,006 bytes**. SHA-256:
-`1a775d19b53faa8556a295880c303ef5e5f17bf1682d669c59ce79203072722e`.
+[Release files and checksums](https://github.com/sutty1307/code-stick/releases/tag/android-usb-memory-preview-v0.10.1-usb.4-1b)
+include the separate installer and corresponding AGPL source for developers.
+They are already included in the complete ZIP. The Llama 3.2 Community License
+and attribution are included too.
