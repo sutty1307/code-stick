@@ -43,7 +43,7 @@ def main():
              '-dname', 'CN=Local UI Probe Test Key,OU=Diagnostic only,O=Code Stick Test'])
         keystore.chmod(0o600)
     run([args.jdk / 'bin/javac', '--release', '8', '-encoding', 'UTF-8', '-classpath', android,
-         '-d', classes, root / 'src/com/codestick/uiprobe/UiProbe.java'])
+         '-d', classes, *sorted((root / 'src').rglob('*.java'))])
     run([args.jdk / 'bin/java', '-cp', tools / 'lib/d8.jar', 'com.android.tools.r8.D8',
          '--min-api', '24', '--lib', android, '--output', dex, *sorted(classes.rglob('*.class'))])
     unsigned = build / 'probe-unsigned.apk'
@@ -53,7 +53,7 @@ def main():
         apk.write(dex / 'classes.dex', 'classes.dex')
     aligned = build / 'probe-aligned.apk'
     run([tools / 'zipalign', '-p', '-f', '4', unsigned, aligned])
-    output = root / 'AI-Drive-NoIdle-UI-Probe-test-only.apk'
+    output = root / 'AI-Drive-NoIdle-UI-Probe-v2-test-only.apk'
     run([args.jdk / 'bin/java', '-jar', tools / 'lib/apksigner.jar', 'sign', '--ks', keystore,
          '--ks-key-alias', 'no-idle-ui-probe-debug', '--ks-pass', 'env:UI_PROBE_TEST_STORE_PASS',
          '--key-pass', 'env:UI_PROBE_TEST_STORE_PASS', '--out', output, aligned])
@@ -74,6 +74,7 @@ def main():
                 'package': 'com.codestick.uiprobe', 'instrumentation_targets_self': True,
                 'read_target_package': 'com.codestick.aidrive', 'declared_permissions': [],
                 'wait_for_idle_referenced_in_dex': False, 'runtime_tested': False,
+                'version_code': 2, 'root_retry_budget_ms': 5000, 'root_poll_interval_ms': 150,
                 'signing_key': 'separate diagnostic-only test key; never the customer app key'}
     (root / 'BUILD-VALIDATION.json').write_text(json.dumps(metadata, indent=2) + '\n')
     (build / 'apksigner-verify.txt').write_text(signature)

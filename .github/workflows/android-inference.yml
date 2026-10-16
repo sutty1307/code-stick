@@ -1,4 +1,4 @@
-name: Android usb.4 exact APK full model inference
+name: Android usb.4 pinned model and CPU comparisons
 
 # Verify the exact repaired offline APK with the real full model on Android.
 on:
@@ -21,6 +21,17 @@ jobs:
   inference:
     if: github.repository == 'sutty1307/code-stick' && github.ref == 'refs/heads/repair/android-runtime-usb4'
     runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - model: 3b
+            threads: 2
+          - model: 3b
+            threads: 1
+          - model: 1b-comparison
+            threads: 2
+    name: inference (${{ matrix.model }}, ${{ matrix.threads }} threads)
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -48,11 +59,13 @@ jobs:
           --sdk "$ANDROID_HOME"
           --candidate portable/android/AI-Drive-Offline_v0.10.1-usb.4.apk
           --evidence inference-evidence-usb4
+          --model-profile ${{ matrix.model }}
+          --cpu-threads ${{ matrix.threads }}
       - name: Retain actual screenshots, UI XML, logcat and results
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: Android-full-model-usb4-${{ github.run_id }}-${{ github.run_attempt }}
+          name: Android-full-model-usb4-${{ matrix.model }}-${{ matrix.threads }}threads-${{ github.run_id }}-${{ github.run_attempt }}
           path: inference-evidence-usb4/
           retention-days: 14
           if-no-files-found: warn

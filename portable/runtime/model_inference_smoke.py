@@ -26,6 +26,7 @@ import xml.etree.ElementTree as ET
 from runtime_smoke import Smoke, PACKAGE, SERIAL, digest, report_annotation
 from usb_memory_smoke import _USBTest, _bounds, _nodes, _root_rows, InvariantError
 from no_idle_ui_probe.run_probe import decode_result, COMPONENT as PROBE_COMPONENT
+from generated_chat_restart import run_generated_chat_restart
 
 API = 35
 IMAGE = 'system-images;android-35;google_apis;x86_64'
@@ -37,8 +38,30 @@ MODEL_SHA256 = 'e1f2b428e316d8bd1cb5ca13e9649329e299d951fbcee6b3cd0e9f1d646c9fa7
 MODEL_URL = ('https://huggingface.co/QuantFactory/Llama-3.2-3B-Instruct-abliterated-GGUF/'
              'resolve/120d74373f679f9d9e0463b435dfd3fb802d9eb0/' + MODEL_FILE + '?download=true')
 MODEL_PHONE = '/sdcard/Download/' + MODEL_FILE
-PROBE_APK = Path(__file__).resolve().parent / 'no_idle_ui_probe/AI-Drive-NoIdle-UI-Probe-test-only.apk'
-PROBE_SHA256 = 'f1cfdfaa4370aef933e9005449b9c635a84bf022a9950a910c8cd86fd39ab046'
+MODEL_PROFILE, CPU_THREADS = '3b', 2
+MODEL_PROFILES = {
+    '3b': (MODEL_FILE, MODEL_BYTES, MODEL_SHA256, MODEL_URL),
+    '1b-comparison': (
+        'Llama-3.2-1B-Instruct-abliterated.Q4_K_M.gguf', 955445792,
+        '68336c25367576f49b29f01ee9034658b51bbded6a7f215e934d997de96301e0',
+        'https://huggingface.co/mradermacher/Llama-3.2-1B-Instruct-abliterated-GGUF/'
+        'resolve/becf36858832feddfea0ace2fabf791797571999/'
+        'Llama-3.2-1B-Instruct-abliterated.Q4_K_M.gguf?download=true'),
+}
+
+
+def select_test_profile(model, threads):
+    """Choose only an explicit pinned comparison; never repin the production kit."""
+    global MODEL_FILE, MODEL_BYTES, MODEL_SHA256, MODEL_URL, MODEL_PHONE, MODEL_PROFILE, CPU_THREADS
+    if model not in MODEL_PROFILES or type(threads) is not int or threads not in (1, 2):
+        raise InvariantError('Unknown pinned model/thread diagnostic profile')
+    MODEL_FILE, MODEL_BYTES, MODEL_SHA256, MODEL_URL = MODEL_PROFILES[model]
+    MODEL_PHONE = '/sdcard/Download/' + MODEL_FILE
+    MODEL_PROFILE, CPU_THREADS = model, threads
+
+
+PROBE_APK = Path(__file__).resolve().parent / 'no_idle_ui_probe/AI-Drive-NoIdle-UI-Probe-v2-test-only.apk'
+PROBE_SHA256 = '9798f76df6fdea290a7b4670c7b01a74949041d24615162689469fdaad5f1efa'
 ENGINE_KEY = 'enginedata-storage'
 SAMPLER_KEY = 'samplerstate-storage'
 FILE_ADD, PLAY, CLOSE, SEND, STOP = '\uf473', '\uf4d9', '\uf431', '\ue163', '\ue047'
@@ -336,7 +359,36 @@ def parse_proc_stat(raw):
     fields = raw[closing + 1:].split()
     return {'pid': int(raw[:opening].strip()), 'comm': raw[opening + 1:closing][:60],
         'state': fields[0], 'user_ticks': int(fields[11]), 'system_ticks': int(fields[12]),
-        'threads': int(fields[17]), 'start_ticks': int(fields[19]), 'rss_pages': int(fields[21])}
+        'threads': int(fields[17]), 'start_ticks': int(fields[19]), 'rss_pages': int(fields[21]),
+        'minflt': int(fields[7]), 'majflt': int(fields[9]), 'virtual_bytes': int(fields[20])}
+
+
+def summarize_backtrace(text, preferred_tids):
+    """Bound newly collected debuggerd evidence to actual busy native threads."""
+    threads, current = [], None
+    for line in text.splitlines():
+        match = re.search(r'^"([^"\n]+)"\s+sysTid\s*=\s*(\d+)', line)
+        if match:
+            current = {'tid': int(match.group(2)), 'comm': match.group(1)[:60], 'frames': []}
+            threads.append(current)
+        elif current is not None and re.match(r'^\s*#\d+\s+pc\b', line):
+            current['frames'].append(line.strip())
+    preferred = {tid: index for index, tid in enumerate(preferred_tids)}
+    ordered = sorted(threads, key=lambda item: (preferred.get(item['tid'], 999),
+        0 if re.search(r'mqt_v_native|llama|ggml', item['comm'], re.I) else 1))
+    selected = []
+    for item in ordered[:3]:
+        frames = item['frames'][:4]
+        for frame in item['frames'][4:]:
+            if re.search(r'llama|ggml', frame, re.I) and len(frames) < 8:
+                frames.append(frame)
+        selected.append({'tid': item['tid'], 'comm': item['comm'], 'frame_count': len(item['frames']),
+                         'frames': [frame[:180] for frame in frames]})
+    return {'thread_count': len(threads), 'selected_threads': selected,
+        'translation_frame_count': sum('libndk_translation' in frame
+            for item in threads for frame in item['frames']),
+        'engine_frame_count': sum(bool(re.search(r'llama|ggml', frame, re.I))
+            for item in threads for frame in item['frames'])}
 
 
 def grouped_native_log(log):
@@ -388,11 +440,11 @@ class InferenceSmoke(Smoke):
     """Keep every result/capture, reserving native notices for the final proof.
 
     GitHub limits notice annotations per step. Four fixture notices plus the
-    explicit onboarding/settings/load/reply notices below total at most eight.
+    explicit onboarding/settings/load/reply notices and restart proof total at most nine.
     The shared runtime helper and its fresh/upgrade behavior are unchanged.
     """
     notice_phases = {'candidate-install', 'candidate-startup', 'verified-full-model-fixture',
-                     'genuine-external-model-selection'}
+                     'genuine-external-model-selection', 'real-generated-chat-restart'}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -481,6 +533,7 @@ class InferenceSmoke(Smoke):
                                'ui_dump', 'services', 'slot_metadata', 'snapshot_read_error')),
                     ('snapshot', ('snapshot',)),
                     ('cpu', ('cpu_samples', 'cpu_sample_error')),
+                    ('native-backtrace', ('native_backtrace',)),
                     ('logs-native', ('fresh_native_log_groups', 'native_log_error')),
                     ('logs-ui', ('actual_app_log_ui_lines', 'app_log_ui_dump',
                                  'app_log_ui_error', 'diagnostic_error'))):
@@ -543,6 +596,9 @@ class InferenceTest(_USBTest):
                 return {'pid': current, 'same_pid': False}
             raw = self.s.shell('cat', '/proc/' + pid + '/stat', timeout=3, check=False)
             process = parse_proc_stat(raw)
+            io_raw = self.s.shell('cat', '/proc/' + pid + '/io', timeout=3, check=False)
+            io = {name: int(value) for name, value in re.findall(r'^(\w+):\s*(\d+)\s*$', io_raw, re.M)
+                  if name in ('rchar', 'wchar', 'syscr', 'syscw', 'read_bytes', 'write_bytes', 'cancelled_write_bytes')}
             task_raw = self.s.shell('cat', '/proc/' + pid + '/task/[0-9]*/stat', timeout=5, check=False)
             tasks = []
             for line in task_raw.splitlines():
@@ -551,14 +607,14 @@ class InferenceTest(_USBTest):
                 except (ValueError, IndexError):
                     continue
             return {'same_pid': True, 'observed_monotonic': time.monotonic(),
-                    'process': process, 'tasks': tasks}
+                    'process': process, 'io': io, 'tasks': tasks}
 
         first = sample()
         time.sleep(2)
         second = sample()
         result = {'requested_interval_seconds': 2, 'same_original_pid': bool(
             first.get('same_pid') and second.get('same_pid')), 'samples': [
-                {key: item[key] for key in ('same_pid', 'process') if key in item}
+                {key: item[key] for key in ('same_pid', 'process', 'io') if key in item}
                 for item in (first, second)]}
         if not result['same_original_pid']:
             return result
@@ -569,6 +625,11 @@ class InferenceTest(_USBTest):
         result['elapsed_seconds'] = round(second['observed_monotonic'] - first['observed_monotonic'], 3)
         result['process_cpu_delta_ticks'] = (after['user_ticks'] + after['system_ticks']
                                              - before['user_ticks'] - before['system_ticks'])
+        result['minor_fault_delta'] = after['minflt'] - before['minflt']
+        result['major_fault_delta'] = after['majflt'] - before['majflt']
+        result['rss_delta_pages'] = after['rss_pages'] - before['rss_pages']
+        result['io_deltas'] = {key: second['io'][key] - value for key, value in first['io'].items()
+                               if key in second['io']}
         previous = {item['pid']: item for item in first['tasks']}
         top = []
         for item in second['tasks']:
@@ -584,6 +645,41 @@ class InferenceTest(_USBTest):
                                          timeout=2, check=False)[:100]
         return result
 
+    def _backtrace_diagnostic(self, diagnostic):
+        """After the failed gate only, collect one bounded original-process stack."""
+        metadata = diagnostic.setdefault('native_backtrace', {})
+        pid = self.continuity_pid
+        if not re.fullmatch(r'\d+', pid or ''):
+            metadata['unavailable'] = 'No valid original PID'
+            return
+        metadata['same_original_pid_before'] = self.s.shell('pidof', PACKAGE, timeout=3, check=False) == pid
+        if not metadata['same_original_pid_before']:
+            return
+        began = time.monotonic()
+        output = ''
+        try:
+            # Device timeout also bounds a remote debuggerd after host adb exits.
+            result = self.s.adb('shell', 'timeout', '25', 'debuggerd', '-b', pid,
+                                timeout=30, check=False)
+            metadata.update({'exit_code': result.returncode, 'stderr_excerpt': result.stderr[:180]})
+            output = result.stdout + '\n' + result.stderr
+        except subprocess.TimeoutExpired as error:
+            def decoded(value):
+                return value.decode(errors='replace') if isinstance(value, bytes) else value or ''
+            output = decoded(error.stdout) + '\n' + decoded(error.stderr)
+            metadata['host_timeout_seconds'] = 30
+        except BudgetExceeded:
+            raise
+        except Exception as error:
+            metadata['read_error'] = type(error).__name__ + ': ' + str(error)[:180]
+        finally:
+            metadata['elapsed_seconds'] = round(time.monotonic() - began, 2)
+        metadata['raw_output_characters'] = len(output)
+        self.s.write('response-failure-native-backtrace.txt', output)
+        preferred = [item['pid'] for item in diagnostic.get('cpu_samples', {}).get('top_threads', [])]
+        metadata.update(summarize_backtrace(output, preferred))
+        metadata['same_original_pid_after'] = self.s.shell('pidof', PACKAGE, timeout=3, check=False) == pid
+
     def response_diagnostic(self, diagnostic):
         """Observe the current disposable app after failure, never replay old evidence."""
         xml = None
@@ -596,6 +692,13 @@ class InferenceTest(_USBTest):
             raise
         except Exception as error:
             diagnostic['cpu_sample_error'] = type(error).__name__ + ': ' + str(error)[:200]
+        try:
+            self._backtrace_diagnostic(diagnostic)
+        except BudgetExceeded:
+            raise
+        except Exception as error:
+            diagnostic.setdefault('native_backtrace', {})['read_error'] = (
+                type(error).__name__ + ': ' + str(error)[:180])
         foreground = self.s.shell('dumpsys', 'activity', 'activities', timeout=8, check=False)
         diagnostic['foreground'] = [line.strip()[:220] for line in foreground.splitlines()
             if re.search(r'topResumedActivity|mResumedActivity|ResumedActivity', line)][-3:]
@@ -659,8 +762,8 @@ class InferenceTest(_USBTest):
                 xml = self._diagnostic_xml(diagnostic, 'app_log_ui_dump', 'response-failure-app-logs.xml')
                 diagnostic['actual_app_log_ui_lines'] = [node.get('text', '')[:350]
                     for node in ET.fromstring(xml).iter('node')
-                    if re.search(r'\[(?:ERROR|WARN)\]|inference|completion|predict|prompt|generat',
-                                 node.get('text', ''), re.I)][-8:]
+                    if node.get('class') == 'android.widget.TextView' and _bounds(node)
+                    and re.match(r'^\[(?:INFO|WARN|ERROR|DEBUG)\]', node.get('text', ''))][-8:]
             except BudgetExceeded:
                 raise
             except Exception as error:
@@ -813,7 +916,7 @@ class InferenceTest(_USBTest):
         data = self._snapshots()
         state = preference(data, ENGINE_KEY) if data else None
         config = state.get('config', {}) if isinstance(state, dict) else {}
-        return data if (config.get('context_length') == 1024 and config.get('threads') == 2
+        return data if (config.get('context_length') == 1024 and config.get('threads') == CPU_THREADS
                         and config.get('batch') == 16 and config.get('gpu_layers') == 0
                         and config.get('devices') in ([], ['CPU'])) else None
 
@@ -823,7 +926,7 @@ class InferenceTest(_USBTest):
         self._tap_xml(self._find('Choose a model'), 'Choose a model')
         self._tap('Settings')
         self._find('CPU Settings', direction='down')
-        for label, value in [('Max Context', 1024), ('Threads', 2), ('Batch', 16)]:
+        for label, value in [('Max Context', 1024), ('Threads', CPU_THREADS), ('Batch', 16)]:
             self._numeric(label, value)
         xml = self._screen()
         if _nodes(xml, 'Backend Device'):
@@ -851,12 +954,12 @@ class InferenceTest(_USBTest):
                    connected_with_verified_save, 30)
         self.s.capture('model-settings-verified-drive-status')
         report_annotation('notice', 'model-settings-durable-save: PASS ' + json.dumps({
-            'context_tokens': 1024, 'cpu_threads': 2, 'batch_tokens': 16,
+            'context_tokens': 1024, 'cpu_threads': CPU_THREADS, 'batch_tokens': 16,
             'previous_revision': previous_revision, 'verified_revision': data['revision'],
             'actual_drive_connected': True, 'actual_verified_save_counter': True,
             'current_slot_metadata': self.last_slot_diagnostics}, sort_keys=True))
         self._tap_xml(self._find('Choose a model'), 'Choose a model')
-        return {'context_tokens': 1024, 'cpu_threads': 2, 'batch_tokens': 16,
+        return {'context_tokens': 1024, 'cpu_threads': CPU_THREADS, 'batch_tokens': 16,
                 'gpu_layers': 0, 'settings_entered_through_real_ui': True,
                 'subsequent_verified_revision': data['revision'], 'drive_status_ui_verified': True}
 
@@ -1029,6 +1132,8 @@ class InferenceTest(_USBTest):
 
             reply = self._wait('New completed native-model reply and durable conversation', finished, 295)
             result = {'actual_full_model_inference': True, 'durable_conversation_verified': True,
+                      'model_profile': MODEL_PROFILE, 'model_sha256': MODEL_SHA256,
+                      'model_filename': MODEL_FILE, 'cpu_threads': CPU_THREADS,
                       'virtual_removable_snapshot_sha256_verified': True,
                       'actual_model_output': reply['text'], 'native_timings': reply['timings'],
                       'snapshot_revision': reply['revision'],
@@ -1038,6 +1143,8 @@ class InferenceTest(_USBTest):
             self.s.results['model_inference_tested'] = True
             self.s.results['real_model_inference'] = result
             report_annotation('notice', 'real-model-inference: PASS ' + json.dumps({
+                'model_profile': MODEL_PROFILE, 'model_sha256': MODEL_SHA256,
+                'model_filename': MODEL_FILE, 'cpu_threads': CPU_THREADS,
                 'actual_model_output': reply['text'][:400],
                 'predicted_tokens': reply['timings']['predicted_n'],
                 'snapshot_revision': reply['revision'], 'physical_phone_tested': False,
@@ -1066,6 +1173,7 @@ def stage_model(smoke, directory):
 
 
 def run(args):
+    select_test_profile(getattr(args, 'model_profile', '3b'), getattr(args, 'cpu_threads', 2))
     evidence = args.evidence.resolve()
     if evidence.exists():
         raise RuntimeError('Use a new evidence directory')
@@ -1078,7 +1186,9 @@ def run(args):
         Path(env['ANDROID_AVD_HOME']).mkdir()
         Path(env['ANDROID_USER_HOME']).mkdir()
         smoke, emulator, logcat, handles = InferenceSmoke(args.sdk, evidence, env), None, None, []
-        smoke.results.update({'test': 'API35 exact usb.4 APK full 3B inference with public Download model',
+        smoke.results.update({'test': 'API35 exact usb.4 APK pinned full-model inference comparison',
+                              'model_profile': MODEL_PROFILE, 'model_sha256': MODEL_SHA256,
+                              'model_filename': MODEL_FILE, 'cpu_threads': CPU_THREADS,
                               'phone_model_storage': 'Download', 'model_on_removable_storage_tested': False,
                               'guest_ram_mib': 6144, 'fresh_install_only': True})
         stage = 'prerequisites'
@@ -1142,7 +1252,9 @@ def run(args):
                           ('genuine-external-model-selection', test.select_model),
                           ('real-full-model-load', test.load_model),
                           ('real-chat-setup', test.configure_chat),
-                          ('real-short-model-response', test.generate)]
+                          ('real-short-model-response', test.generate),
+                          ('real-generated-chat-restart', lambda: run_generated_chat_restart(
+                              test, expected_rendered_reply=lambda raw: ' '.join(visible_reply_words(raw))))]
                 for label, operation in phases:
                     stage = label
                     if not smoke.phase(label, operation):
@@ -1186,4 +1298,6 @@ if __name__ == '__main__':
     parser.add_argument('--sdk', type=Path, required=True)
     parser.add_argument('--candidate', type=Path, required=True)
     parser.add_argument('--evidence', type=Path, required=True)
+    parser.add_argument('--model-profile', choices=tuple(MODEL_PROFILES), default='3b')
+    parser.add_argument('--cpu-threads', type=int, choices=(1, 2), default=2)
     raise SystemExit(run(parser.parse_args()))

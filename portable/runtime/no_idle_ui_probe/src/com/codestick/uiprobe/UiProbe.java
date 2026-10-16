@@ -28,12 +28,17 @@ public final class UiProbe extends Instrumentation {
     private static final int MAX_XML_BYTES = 131072;
     private static final int MAX_CHILD_QUERIES = 512;
     private static final long WATCHDOG_MS = 30000;
+    private static final long ROOT_BUDGET_MS = 5000;
+    private static final long ROOT_POLL_MS = 150;
     private final AtomicBoolean finished = new AtomicBoolean(false);
     private String nonce = "";
     private int count = 0;
     private int childQueries = 0;
     private int remainingChars = MAX_TOTAL_ATTRIBUTE_CHARS;
     private boolean truncated = false;
+    private int rootAttempts = 0;
+    private int rootNullReads = 0;
+    private long rootElapsedMs = 0;
 
     @Override public void onCreate(Bundle arguments) {
         String supplied = arguments == null ? null : arguments.getString("probe_nonce");
@@ -56,13 +61,22 @@ public final class UiProbe extends Instrumentation {
         watchdog.start();
         AccessibilityNodeInfo root = null;
         try {
-            UiAutomation automation = getUiAutomation(UiAutomation.FLAG_DONT_SUPPRESS_ACCESSIBILITY_SERVICES);
+            final UiAutomation automation = getUiAutomation(UiAutomation.FLAG_DONT_SUPPRESS_ACCESSIBILITY_SERVICES);
             // Deliberately no waitForIdle, executeAndWaitForEvent or UI input.
-            root = automation.getRootInActiveWindow();
-            if (root == null) {
-                finishResult("root_null", "Android returned no active accessibility root", null, "");
+            RootPoller.Result<AccessibilityNodeInfo> acquired = RootPoller.acquire(
+                new RootPoller.Reader<AccessibilityNodeInfo>() {
+                    public AccessibilityNodeInfo read() { return automation.getRootInActiveWindow(); }
+                    public String packageName(AccessibilityNodeInfo node) { return string(node.getPackageName()); }
+                    public void release(AccessibilityNodeInfo node) { node.recycle(); }
+                }, TARGET, ROOT_BUDGET_MS, ROOT_POLL_MS);
+            rootAttempts = acquired.attempts;
+            rootNullReads = acquired.nullReads;
+            rootElapsedMs = acquired.elapsedMs;
+            if (!"ok".equals(acquired.status)) {
+                finishResult(acquired.status, "Bounded root acquisition did not return the target window", null, acquired.packageName);
                 return;
             }
+            root = acquired.root;
             String activePackage = string(root.getPackageName());
             if (!TARGET.equals(activePackage)) {
                 finishResult("wrong_active_package", "The active accessibility window is not AI Drive", null, activePackage);
@@ -167,6 +181,12 @@ public final class UiProbe extends Instrumentation {
         result.putString("probe_nodes", Integer.toString(count));
         result.putString("probe_truncated", Boolean.toString(truncated));
         result.putString("probe_wait_for_idle", "false");
+        result.putString("probe_version", "2");
+        result.putString("probe_root_attempts", Integer.toString(rootAttempts));
+        result.putString("probe_root_null_reads", Integer.toString(rootNullReads));
+        result.putString("probe_root_elapsed_ms", Long.toString(rootElapsedMs));
+        result.putString("probe_root_budget_ms", Long.toString(ROOT_BUDGET_MS));
+        result.putString("probe_root_poll_ms", Long.toString(ROOT_POLL_MS));
         if (xml != null) {
             result.putString("probe_xml_base64", Base64.encodeToString(xml, Base64.NO_WRAP));
             try {

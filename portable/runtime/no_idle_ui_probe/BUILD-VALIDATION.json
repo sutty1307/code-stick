@@ -1,12 +1,15 @@
 {
-  "artifact": "AI-Drive-NoIdle-UI-Probe-test-only.apk",
-  "bytes": 12691,
-  "sha256": "f1cfdfaa4370aef933e9005449b9c635a84bf022a9950a910c8cd86fd39ab046",
+  "artifact": "AI-Drive-NoIdle-UI-Probe-v2-test-only.apk",
+  "bytes": 16787,
+  "sha256": "9798f76df6fdea290a7b4670c7b01a74949041d24615162689469fdaad5f1efa",
   "package": "com.codestick.uiprobe",
   "instrumentation_targets_self": true,
   "read_target_package": "com.codestick.aidrive",
   "declared_permissions": [],
   "wait_for_idle_referenced_in_dex": false,
   "runtime_tested": false,
+  "version_code": 2,
+  "root_retry_budget_ms": 5000,
+  "root_poll_interval_ms": 150,
   "signing_key": "separate diagnostic-only test key; never the customer app key"
 }

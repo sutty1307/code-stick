@@ -40,6 +40,12 @@ def decode_result(stdout, nonce):
     if (fields.get('probe_active_package') != TARGET or fields.get('probe_truncated') != 'false'
             or fields.get('probe_wait_for_idle') != 'false'):
         raise RuntimeError('Probe active-package/completeness/no-idle gate failed')
+    if (fields.get('probe_version') != '2' or fields.get('probe_root_budget_ms') != '5000'
+            or fields.get('probe_root_poll_ms') != '150'
+            or not 1 <= int(fields.get('probe_root_attempts', '-1')) <= 35
+            or not 0 <= int(fields.get('probe_root_elapsed_ms', '-1')) <= 5000
+            or not 0 <= int(fields.get('probe_root_null_reads', '-1')) < int(fields['probe_root_attempts'])):
+        raise RuntimeError('Probe root retry metadata gate failed')
     if not re.search(r'^INSTRUMENTATION_CODE:\s*-1\s*$', stdout, re.MULTILINE):
         raise RuntimeError('Instrumentation did not finish with RESULT_OK')
     raw = base64.b64decode(fields.get('probe_xml_base64', ''), validate=True)
@@ -71,7 +77,7 @@ def main():
     nonce = secrets.token_hex(16)
     result = subprocess.run([str(args.adb), '-s', args.serial, 'shell', 'am', 'instrument',
                              '-w', '-r', '-e', 'probe_nonce', nonce, COMPONENT],
-                            capture_output=True, text=True, timeout=45)
+                            capture_output=True, text=True, timeout=40)
     if result.returncode:
         raise RuntimeError('Probe instrumentation command failed: ' + result.stderr[-500:])
     xml, metadata = decode_result(result.stdout, nonce)

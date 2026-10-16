@@ -19,6 +19,8 @@ def output(**changes):
               'probe_nodes': '1', 'probe_truncated': 'false', 'probe_wait_for_idle': 'false',
               'probe_xml_base64': base64.b64encode(raw).decode(),
               'probe_xml_sha256': hashlib.sha256(raw).hexdigest()}
+    fields.update({'probe_version': '2', 'probe_root_budget_ms': '5000', 'probe_root_poll_ms': '150',
+                   'probe_root_attempts': '3', 'probe_root_null_reads': '2', 'probe_root_elapsed_ms': '301'})
     fields.update(changes)
     return '\n'.join('INSTRUMENTATION_RESULT: ' + key + '=' + value for key, value in fields.items()) + '\nINSTRUMENTATION_CODE: -1\n'
 
@@ -63,6 +65,12 @@ class ProtocolTests(unittest.TestCase):
     def test_non_ok_instrumentation_code_rejected(self):
         with self.assertRaisesRegex(RuntimeError, 'RESULT_OK'):
             decode_result(output().replace('INSTRUMENTATION_CODE: -1', 'INSTRUMENTATION_CODE: 0'), NONCE)
+
+    def test_retry_metadata_cannot_claim_a_late_or_unattempted_success(self):
+        for change in ({'probe_root_attempts': '0'}, {'probe_root_elapsed_ms': '5001'},
+                       {'probe_root_null_reads': '3'}, {'probe_version': '1'}):
+            with self.subTest(change=change), self.assertRaisesRegex(RuntimeError, 'root retry metadata'):
+                decode_result(output(**change), NONCE)
 
 
 if __name__ == '__main__':

@@ -30,7 +30,26 @@ class DiagnosticContract(unittest.TestCase):
         fields[11], fields[12], fields[17], fields[19], fields[21] = '120', '45', '6', '9999', '333'
         parsed = m.parse_proc_stat('4321 (mqt (v) js) ' + ' '.join(fields))
         self.assertEqual(parsed, {'pid': 4321, 'comm': 'mqt (v) js', 'state': 'S',
-            'user_ticks': 120, 'system_ticks': 45, 'threads': 6, 'start_ticks': 9999, 'rss_pages': 333})
+            'user_ticks': 120, 'system_ticks': 45, 'threads': 6, 'start_ticks': 9999, 'rss_pages': 333,
+            'minflt': 0, 'majflt': 0, 'virtual_bytes': 0})
+
+    def test_backtrace_prioritizes_observed_busy_threads_and_retains_deep_engine_frame(self):
+        raw = '\n'.join(['"main" sysTid=1', '  #00 pc 111 /system/lib64/libart.so',
+            '"mqt_v_native" sysTid=8'] + ['  #%02d pc 222 /system/lib64/libndk_translation.so' % i
+                for i in range(8)] + ['  #08 pc 333 /data/app/libllama.so (ggml_compute_forward+12)',
+            '"RenderThread" sysTid=9', '  #00 pc 444 /system/lib64/libhwui.so'])
+        result = m.summarize_backtrace(raw, [8, 9, 1])
+        self.assertEqual([item['tid'] for item in result['selected_threads']], [8, 9, 1])
+        self.assertIn('libllama.so', result['selected_threads'][0]['frames'][-1])
+        self.assertEqual(result['translation_frame_count'], 8)
+        self.assertEqual(result['engine_frame_count'], 1)
+        self.assertLess(len(json.dumps(result)), 6000)
+
+    def test_backtrace_error_never_substitutes_thread_or_engine_evidence(self):
+        result = m.summarize_backtrace('debuggerd: failed to attach to process', [8])
+        self.assertEqual(result['thread_count'], 0)
+        self.assertEqual(result['selected_threads'], [])
+        self.assertEqual(result['engine_frame_count'], 0)
 
     def test_log_noise_does_not_evict_engine_or_java_error(self):
         native = 'I/RNLlama(12): llama_eval prompt eval time = 12 ms'
