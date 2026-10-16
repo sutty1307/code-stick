@@ -1,0 +1,4 @@
+build/
+diagnostic-only-signing/
+__pycache__/
+*.apk.idsig

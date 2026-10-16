@@ -25,6 +25,7 @@ import xml.etree.ElementTree as ET
 
 from runtime_smoke import Smoke, PACKAGE, SERIAL, digest, report_annotation
 from usb_memory_smoke import _USBTest, _bounds, _nodes, _root_rows, InvariantError
+from no_idle_ui_probe.run_probe import decode_result, COMPONENT as PROBE_COMPONENT
 
 API = 35
 IMAGE = 'system-images;android-35;google_apis;x86_64'
@@ -36,6 +37,8 @@ MODEL_SHA256 = 'e1f2b428e316d8bd1cb5ca13e9649329e299d951fbcee6b3cd0e9f1d646c9fa7
 MODEL_URL = ('https://huggingface.co/QuantFactory/Llama-3.2-3B-Instruct-abliterated-GGUF/'
              'resolve/120d74373f679f9d9e0463b435dfd3fb802d9eb0/' + MODEL_FILE + '?download=true')
 MODEL_PHONE = '/sdcard/Download/' + MODEL_FILE
+PROBE_APK = Path(__file__).resolve().parent / 'no_idle_ui_probe/AI-Drive-NoIdle-UI-Probe-test-only.apk'
+PROBE_SHA256 = 'f1cfdfaa4370aef933e9005449b9c635a84bf022a9950a910c8cd86fd39ab046'
 ENGINE_KEY = 'enginedata-storage'
 SAMPLER_KEY = 'samplerstate-storage'
 FILE_ADD, PLAY, CLOSE, SEND, STOP = '\uf473', '\uf4d9', '\uf431', '\ue163', '\ue047'
@@ -325,6 +328,34 @@ def response_snapshot_diagnostic(data, prompt, baseline_ids):
     return result
 
 
+def parse_proc_stat(raw):
+    """Parse Linux proc stat without splitting spaces/parentheses in comm."""
+    opening, closing = raw.find('('), raw.rfind(')')
+    if opening < 1 or closing <= opening:
+        raise ValueError('Malformed proc stat comm')
+    fields = raw[closing + 1:].split()
+    return {'pid': int(raw[:opening].strip()), 'comm': raw[opening + 1:closing][:60],
+        'state': fields[0], 'user_ticks': int(fields[11]), 'system_ticks': int(fields[12]),
+        'threads': int(fields[17]), 'start_ticks': int(fields[19]), 'rss_pages': int(fields[21])}
+
+
+def grouped_native_log(log):
+    """Keep engine/error evidence independently of noisy provider and GC logs."""
+    lines = log.splitlines()
+    provider = [line for line in lines if 'DocumentFile' in line and 'Failed query' in line]
+    gc = [line for line in lines if re.search(r'\bGC\b|concurrent.*(?:mark|copy)', line, re.I)]
+    noise = set(provider + gc)
+    remaining = [line for line in lines if line not in noise]
+    return {'provider_query_warning_count': len(provider), 'gc_line_count': len(gc),
+        'provider_warning_example': provider[-1][:220] if provider else None,
+        'engine_perf_lines': [line[:260] for line in remaining
+            if re.search(r'RNLLAMA|llama|ggml|prompt.eval|eval.time|tokens.per.second|completion', line, re.I)][-8:],
+        'java_js_error_lines': [line[:260] for line in remaining
+            if re.search(r'^[EF]/|AndroidRuntime|ReactNativeJS|exception|failed|'
+                         r'HeadlessJsTask|ForegroundService|Cannot start headless task|'
+                         r'CatalystInstance|ReactHost', line, re.I)][-8:]}
+
+
 def icon_target(xml, glyph, header=False):
     root = ET.fromstring(xml)
     parents = {child: parent for parent in root.iter() for child in parent}
@@ -363,6 +394,61 @@ class InferenceSmoke(Smoke):
     notice_phases = {'candidate-install', 'candidate-startup', 'verified-full-model-fixture',
                      'genuine-external-model-selection'}
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.probe_enabled = False
+        self.probe_preferred = False
+        self.probe_count = 0
+
+    def install_probe(self):
+        if PROBE_APK.is_symlink() or digest(PROBE_APK) != PROBE_SHA256:
+            raise InvariantError('Read-only diagnostic probe does not match its reviewed hash')
+        result = self.adb('install', '--no-streaming', '-t', PROBE_APK, timeout=45)
+        if not re.search(r'^Success\s*$', result.stdout, re.MULTILINE):
+            raise RuntimeError('Diagnostic-only probe installation did not report success')
+        return {'test_only': True, 'package': 'com.codestick.uiprobe',
+                'apk_sha256': PROBE_SHA256, 'customer_apk_unchanged': True}
+
+    def probe_xml(self):
+        if not self.probe_enabled:
+            raise InvariantError('Read-only no-idle probe is limited to the sent-response phase')
+        def identity():
+            pid = self.shell('pidof', PACKAGE, timeout=3, check=False)
+            foreground = self.shell('dumpsys', 'activity', 'activities', timeout=5)
+            resumed = [line.strip()[:240] for line in foreground.splitlines()
+                       if re.search(r'topResumedActivity|mResumedActivity|ResumedActivity', line)]
+            if pid != self.probe_expected_pid or not any(PACKAGE + '/' in line for line in resumed):
+                raise InvariantError('Read-only UI probe lost the original app process/foreground')
+            return {'pid': pid, 'resumed': resumed[-3:]}
+        before = identity()
+        nonce = uuid.uuid4().hex
+        result = self.adb('shell', 'am', 'instrument', '-w', '-r', '-e', 'probe_nonce',
+                          nonce, PROBE_COMPONENT, timeout=40)
+        xml, metadata = decode_result(result.stdout, nonce)
+        metadata['identity_before'], metadata['identity_after'] = before, identity()
+        self.probe_count += 1
+        prefix = f'no-idle-ui-{self.probe_count:03d}'
+        self.write(prefix + '.xml', xml)
+        self.write(prefix + '.json', json.dumps(metadata, indent=2) + '\n')
+        self.results['no_idle_ui_probe'] = {'reads': self.probe_count,
+            'actual_active_package': metadata['probe_active_package'],
+            'actual_xml_sha256': metadata['probe_xml_sha256'], 'method': 'accessibility-no-idle',
+            'customer_app_apk_unchanged': True, 'grants_or_appdata_injected': False}
+        return xml
+
+    def xml(self, maximum=50):
+        if not self.probe_enabled:
+            return super().xml(maximum)
+        if self.probe_preferred:
+            return self.probe_xml()
+        try:
+            return super().xml(min(maximum, 20))
+        except (RuntimeError, subprocess.TimeoutExpired) as error:
+            self.results['normal_dump_before_no_idle_fallback'] = {
+                'error': type(error).__name__ + ': ' + str(error)[:300]}
+            self.probe_preferred = True
+            return self.probe_xml()
+
     def phase(self, label, operation):
         started = time.monotonic()
         try:
@@ -392,10 +478,12 @@ class InferenceSmoke(Smoke):
                 self.write('response-failure-diagnostic.json', json.dumps(diagnostic, indent=2) + '\n')
                 for name, keys in (
                     ('state', ('expected_pid', 'current_pid', 'same_pid', 'foreground', 'ui',
-                               'services', 'slot_metadata', 'snapshot_read_error')),
+                               'ui_dump', 'services', 'slot_metadata', 'snapshot_read_error')),
                     ('snapshot', ('snapshot',)),
-                    ('logs', ('fresh_native_lines', 'native_log_error', 'actual_app_log_ui_lines',
-                              'app_log_ui_error', 'diagnostic_error'))):
+                    ('cpu', ('cpu_samples', 'cpu_sample_error')),
+                    ('logs-native', ('fresh_native_log_groups', 'native_log_error')),
+                    ('logs-ui', ('actual_app_log_ui_lines', 'app_log_ui_dump',
+                                 'app_log_ui_error', 'diagnostic_error'))):
                     part = {key: diagnostic[key] for key in keys if key in diagnostic}
                     report_annotation('error', 'Fresh response failure ' + name + ': '
                                       + json.dumps(part, sort_keys=True, ensure_ascii=False))
@@ -414,12 +502,100 @@ class InferenceTest(_USBTest):
         self._reported_invalid_slot = False
         self.onboarding_character, self.onboarding_revision = None, None
 
+    def _diagnostic_xml(self, diagnostic, key, name):
+        """Preserve real dump output even when CLI exits0 without creating XML."""
+        path = '/sdcard/ai-drive-response-diagnostic.xml'
+        metadata = diagnostic.setdefault(key, {})
+        began = time.monotonic()
+        self.s.shell('rm', '-f', path, timeout=3)
+        try:
+            result = self.s.adb('shell', 'uiautomator', 'dump', path, timeout=15, check=False)
+            metadata.update({'exit_code': result.returncode, 'stdout': result.stdout[:600],
+                             'stderr': result.stderr[:400]})
+        except subprocess.TimeoutExpired as error:
+            def excerpt(value):
+                return (value.decode(errors='replace') if isinstance(value, bytes) else value or '')[:600]
+            metadata.update({'timed_out': True, 'stdout': excerpt(error.stdout), 'stderr': excerpt(error.stderr)})
+        finally:
+            metadata['elapsed_seconds'] = round(time.monotonic() - began, 2)
+        metadata['xml_exists'] = not self.s.adb('shell', 'test', '-f', path,
+                                               timeout=3, check=False).returncode
+        if not metadata['xml_exists'] or metadata.get('exit_code') or metadata.get('timed_out'):
+            if not getattr(self.s, 'probe_enabled', False):
+                raise RuntimeError('Actual UI dump did not create XML; metadata=' + json.dumps(metadata))
+            self.s.probe_preferred = True
+            xml = self.s.probe_xml()
+            metadata['fallback'] = self.s.results.get('no_idle_ui_probe')
+        else:
+            xml = self.s.shell('cat', path, timeout=4)
+        ET.fromstring(xml)
+        self.s.write(name, xml)
+        return xml
+
+    def _cpu_diagnostic(self):
+        pid = self.continuity_pid
+        if not re.fullmatch(r'\d+', pid or ''):
+            return {'unavailable': 'No valid original app PID'}
+
+        def sample():
+            current = self.s.shell('pidof', PACKAGE, timeout=3, check=False)
+            if current != pid:
+                return {'pid': current, 'same_pid': False}
+            raw = self.s.shell('cat', '/proc/' + pid + '/stat', timeout=3, check=False)
+            process = parse_proc_stat(raw)
+            task_raw = self.s.shell('cat', '/proc/' + pid + '/task/[0-9]*/stat', timeout=5, check=False)
+            tasks = []
+            for line in task_raw.splitlines():
+                try:
+                    tasks.append(parse_proc_stat(line))
+                except (ValueError, IndexError):
+                    continue
+            return {'same_pid': True, 'observed_monotonic': time.monotonic(),
+                    'process': process, 'tasks': tasks}
+
+        first = sample()
+        time.sleep(2)
+        second = sample()
+        result = {'requested_interval_seconds': 2, 'same_original_pid': bool(
+            first.get('same_pid') and second.get('same_pid')), 'samples': [
+                {key: item[key] for key in ('same_pid', 'process') if key in item}
+                for item in (first, second)]}
+        if not result['same_original_pid']:
+            return result
+        before, after = first['process'], second['process']
+        result['same_process_start_time'] = before['start_ticks'] == after['start_ticks']
+        if not result['same_process_start_time']:
+            return result
+        result['elapsed_seconds'] = round(second['observed_monotonic'] - first['observed_monotonic'], 3)
+        result['process_cpu_delta_ticks'] = (after['user_ticks'] + after['system_ticks']
+                                             - before['user_ticks'] - before['system_ticks'])
+        previous = {item['pid']: item for item in first['tasks']}
+        top = []
+        for item in second['tasks']:
+            old = previous.get(item['pid'])
+            if old and old['start_ticks'] == item['start_ticks']:
+                top.append({key: item[key] for key in ('pid', 'comm', 'state')} | {'cpu_delta_ticks':
+                    item['user_ticks'] + item['system_ticks'] - old['user_ticks'] - old['system_ticks']})
+        top.sort(key=lambda item: item['cpu_delta_ticks'], reverse=True)
+        result['thread_count_observed'] = len(second['tasks'])
+        result['top_threads'] = top[:5]
+        for item in result['top_threads']:
+            item['wchan'] = self.s.shell('cat', f'/proc/{pid}/task/{item["pid"]}/wchan',
+                                         timeout=2, check=False)[:100]
+        return result
+
     def response_diagnostic(self, diagnostic):
         """Observe the current disposable app after failure, never replay old evidence."""
         xml = None
         diagnostic['expected_pid'] = self.continuity_pid
         pid = self.s.shell('pidof', PACKAGE, timeout=5, check=False)
         diagnostic.update({'current_pid': pid, 'same_pid': pid == self.continuity_pid})
+        try:
+            diagnostic['cpu_samples'] = self._cpu_diagnostic()
+        except BudgetExceeded:
+            raise
+        except Exception as error:
+            diagnostic['cpu_sample_error'] = type(error).__name__ + ': ' + str(error)[:200]
         foreground = self.s.shell('dumpsys', 'activity', 'activities', timeout=8, check=False)
         diagnostic['foreground'] = [line.strip()[:220] for line in foreground.splitlines()
             if re.search(r'topResumedActivity|mResumedActivity|ResumedActivity', line)][-3:]
@@ -433,12 +609,11 @@ class InferenceTest(_USBTest):
             diagnostic['services'] = {'read_error': type(error).__name__}
         try:
             # Bypass _screen's continuity/session guards to record an actual crash UI too.
-            xml = self.s.xml(maximum=15)
-            self.s.write('response-failure-before-navigation.xml', xml)
+            xml = self._diagnostic_xml(diagnostic, 'ui_dump', 'response-failure-before-navigation.xml')
             nodes = list(ET.fromstring(xml).iter('node'))
             labels = list(dict.fromkeys(node.get('text', '') for node in nodes
                           if node.get('text') and _bounds(node)))
-            diagnostic['ui'] = {'labels': [value[:100] for value in labels[:18]],
+            diagnostic['ui'] = {'labels': [value[:90] for value in labels[:16]],
                 'exact_prompt_in_edittext': any(node.get('class') == 'android.widget.EditText'
                     and node.get('text') == self.prompt for node in nodes),
                 'drafts': [node.get('text', '')[:100] for node in nodes
@@ -470,10 +645,7 @@ class InferenceTest(_USBTest):
             if re.fullmatch(r'\d+', self.continuity_pid or ''):
                 log = self.s.shell('logcat', '-d', '--pid', self.continuity_pid,
                                    '-v', 'brief', timeout=8, check=False)
-                diagnostic['fresh_native_lines'] = [line[:220] for line in log.splitlines()
-                    if re.search(r'RNLLAMA|llama|ggml|AndroidRuntime|ReactNativeJS|exception|error|failed|'
-                                 r'background|headless|foregroundservice',
-                                 line, re.I)][-8:]
+                diagnostic['fresh_native_log_groups'] = grouped_native_log(log)
         except BudgetExceeded:
             raise
         except Exception as error:
@@ -484,8 +656,7 @@ class InferenceTest(_USBTest):
             try:
                 self._swipe('right')
                 self._tap('Logs', maximum=8)
-                xml = self.s.xml(maximum=15)
-                self.s.write('response-failure-app-logs.xml', xml)
+                xml = self._diagnostic_xml(diagnostic, 'app_log_ui_dump', 'response-failure-app-logs.xml')
                 diagnostic['actual_app_log_ui_lines'] = [node.get('text', '')[:350]
                     for node in ET.fromstring(xml).iter('node')
                     if re.search(r'\[(?:ERROR|WARN)\]|inference|completion|predict|prompt|generat',
@@ -834,6 +1005,10 @@ class InferenceTest(_USBTest):
                                    for node in ET.fromstring(self._screen()).iter('node')), 15)
             self._hide_keyboard()
             self._icon(SEND)
+            # Observe the real active accessibility tree if continuous animation
+            # prevents UiAutomator's idle gate. No input, grants or appdata changes.
+            self.s.probe_enabled = True
+            self.s.probe_expected_pid = self.continuity_pid
 
             def finished():
                 xml = self._screen()
@@ -958,6 +1133,7 @@ def run(args):
                 test = InferenceTest(smoke)
                 phases = [('candidate-install', lambda: smoke.install(args.candidate, 4)),
                           ('candidate-startup', lambda: smoke.launch('candidate')),
+                          ('read-only-accessibility-probe-install', smoke.install_probe),
                           ('virtual-removable-fixture', test.fixture),
                           ('virtual-removable-saf-grant', test.grant),
                           ('actual-default-ai-bot-onboarding', test.onboarding),
