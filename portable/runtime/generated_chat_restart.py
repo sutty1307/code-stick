@@ -66,6 +66,44 @@ def reply_identity(data, prompt, strict_reply):
             'all_chat_entry_ids': sorted(entry['id'] for entry in entries if entry.get('chat_id') == chat_id)}
 
 
+def _visible_bubble_text(value):
+    """Remove ONE source-inserted LTR textgroup wrapper, only on observed UI.
+
+    Markdown.tsx:279-281 emits LRI + rendered children + PDI for an LTR run.
+    Internal/repeated/unmatched isolates and RTL/multiple runs stay unsupported.
+    Canonical expected text and all native/USB/archive records are unchanged.
+    """
+    if value.startswith('\u2066') and value.endswith('\u2069'):
+        value = value[1:-1]
+    if any(character in value for character in '\u2066\u2067\u2068\u2069'):
+        return None
+    return ' '.join(value.split())
+
+
+def bubble_match_diagnostic(xml, text, maximum=2):
+    """Bounded current matching-text ancestry; never changes the UI predicate."""
+    root = ET.fromstring(xml)
+    parents = {child: parent for parent in root.iter() for child in parent}
+    expected = ' '.join(text.split())
+    matches = []
+    for node in root.iter('node'):
+        if _visible_bubble_text(node.get('text', '')) != expected:
+            continue
+        path, ancestor = [], parents.get(node)
+        for _ in range(5):
+            if ancestor is None:
+                break
+            path.append({key: ancestor.get(key, '')[:64] for key in
+                         ('class', 'clickable', 'enabled', 'bounds')})
+            ancestor = parents.get(ancestor)
+        matches.append({'candidate': {key: node.get(key, '')[:120] for key in
+                        ('class', 'text', 'bounds', 'visible-to-user', 'enabled')},
+                        'ancestor_path': path})
+        if len(matches) >= maximum:
+            break
+    return {'matching_candidates': matches}
+
+
 def exact_bubble_visible(xml, text):
     """Exact TextView inside an actual clickable message bubble, not word bags.
 
@@ -83,7 +121,7 @@ def exact_bubble_visible(xml, text):
         if (node.get('class') != 'android.widget.TextView'
                 or node.get('visible-to-user') == 'false' or not bounds
                 or int(bounds[3]) <= int(bounds[1]) or int(bounds[4]) <= int(bounds[2])
-                or normalized(node.get('text', '')) != expected):
+                or _visible_bubble_text(node.get('text', '')) != expected):
             continue
         ancestor = parents.get(node)
         while ancestor is not None:
@@ -91,7 +129,7 @@ def exact_bubble_visible(xml, text):
                 # Header/avatar names have no message-bubble clickable ancestor.
                 if ancestor.get('enabled') == 'false':
                     break
-                if ancestor.get('class') == 'android.view.View' and not any(
+                if ancestor.get('class') in {'android.view.View', 'android.view.ViewGroup'} and not any(
                         child.get('class') == 'android.widget.EditText' for child in ancestor.iter('node')):
                     return True
                 break
@@ -183,7 +221,21 @@ def run_generated_chat_restart(test, expected_rendered_reply=None):
             if reply_identity(after, test.prompt, strict_after) != expected:
                 raise InvariantError('Restart changed generated chat IDs, raw text, timings, active swipes or archive')
             return after
-        after = test._wait('Exact restored generated chat in actual UI and genuine USB snapshot', restored_chat, 35)
+        try:
+            after = test._wait('Exact restored generated chat in actual UI and genuine USB snapshot', restored_chat, 35)
+        except RuntimeError as error:
+            # The last hierarchy is from this operation's unchanged PID-guarded
+            # UI read. Report actual matching candidate classes/ancestry only.
+            diagnostic = {}
+            try:
+                diagnostic = {'user': bubble_match_diagnostic(test.last_ui, test.prompt),
+                              'assistant': bubble_match_diagnostic(test.last_ui, expected_ui)}
+                test.s.write('generated-chat-restart-bubble-diagnostic.json',
+                             json.dumps(diagnostic, indent=2) + '\n')
+            except Exception as diagnostic_error:
+                diagnostic = {'diagnostic_error': type(diagnostic_error).__name__ + ': ' + str(diagnostic_error)[:160]}
+            raise RuntimeError(str(error) + '; actual matching bubble ancestry=' +
+                               json.dumps(diagnostic, separators=(',', ':'))) from error
         test.s.capture('generated-chat-restored-after-force-stop')
         result = {'generated_chat_restarted_and_restored': True, 'chat_id': expected['chat_id'],
                   'user_entry_id': expected['user_entry_id'], 'assistant_entry_id': expected['assistant_entry_id'],

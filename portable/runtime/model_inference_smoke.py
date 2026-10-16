@@ -1164,6 +1164,7 @@ class InferenceTest(_USBTest):
                 'model_filename': MODEL_FILE, 'cpu_threads': CPU_THREADS,
                 'actual_model_output': reply['text'][:400],
                 'predicted_tokens': reply['timings']['predicted_n'],
+                'native_timings': reply['timings'],
                 'snapshot_revision': reply['revision'], 'physical_phone_tested': False,
                 'model_location': result['model_location']}, sort_keys=True))
             return result

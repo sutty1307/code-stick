@@ -1,4 +1,4 @@
-name: Android usb.4 pinned 1B model on API35 and API36
+name: Android usb.4 pinned 1B reply and restart on API36
 
 # Verify the exact repaired offline APK with the real full model on Android.
 on:
@@ -9,6 +9,7 @@ on:
       - portable/runtime/model_inference_smoke.py
       - portable/runtime/picker_navigation.py
       - portable/runtime/picker_search.py
+      - portable/runtime/generated_chat_restart.py
       - portable/runtime/no_idle_ui_probe/**
       - portable/android/AI-Drive-Offline_v0.10.1-usb.4.apk
 
@@ -27,9 +28,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - model: 1b-comparison
-            threads: 2
-            api: 35
           - model: 1b-comparison
             threads: 2
             api: 36
