@@ -1,0 +1,49 @@
+name: Assemble reviewed Android USB kit draft
+
+# LOCAL PROPOSAL ONLY. Copy to .github/workflows/android-usb-draft-1b.yml only after
+# runtime evidence and final candidate seed have been reviewed. No main changes.
+on:
+  push:
+    branches: [portable/android-usb-download]
+    paths:
+      - portable/android-release-seed/v0.10.1-usb.4-1b/**
+      - portable/scripts/assemble_and_draft_usb4.py
+      - portable/scripts/model_profile.py
+      - portable/model-profiles/llama32-1b-q4km.json
+      - .github/workflows/android-usb-draft-1b.yml
+
+permissions: {}
+
+concurrency:
+  group: android-usb-draft-v0.10.1-usb.4-1b
+  cancel-in-progress: false
+
+jobs:
+  complete-kit:
+    if: github.repository == 'sutty1307/code-stick' && github.ref == 'refs/heads/portable/android-usb-download'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    permissions:
+      contents: write
+    steps:
+      - name: Check out only the reviewed candidate commit
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Verify seed, download pinned model and validate complete ZIP
+        run: >-
+          python3 portable/scripts/assemble_and_draft_usb4.py
+          --model-profile portable/model-profiles/llama32-1b-q4km.json assemble
+          --seed portable/android-release-seed/v0.10.1-usb.4-1b
+          --output delivery-output-1b
+      - name: Create or resume the same draft prerelease and upload verified files
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          python3 portable/scripts/assemble_and_draft_usb4.py
+          --model-profile portable/model-profiles/llama32-1b-q4km.json draft
+          --output delivery-output-1b
+          --target "$GITHUB_SHA"
+          --create-draft

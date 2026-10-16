@@ -1,0 +1,29 @@
+SELECTED MODEL — REFERENCE AND INTEGRITY
+
+Built with Llama.
+Model: Llama 3.2 1B Instruct Abliterated
+Quantization: Q4_K_M
+Quantized by: mradermacher
+Declared modified base: huihui-ai/Llama-3.2-1B-Instruct-abliterated
+File: Llama-3.2-1B-Instruct-abliterated.Q4_K_M.gguf
+Bytes: 955445792
+SHA-256: 68336c25367576f49b29f01ee9034658b51bbded6a7f215e934d997de96301e0
+Repository: mradermacher/Llama-3.2-1B-Instruct-abliterated-GGUF
+Pinned revision: becf36858832feddfea0ace2fabf791797571999
+Pinned public model URL:
+https://huggingface.co/mradermacher/Llama-3.2-1B-Instruct-abliterated-GGUF/resolve/becf36858832feddfea0ace2fabf791797571999/Llama-3.2-1B-Instruct-abliterated.Q4_K_M.gguf?download=true
+
+The completed kit ZIP includes this full file in models. Keep the whole kit
+folder together; this reference does not replace the complete kit download.
+In the app, use Choose a model > document-plus > Use External Model.
+Select the file above; use Max Context 1024, Threads 2, Batch 16.
+
+The pinned quantizer model card is MODEL-CARD.md. It declares huihui-ai lineage;
+the base repository contents/revision were not independently verified because
+ordinary public API access returned 401. See MODEL-PROVENANCE.json.
+
+The complete file size and SHA-256 were checked against the pinned publisher
+metadata. Linux CPU inference is separate from Android app reply evidence.
+See ../APP-VALIDATION.json for the actual tested app/model scope.
+LLAMA-3.2-LICENSE.txt contains the full Meta Llama 3.2 Community License.
+NOTICE.txt preserves the required Meta attribution.

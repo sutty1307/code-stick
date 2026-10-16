@@ -1,10 +1,10 @@
 # Android downloads: AI Drive Offline
 
-**Complete Android USB kit is being repaired; no finished complete-kit download yet.**
+**The complete Android USB kit is being assembled and checked; its download is not public yet.**
 
 Real AI replies using **Llama 3.2 1B Instruct Abliterated** have passed on
-Android 15 and 16 emulators. The generated-chat restart check is still being
-verified. The installer below is available for app installation only; it does
+Android 15 and 16 emulators. The generated-chat restart check has now passed on
+Android 16 too. The installer below is available for app installation only; it does
 not contain the model or the complete USB kit.
 
 **[Download the Android app installer — usb.4, 67.7 MB](https://github.com/sutty1307/code-stick/raw/refs/heads/repair/android-runtime-usb4/portable/android/AI-Drive-Offline_v0.10.1-usb.4.apk)**
@@ -19,9 +19,9 @@ not contain the model or the complete USB kit.
    install and open the app manually; connecting a USB drive does not start it.
 
 App installation, USB preference/note persistence and actual model replies have
-passed emulator tests. The complete generated-chat restart check has not passed
-yet. A physical phone and physical USB drive remain untested.
-[Recorded Android model tests](https://github.com/sutty1307/code-stick/actions/runs/38878627822).
+passed emulator tests. The exact generated conversation was also restored after
+force-stop/relaunch. A physical phone and physical USB drive remain untested.
+[Recorded Android model tests](https://github.com/sutty1307/code-stick/actions/runs/38880538406).
 
 ## Picture guide
 
@@ -29,8 +29,8 @@ yet. A physical phone and physical USB drive remain untested.
 
 These are illustrations, not actual screenshots. They show the intended steps
 **after the app and model files are already on a USB drive**. Those prepared files
-are not offered as a finished kit here; generated-chat restart verification
-is still in progress.
+are not offered as a finished kit here yet; the complete ZIP download is being
+assembled and checked.
 For the installer downloaded above, use **Files > Downloads** as described above.
 
 ![First install on an Android phone, with files already on the USB drive](pictures/First-Install-usb4.png)

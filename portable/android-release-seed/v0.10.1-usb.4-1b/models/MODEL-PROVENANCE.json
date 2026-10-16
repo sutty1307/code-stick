@@ -1,0 +1,108 @@
+{
+  "format_version": 1,
+  "scope": "Selected 1B model provenance; actual one-chat Android emulator reply/restart validation recorded separately from Linux smoke and physical-device scope",
+  "model": {
+    "name": "Llama 3.2 1B Instruct Abliterated",
+    "filename": "Llama-3.2-1B-Instruct-abliterated.Q4_K_M.gguf",
+    "quantization": "Q4_K_M",
+    "size_bytes": 955445792,
+    "sha256": "68336c25367576f49b29f01ee9034658b51bbded6a7f215e934d997de96301e0",
+    "repository": "mradermacher/Llama-3.2-1B-Instruct-abliterated-GGUF",
+    "quantization_publisher": "mradermacher",
+    "revision": "becf36858832feddfea0ace2fabf791797571999",
+    "download_url": "https://huggingface.co/mradermacher/Llama-3.2-1B-Instruct-abliterated-GGUF/resolve/becf36858832feddfea0ace2fabf791797571999/Llama-3.2-1B-Instruct-abliterated.Q4_K_M.gguf?download=true"
+  },
+  "lineage": {
+    "declared_modified_base": "huihui-ai/Llama-3.2-1B-Instruct-abliterated",
+    "declaration_source": "models/MODEL-CARD.md",
+    "base_contents_or_revision_independently_verified": false,
+    "limitation": "Pinned quantizer README declares the base; ordinary public base API access returned 401."
+  },
+  "integrity": {
+    "full_file_size_verified": true,
+    "full_file_sha256_verified": true,
+    "pinned_publisher_metadata_matched": true,
+    "gguf_architecture": "llama",
+    "gguf_size_label": "1B"
+  },
+  "quantizer_model_card": {
+    "path": "models/MODEL-CARD.md",
+    "sha256": "a2c3b545873ba32d3522f922294c2332d91a22d5cc711dbae8455a4c1bf7fd6b",
+    "source_url": "https://huggingface.co/mradermacher/Llama-3.2-1B-Instruct-abliterated-GGUF/raw/becf36858832feddfea0ace2fabf791797571999/README.md"
+  },
+  "license": {
+    "name": "Llama 3.2 Community License",
+    "path": "models/LLAMA-3.2-LICENSE.txt",
+    "sha256": "8cc15535a8a34b41888f644b339a1a9eb428af793a4f5e24df58a3e5b1487d74",
+    "source_url": "https://raw.githubusercontent.com/meta-llama/llama-models/8d29d93fa5700a60532e0061a02ffa89d0acd3fc/models/llama3_2/LICENSE",
+    "source_commit": "8d29d93fa5700a60532e0061a02ffa89d0acd3fc",
+    "notice_path": "models/NOTICE.txt",
+    "notice_sha256": "3bc2d1a6b360a03d172058198631b931c9aadf01650892fb0d25b93c6b8f0025",
+    "product_attribution": "Built with Llama"
+  },
+  "linux_cpu_smoke": {
+    "environment": "Linux x86_64 CPU",
+    "llama_cpp_build": "b11429",
+    "exact_model_sha256": "68336c25367576f49b29f01ee9034658b51bbded6a7f215e934d997de96301e0",
+    "actual_inference_observed": true,
+    "exit_code": 0,
+    "prompt": "Say hello in three words.",
+    "actual_reply": "Hello.",
+    "three_word_instruction_followed": false,
+    "context_tokens": 1024,
+    "cpu_threads": 2,
+    "batch_tokens": 16,
+    "android_execution_evidence": false,
+    "phone_performance_evidence": false
+  },
+  "android_app_validation": {
+    "status": "passed",
+    "scope": "One generated chat in Android API 36 emulator with ARM64 translation; model in public phone Download and memory on disposable virtual removable disk",
+    "reply_or_generated_chat_restart_pass_established": true,
+    "native_reply_and_same_generated_chat_restart_passed": true,
+    "run_id": 38880538406,
+    "run_url": "https://github.com/sutty1307/code-stick/actions/runs/38880538406",
+    "test_commit": "868c30e2fc84dfc0b6b2a3e826d4724d093cc8d4",
+    "job_id": 116905926139,
+    "job_conclusion": "success",
+    "actual_model_output": "session inference 590ddeb14a",
+    "predicted_tokens": 7,
+    "native_timings": {
+      "cache_n": 81,
+      "predicted_ms": 9926.456999999999,
+      "predicted_n": 7,
+      "predicted_per_second": 0.7051861505066712,
+      "predicted_per_token_ms": 1418.0652857142854,
+      "prompt_ms": 165209.689,
+      "prompt_n": 73,
+      "prompt_per_second": 0.4418627045536052,
+      "prompt_per_token_ms": 2263.146424657534
+    },
+    "reply_snapshot_revision": 17,
+    "restart_snapshot_revision_before": 17,
+    "restart_snapshot_revision_after": 18,
+    "old_pid": "4154",
+    "new_pid": "10038",
+    "restart_elapsed_seconds": 11.15,
+    "actual_user_and_assistant_bubbles_visible": true,
+    "exact_timings_swipes_archive_preserved": true,
+    "app_data_cleared": false,
+    "grants_changed": false,
+    "all_conversations_migration_tested": false,
+    "actual_evidence_document": "APP-VALIDATION.json",
+    "physical_phone_tested": false,
+    "physical_usb_tested": false,
+    "physical_sd_tested": false,
+    "model_on_removable_storage_tested": false,
+    "media_durability_android_tested": false,
+    "retail_readiness_established": false
+  },
+  "app_pins": {
+    "version": "0.10.1-usb.4",
+    "apk_filename": "AI-Drive-Offline_v0.10.1-usb.4.apk",
+    "apk_sha256": "c833e55ff089903f3bc0e084f10b91516590fa5d9945138723e4ba466508d549",
+    "source_filename": "AI-Drive-Offline-v0.10.1-usb.4-source.zip",
+    "source_sha256": "1a775d19b53faa8556a295880c303ef5e5f17bf1682d669c59ce79203072722e",
+    "app_or_source_rebuilt_for_overlay": false
+  }
+}
