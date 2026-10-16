@@ -1,123 +1,45 @@
 # Android downloads: AI Drive Offline
 
-This preview is for an ARM64 Android phone (Android 7 or newer). It includes
-local Llama inference, automatic USB/SD memory, and offline calculator and note
-tools. It has no Internet permission. Android requires you to install and open
-the app; plugging in a USB drive does not automatically launch it.
+**Complete Android USB kit is being repaired; no finished complete-kit download yet.**
 
-## Downloads
+An AI reply on Android has **not been verified**. The installer below is available
+for app installation only. The APK does **not** contain a model or the complete
+USB kit.
 
-- [Android installer — 67.7 MB](https://github.com/sutty1307/code-stick/raw/refs/heads/portable/android-usb-download/portable/android/AI-Drive-Offline_v0.10.1-usb.1.apk)
-- [Llama 3.2 3B Instruct Abliterated model — 2.02 GB](https://huggingface.co/QuantFactory/Llama-3.2-3B-Instruct-abliterated-GGUF/resolve/120d74373f679f9d9e0463b435dfd3fb802d9eb0/Llama-3.2-3B-Instruct-abliterated.Q4_K_M.gguf?download=true)
-- [Four-page picture guide](Android-AI-Drive-Picture-Guide.pdf)
+**[Download the Android app installer — usb.4, 67.7 MB](https://github.com/sutty1307/code-stick/raw/refs/heads/repair/android-runtime-usb4/portable/android/AI-Drive-Offline_v0.10.1-usb.4.apk)**
 
+1. Open this page in **Chrome on the Android phone** and tap the installer link.
+2. When the download finishes, open **Files > Downloads** and tap
+   `AI-Drive-Offline_v0.10.1-usb.4.apk`.
+3. If Android asks, tap **Settings > Allow from this source**, then go back and
+   tap **Install > Open**. The permission may be for Files or Chrome, depending
+   on which app opened the APK.
+4. Open **AI Drive Offline**. No account is required. Android requires you to
+   install and open the app manually; connecting a USB drive does not start it.
 
-## Set up from these downloads
+App installation and USB memory tests passed in an Android emulator. The AI reply
+test has **not passed**. A physical phone and physical USB drive remain untested.
+Installing this APK does not establish that offline AI chat works.
 
-Use the Android phone for these steps. If you are reading on an iPhone, open
-these instructions on the Android phone you will use with the drive.
+## Picture guide
 
-### Installation picture for separately downloaded app
+[Open or download the two-page picture guide (PDF)](https://github.com/sutty1307/code-stick/raw/refs/heads/portable/android-usb-download/portable/android/Android-AI-Drive-Picture-Guide-usb4.pdf)
 
-![Install the downloaded Android app](pictures/Install-from-Downloads.png)
+These are illustrations, not actual screenshots. They show the intended steps
+**after the app and model files are already on a USB drive**. Those prepared files
+are not offered as a finished kit here, and a full model reply is not verified.
+For the installer downloaded above, use **Files > Downloads** as described above.
 
-1. On Android, tap **Android installer** above and wait for the download.
-   Open **Files > Downloads** and tap `AI-Drive-Offline_v0.10.1-usb.1.apk`.
-2. If Android blocks installation, tap **Settings**, enable **Allow from this
-   source** for the app opening the file, then go Back. Tap **Install > Open**.
-   The permission may be for Files or Chrome, depending on how you opened it.
-3. Connect the USB drive or SD-card reader to Android. In Files, open that
-   removable drive and create one folder named **AI-Drive**.
-4. Tap the **Llama model** download above. When it finishes, find the `.gguf`
-   file in **Files > Downloads** and copy it into **USB drive > AI-Drive**.
-   Wait for the copy to finish. The model is about 2 GB; it is a separate download
-   from the installer.
-5. Open **AI Drive Offline > menu > Drive Memory > Choose USB memory folder**.
-   Select **USB drive > AI-Drive**, then tap **Use this folder > Allow**.
-   Wait for **Drive connected** and **Verified save #**.
-6. Open **menu > Models**. Tap the document-plus icon, then **Use External
-   Model**. Select the `.gguf` inside **USB drive > AI-Drive**.
-7. In Models, tap the bottom **Settings** tab, set **Max Context** to **2048**,
-   then return to the **Models** tab. Tap the circular play button beside the
-   model and wait for **Model Loaded**. Go Back to the home list, open **AI Bot**,
-   and send a message. Keep the drive connected.
+![First install on an Android phone, with files already on the USB drive](pictures/First-Install-usb4.png)
 
-The picture guide starts after drive insertion and shows an `Android-Drive-Kit`
-folder with separate `apps` and `models` folders on prepared sticks. The separate
-downloads do not create those folders. For this setup, use the single
-**AI-Drive** folder above; the pictured folder hierarchy is optional.
-If the drive is unavailable or a save fails, resolve the visible error before
-disconnecting the session.
+![Intended steps after plugging in the prepared USB drive; AI replies remain unverified](pictures/After-You-Plug-It-In-usb4.png)
 
-## Picture guide for a prepared Android-Drive-Kit stick
+## File verification and source
 
-These pictures assume an `Android-Drive-Kit` folder on the USB drive, with the
-installer in `apps` and the model in the separate `models` folder. For separately
-downloaded files, follow the **Downloads** and **AI-Drive** instructions above.
-The screens are illustrations; wording may vary on your phone.
+Installer: **67,666,025 bytes**. SHA-256:
+`c833e55ff089903f3bc0e084f10b91516590fa5d9945138723e4ba466508d549`.
 
-### 1. Install the app and connect USB memory
-
-![Picture guide page 1: install the app and choose the USB memory folder](pictures/Page-1.png)
-
-### 2. Select the model and start chatting
-
-![Picture guide page 2: select the model, load it and send a message](pictures/Page-2.png)
-
-### 3. Use memory and offline tools
-
-![Picture guide page 3: review memories, continue chats and use offline tools](pictures/Page-3.png)
-
-### 4. Save, disconnect and return
-
-![Picture guide page 4: safely disconnect, return to the same drive and get help](pictures/Page-4.png)
-
-## What is remembered
-
-Full chats, alternate replies, preferences, explicit facts, notes, profiles,
-and personal assets automatically save to the selected removable folder.
-Settings and the conversation database operate in RAM; personal attachments use
-disposable cache mirrored into USB snapshots. You can reconnect the same drive
-on another compatible phone and select its memory folder again. Model file
-permissions are specific to each phone and may need to be selected again.
-
-Memory files are unencrypted. Visible storage limits apply, and there is no
-automatic phone or cloud fallback. The complete stored history is distinct
-from the limited context that can fit into a model prompt.
-
-## Validation and source
-
-- [Corresponding modified application source](AI-Drive-Offline-v0.10.1-usb.1-source.zip)
-- [Application license](AI-Drive-Offline-AGPL-3.0.txt)
-- [Llama license](Llama-3.2-Community-License.txt) and [required attribution](Llama-3.2-NOTICE.txt)
-- [File checksums](DOWNLOADS-SHA256.json)
-- [Detailed USB memory and tools documentation](USB-MEMORY-AND-TOOLS.md)
-- [Installer build provenance](AI-Drive-Offline_v0.10.1-usb.1.build.json)
-
-149 software tests and the TypeScript check passed. The installer signature,
-alignment, and absence of Internet permission were checked. The full model was
-verified against its publisher digest and ran on a cloud CPU. Physical Android
-installation, USB detach/reconnect, inference performance, and retail readiness
-remain untested.
-
-The APK contains newly compiled application source with the verified matching
-publisher native runtime. Full native recompilation was blocked by Maven
-transport errors. Both build paths, the prominent modification notice dated
-2026-10-11, and corresponding application source are in the source archive.
-Private signing keys are excluded. See the build provenance for exact inputs.
-
-Installer SHA-256:
-`937b9d098130525d72dbbbf428868c4a66794927a801fe55d6a8899278cb28e2`.
-
-Model SHA-256:
-`e1f2b428e316d8bd1cb5ca13e9649329e299d951fbcee6b3cd0e9f1d646c9fa7`.
-
-Built with Llama.
-
-Llama 3.2 is licensed under the Llama 3.2 Community License,
-Copyright © Meta Platforms, Inc. All Rights Reserved.
-
-These files are on a dedicated distribution branch of `sutty1307/code-stick`;
-the original `main` application files have not been changed. The complete 2.1 GB
-USB kit exists in the development environment but is not a hosted release
-asset. The two direct downloads above provide the Android app and full model.
+For developers: [corresponding modified application source](https://github.com/sutty1307/code-stick/raw/refs/heads/repair/android-runtime-usb4/portable/android/AI-Drive-Offline-v0.10.1-usb.4-source.zip)
+and [AGPL-3.0 license](AI-Drive-Offline-AGPL-3.0.txt). You do not need the source
+archive to install the app. Source archive: **3,811,006 bytes**. SHA-256:
+`1a775d19b53faa8556a295880c303ef5e5f17bf1682d669c59ce79203072722e`.
