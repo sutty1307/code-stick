@@ -248,6 +248,83 @@ def visible_reply_words(text):
     return text.split()
 
 
+def response_snapshot_diagnostic(data, prompt, baseline_ids):
+    """Explain the unchanged strict reply gate using only the fresh fixture rows."""
+    result = {'snapshot_revision': data.get('revision')}
+    entries, swipes = rows(data, 'chat_entries'), rows(data, 'chat_swipes')
+    users = [entry for entry in entries if entry.get('is_user') == 1 and any(
+        swipe.get('entry_id') == entry.get('id') and swipe.get('active') == 1
+        and swipe.get('swipe') == prompt for swipe in swipes)]
+    result['exact_prompt_user_count'] = len(users)
+    result['baseline_entry_count'] = len(baseline_ids)
+    result['new_entries'] = []
+    user = users[0] if len(users) == 1 else None
+    for entry in entries:
+        if str(entry.get('id')) in baseline_ids:
+            continue
+        item = {key: entry.get(key) for key in ('id', 'chat_id', 'is_user', 'swipe_id')}
+        item['after_unique_prompt_same_chat'] = bool(user and entry.get('chat_id') == user.get('chat_id')
+            and type(entry.get('id')) is int and entry['id'] > user['id'])
+        item['swipes'] = []
+        for swipe in swipes:
+            if swipe.get('entry_id') != entry.get('id'):
+                continue
+            text = swipe.get('swipe')
+            timing = swipe.get('timings')
+            detail = {key: swipe.get(key) for key in ('id', 'active', 'gen_started', 'gen_finished')}
+            detail.update({'text_type': type(text).__name__,
+                           'text_characters': len(text) if isinstance(text, str) else None,
+                           'text_excerpt': text[:240] if isinstance(text, str) else None,
+                           'timings_raw_type': type(timing).__name__})
+            if isinstance(timing, str):
+                try:
+                    timing = json.loads(timing)
+                except (ValueError, TypeError) as error:
+                    detail['timings_parse_error'] = str(error)[:180]
+            if isinstance(timing, dict):
+                detail['timings'] = {key: timing.get(key) for key in (
+                    'predicted_n', 'predicted_ms', 'prompt_n', 'prompt_ms',
+                    'predicted_per_second', 'prompt_per_second')}
+            archive = [conversation for conversation in data.get('conversations', [])
+                       if conversation.get('id') == str(entry.get('chat_id'))]
+            detail['archive_count'] = len(archive)
+            messages = archive[0].get('messages', []) if len(archive) == 1 else []
+            detail['exact_entry_archived'] = any(message.get('id') == str(entry.get('id'))
+                and message.get('text') == text
+                and message.get('role') == ('user' if entry.get('is_user') == 1 else 'assistant')
+                for message in messages)
+            item['swipes'].append(detail)
+        item['swipes_omitted'] = max(0, len(item['swipes']) - 2)
+        item['swipes'] = item['swipes'][:2]
+        result['new_entries'].append(item)
+    result['new_entries_omitted'] = max(0, len(result['new_entries']) - 4)
+    result['new_entries'] = result['new_entries'][:4]
+    try:
+        reply = completed_reply(data, prompt, baseline_ids)
+        result['strict_native_and_durable_gate_satisfied'] = bool(reply)
+        if reply:
+            result['verified_reply_excerpt'] = reply['text'][:240]
+    except Exception as error:
+        result['strict_gate_error'] = type(error).__name__ + ': ' + str(error)[:240]
+    for key, name in ((ENGINE_KEY, 'engine'), (SAMPLER_KEY, 'sampler')):
+        try:
+            state = preference(data, key)
+            if name == 'engine':
+                config = (state or {}).get('config', {})
+                model = (state or {}).get('lastModel') or {}
+                result['engine'] = {'config': {key: config.get(key) for key in (
+                    'context_length', 'threads', 'batch', 'gpu_layers', 'devices')},
+                    'lastModel': {key: model.get(key) for key in ('id', 'name', 'file')}}
+            elif isinstance(state, dict):
+                values, index = state.get('configList', []), state.get('currentConfigIndex')
+                result['sampler'] = {'currentConfigIndex': index,
+                    'genamt': values[index].get('data', {}).get('genamt')
+                    if type(index) is int and 0 <= index < len(values) else None}
+        except Exception as error:
+            result[name + '_preference_error'] = type(error).__name__ + ': ' + str(error)[:180]
+    return result
+
+
 def icon_target(xml, glyph, header=False):
     root = ET.fromstring(xml)
     parents = {child: parent for parent in root.iter() for child in parent}
@@ -300,6 +377,28 @@ class InferenceSmoke(Smoke):
             self.results['phases'][label] = {'passed': False,
                 'elapsed_seconds': round(time.monotonic() - started, 2), 'error': str(error)}
             report_annotation('error', f'{label}: {type(error).__name__}: {error}')
+            # The operation's 300s alarm has exited. This separate failure-only
+            # budget observes fresh state; it cannot turn the failed gate green.
+            owner = getattr(operation, '__self__', None)
+            if label == 'real-short-model-response' and isinstance(owner, InferenceTest):
+                diagnostic = {}
+                try:
+                    with budget(90):
+                        owner.response_diagnostic(diagnostic)
+                except Exception as diagnostic_error:
+                    diagnostic['diagnostic_error'] = (type(diagnostic_error).__name__ + ': '
+                                                       + str(diagnostic_error)[:240])
+                self.results['response_failure_diagnostic'] = diagnostic
+                self.write('response-failure-diagnostic.json', json.dumps(diagnostic, indent=2) + '\n')
+                for name, keys in (
+                    ('state', ('expected_pid', 'current_pid', 'same_pid', 'foreground', 'ui',
+                               'services', 'slot_metadata', 'snapshot_read_error')),
+                    ('snapshot', ('snapshot',)),
+                    ('logs', ('fresh_native_lines', 'native_log_error', 'actual_app_log_ui_lines',
+                              'app_log_ui_error', 'diagnostic_error'))):
+                    part = {key: diagnostic[key] for key in keys if key in diagnostic}
+                    report_annotation('error', 'Fresh response failure ' + name + ': '
+                                      + json.dumps(part, sort_keys=True, ensure_ascii=False))
             return False
         finally:
             self.capture(label)
@@ -314,6 +413,87 @@ class InferenceTest(_USBTest):
         self.last_slot_diagnostics, self._last_diagnostic_text = {}, None
         self._reported_invalid_slot = False
         self.onboarding_character, self.onboarding_revision = None, None
+
+    def response_diagnostic(self, diagnostic):
+        """Observe the current disposable app after failure, never replay old evidence."""
+        xml = None
+        diagnostic['expected_pid'] = self.continuity_pid
+        pid = self.s.shell('pidof', PACKAGE, timeout=5, check=False)
+        diagnostic.update({'current_pid': pid, 'same_pid': pid == self.continuity_pid})
+        foreground = self.s.shell('dumpsys', 'activity', 'activities', timeout=8, check=False)
+        diagnostic['foreground'] = [line.strip()[:220] for line in foreground.splitlines()
+            if re.search(r'topResumedActivity|mResumedActivity|ResumedActivity', line)][-3:]
+        try:
+            services = self.s.shell('dumpsys', 'activity', 'services', PACKAGE, timeout=5, check=False)
+            diagnostic['services'] = [line.strip()[:180] for line in services.splitlines()
+                if re.search(r'ServiceRecord|isForeground|foregroundId|background|headless', line, re.I)][-5:]
+        except BudgetExceeded:
+            raise
+        except Exception as error:
+            diagnostic['services'] = {'read_error': type(error).__name__}
+        try:
+            # Bypass _screen's continuity/session guards to record an actual crash UI too.
+            xml = self.s.xml(maximum=15)
+            self.s.write('response-failure-before-navigation.xml', xml)
+            nodes = list(ET.fromstring(xml).iter('node'))
+            labels = list(dict.fromkeys(node.get('text', '') for node in nodes
+                          if node.get('text') and _bounds(node)))
+            diagnostic['ui'] = {'labels': [value[:100] for value in labels[:18]],
+                'exact_prompt_in_edittext': any(node.get('class') == 'android.widget.EditText'
+                    and node.get('text') == self.prompt for node in nodes),
+                'drafts': [node.get('text', '')[:100] for node in nodes
+                           if node.get('class') == 'android.widget.EditText'][:2],
+                'send_visible': bool(icon_target(xml, SEND)),
+                'stop_visible': bool(icon_target(xml, STOP))}
+        except BudgetExceeded:
+            raise
+        except Exception as error:
+            diagnostic['ui'] = {'read_error': type(error).__name__ + ': ' + str(error)[:180]}
+        try:
+            data = self._snapshots()
+            diagnostic['snapshot'] = response_snapshot_diagnostic(data, self.prompt, self.baseline_ids)
+            diagnostic['snapshot']['revision_before_send'] = self.current_revision
+            if xml and diagnostic['snapshot'].get('strict_native_and_durable_gate_satisfied'):
+                words = visible_reply_words(completed_reply(data, self.prompt, self.baseline_ids)['text'])
+                rendered = ' '.join(node.get('text', '') for node in ET.fromstring(xml).iter('node'))
+                diagnostic['snapshot']['rendered_words_gate_satisfied'] = bool(words) and all(
+                    word in rendered for word in words)
+                diagnostic['snapshot']['missing_rendered_words'] = [word[:60] for word in words
+                                                                   if word not in rendered][:8]
+        except BudgetExceeded:
+            raise
+        except Exception as error:
+            diagnostic['snapshot_read_error'] = type(error).__name__ + ': ' + str(error)[:240]
+        diagnostic['slot_metadata'] = self.last_slot_diagnostics
+        try:
+            # Same original PID only; never mix a replacement process into the evidence.
+            if re.fullmatch(r'\d+', self.continuity_pid or ''):
+                log = self.s.shell('logcat', '-d', '--pid', self.continuity_pid,
+                                   '-v', 'brief', timeout=8, check=False)
+                diagnostic['fresh_native_lines'] = [line[:220] for line in log.splitlines()
+                    if re.search(r'RNLLAMA|llama|ggml|AndroidRuntime|ReactNativeJS|exception|error|failed|'
+                                 r'background|headless|foregroundservice',
+                                 line, re.I)][-8:]
+        except BudgetExceeded:
+            raise
+        except Exception as error:
+            diagnostic['native_log_error'] = type(error).__name__ + ': ' + str(error)[:180]
+        # Production removes Logger.console.log. Read its actual current Logs UI;
+        # the original chat screen and snapshots are recorded before navigation.
+        if pid == self.continuity_pid:
+            try:
+                self._swipe('right')
+                self._tap('Logs', maximum=8)
+                xml = self.s.xml(maximum=15)
+                self.s.write('response-failure-app-logs.xml', xml)
+                diagnostic['actual_app_log_ui_lines'] = [node.get('text', '')[:350]
+                    for node in ET.fromstring(xml).iter('node')
+                    if re.search(r'\[(?:ERROR|WARN)\]|inference|completion|predict|prompt|generat',
+                                 node.get('text', ''), re.I)][-8:]
+            except BudgetExceeded:
+                raise
+            except Exception as error:
+                diagnostic['app_log_ui_error'] = type(error).__name__ + ': ' + str(error)[:180]
 
     def onboarding(self):
         """Cheap real Home/default-card gate before model download or inference."""
