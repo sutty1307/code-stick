@@ -19,6 +19,7 @@ FILE_LIST_CLASSES = {
     'android.support.v7.widget.RecyclerView',
     'android.widget.GridView',
     'android.widget.ListView',
+    'android.widget.ScrollView',  # Actual API35 DocumentsUI hierarchy in run38875547356.
 }
 
 

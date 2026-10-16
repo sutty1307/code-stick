@@ -18,6 +18,19 @@ def screen(download_y=None, overflow=6000, extra='', rotation='0'):
 
 
 class PickerTests(unittest.TestCase):
+    def test_observed_api35_vertical_scrollview_with_horizontal_breadcrumb(self):
+        # Real run38875547356 exposed this class and these screen bounds.
+        xml = ('<hierarchy rotation="0"><node package="com.google.android.documentsui" '
+               'class="android.widget.ScrollView" scrollable="true" bounds="[0,63][1080,1920]">'
+               '<node package="com.google.android.documentsui" class="android.widget.HorizontalScrollView" '
+               'scrollable="true" bounds="[0,315][1080,441]">'
+               '<node package="com.google.android.documentsui" class="android.widget.TextView" '
+               'text="Files on sdk_gphone64_x86_64" bounds="[30,320][700,400]"/></node>'
+               '<node package="com.google.android.documentsui" class="android.widget.TextView" '
+               'text="Alarms" bounds="[30,500][330,550]"/></node></hierarchy>')
+        self.assertEqual(visible_scroll_bounds(xml, 1080, 1920), (0, 63, 1080, 1920))
+        self.assertEqual(visible_scroll_target(xml, 1080, 1920), (540, 1455, 540, 527))
+
     def test_offscreen_extents_never_expand_real_display_or_swipe(self):
         xml = screen(download_y=5000)
         self.assertEqual(display_dimensions('Physical size: 1080x1920', xml), (1080, 1920))
